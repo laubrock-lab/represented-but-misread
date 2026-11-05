@@ -13,11 +13,20 @@ Usage
     python prepare_texts.py                 # both corpora, experiment subset
     python prepare_texts.py --corpus chat   # chats only
     python prepare_texts.py --all-generators
+    python prepare_texts.py --corpus chat --truncate-words 20    # length control
+    python prepare_texts.py --corpus journalism --windows 80     # length control
+
+Length control: --truncate-words N keeps the first N words of every text and
+drops texts with fewer than N words; --windows N cuts every text into
+non-overlapping N-word windows (the remainder is discarded). Windows keep
+their source_id, so grouped CV still treats the source as the unit.
+Original whitespace and line breaks inside the kept span are preserved.
 """
 
 from __future__ import annotations
 
 import argparse
+import re
 
 import pandas as pd
 
@@ -104,20 +113,61 @@ def _finish(rows: list[dict]) -> pd.DataFrame:
     return out
 
 
+def _word_spans(text: str) -> list[re.Match]:
+    return list(re.finditer(r"\S+", text))
+
+
+def truncate_words(df: pd.DataFrame, n: int) -> pd.DataFrame:
+    rows = []
+    for r in df.to_dict("records"):
+        w = _word_spans(r["text"])
+        if len(w) >= n:
+            rows.append(r | dict(text=r["text"][:w[n - 1].end()]))
+    return pd.DataFrame(rows)
+
+
+def windows(df: pd.DataFrame, n: int) -> pd.DataFrame:
+    rows = []
+    for r in df.to_dict("records"):
+        w = _word_spans(r["text"])
+        for k in range(len(w) // n):
+            rows.append(r | dict(text_id=f"{r['text_id']}__w{k:02d}", parent_id=r["text_id"],
+                                 window=k, text=r["text"][w[k * n].start():w[k * n + n - 1].end()]))
+    return pd.DataFrame(rows)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--corpus", choices=["chat", "journalism", "both"], default="both")
     ap.add_argument("--all-generators", action="store_true",
                     help="include generators/models not used in the human experiment")
+    lc = ap.add_mutually_exclusive_group()
+    lc.add_argument("--truncate-words", type=int, metavar="N",
+                    help="keep the first N words; drop shorter texts")
+    lc.add_argument("--windows", type=int, metavar="N",
+                    help="non-overlapping N-word windows per text")
     args = ap.parse_args()
 
     config.DATA_DIR.mkdir(exist_ok=True)
     loaders = {"chat": load_chats, "journalism": load_journalism}
     corpora = ["chat", "journalism"] if args.corpus == "both" else [args.corpus]
     suffix = "_all" if args.all_generators else ""
+    if args.truncate_words:
+        suffix += f"_tw{args.truncate_words}"
+    elif args.windows:
+        suffix += f"_win{args.windows}"
     for corpus in corpora:
         df = loaders[corpus](args.all_generators)
+        n_before = df.groupby("prompt_type").size().to_dict()
+        if args.truncate_words:
+            df = truncate_words(df, args.truncate_words)
+            print(f"{corpus}: truncated to {args.truncate_words} words; texts per type "
+                  f"before -> after: {n_before} -> {df.groupby('prompt_type').size().to_dict()}")
+        elif args.windows:
+            df = windows(df, args.windows)
+            print(f"{corpus}: {args.windows}-word windows per type: "
+                  f"{df.groupby('prompt_type').size().to_dict()} (from {n_before} texts)")
         path = config.DATA_DIR / f"texts_{corpus}{suffix}.parquet"
         df.to_parquet(path, index=False)
         counts = df.groupby(["is_ai", "prompt_type"]).size().to_dict()
