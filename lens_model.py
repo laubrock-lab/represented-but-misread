@@ -17,6 +17,9 @@ Two variants: "raw" (across all items, the classic lens model) and
 *beyond* the class differences; this removes the trivial part of the overlap
 between utilization and validity).
 
+Item-level cue files with a text_id column (e.g. from segment_features.py)
+are matched on text_id; the lab course chat features_raw.csv on source/generator.
+
 All correlations are Spearman. CIs: grouped bootstrap over source_id. The key
 test is the difference instruct - base in similarity to the human profile.
 
@@ -61,7 +64,7 @@ GROUP_MODEL = {"gpt": "gpt-5.4", "claude": "claude-opus-4-6"}
 def load_items(out_dir: Path, features_csv: Path, human_csv: Path) -> tuple[pd.DataFrame, list[str]]:
     # model judgments, averaged over answer orders per condition
     files = [f for f in out_dir.glob("*.csv")
-             if not f.name.startswith(("sdt_summary", "probe_", "lens_"))]
+             if not f.name.startswith(("sdt_summary", "probe_", "lens_", "features_"))]
     j = pd.concat([pd.read_csv(f, keep_default_na=False) for f in files], ignore_index=True)
     j["judge"] = j["preset"] + "_" + j["variant"] + "_" + j["fmt"]
     keys = ["text_id", "source_id", "generator", "gen_model", "prompt_type", "is_ai"]
@@ -70,20 +73,27 @@ def load_items(out_dir: Path, features_csv: Path, human_csv: Path) -> tuple[pd.D
     n_len = j.drop_duplicates("text_id").set_index("text_id")["n_text_tokens"]
     wide["n_text_tokens"] = wide["text_id"].map(n_len)
 
-    # cues (feature columns only — the file also contains the texts, never read here)
-    f = pd.read_csv(features_csv, usecols=["source_id", "generator", "model_group"] + FEATURES)
-    f["gen_model"] = np.where(f["generator"] == "human_text", "",
-                              f["model_group"].map(GROUP_MODEL))
-    f = f.drop(columns="model_group").drop_duplicates(["source_id", "generator", "gen_model"])
-    items = wide.merge(f, on=["source_id", "generator", "gen_model"], how="left")
+    # cues (feature columns only — lab course's features_raw.csv also contains the
+    # texts, which are never read here). Item-level files (e.g. segments) are
+    # matched on text_id, the lab course chat file on source_id/generator/model.
+    header = pd.read_csv(features_csv, nrows=0).columns
+    feats = [c for c in FEATURES if c in header]
+    if "text_id" in header:
+        f = pd.read_csv(features_csv, usecols=["text_id"] + feats)
+        items = wide.merge(f, on="text_id", how="left")
+    else:
+        f = pd.read_csv(features_csv, usecols=["source_id", "generator", "model_group"] + feats)
+        f["gen_model"] = np.where(f["generator"] == "human_text", "",
+                                  f["model_group"].map(GROUP_MODEL))
+        f = f.drop(columns="model_group").drop_duplicates(["source_id", "generator", "gen_model"])
+        items = wide.merge(f, on=["source_id", "generator", "gen_model"], how="left")
 
     # human judgments
     h = pd.read_csv(human_csv, keep_default_na=False)
     h = h.rename(columns={"p_ki": "human_p_ki", "signed_conf": "human_signed", "n": "human_n"})
-    items = items.merge(h[["source_id", "generator", "gen_model", "human_p_ki",
-                           "human_signed", "human_n"]],
-                        on=["source_id", "generator", "gen_model"], how="left")
-    return items, judges
+    on = ["text_id"] if "text_id" in h.columns else ["source_id", "generator", "gen_model"]
+    items = items.merge(h[on + ["human_p_ki", "human_signed", "human_n"]], on=on, how="left")
+    return items, judges, feats
 
 
 # ---------------------------------------------------------------------------
@@ -111,7 +121,8 @@ def within(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     return out
 
 
-def lens_stats(items: pd.DataFrame, judges: list[str], human: str) -> dict:
+def lens_stats(items: pd.DataFrame, judges: list[str], human: str,
+               FEATURES: list[str] = FEATURES) -> dict:
     """All lens-model statistics for one (possibly bootstrapped) item set."""
     res = {}
     # ecological validity: always on the raw cues (centring within class removes it)
@@ -141,7 +152,7 @@ def _profile_r(a: np.ndarray, b: np.ndarray) -> float:
 
 
 def bootstrap(items: pd.DataFrame, judges: list[str], human: str, n_boot: int,
-              seed: int) -> pd.DataFrame:
+              seed: int, feats: list[str] = FEATURES) -> pd.DataFrame:
     rng = np.random.default_rng(seed)
     groups = items["source_id"].unique()
     idx = items.groupby("source_id").indices
@@ -149,7 +160,7 @@ def bootstrap(items: pd.DataFrame, judges: list[str], human: str, n_boot: int,
     for _ in range(n_boot):
         draw = rng.choice(groups, size=len(groups), replace=True)
         b = items.iloc[np.concatenate([idx[g] for g in draw])].reset_index(drop=True)
-        s = lens_stats(b, judges, human)
+        s = lens_stats(b, judges, human, feats)
         rows.append({k: v for k, v in s.items() if not k.startswith("_")})
     return pd.DataFrame(rows)
 
@@ -164,21 +175,23 @@ def main() -> None:
     ap.add_argument("out_dir", type=Path)
     ap.add_argument("--features", type=Path, required=True,
                     help="lab course features_raw.csv (only feature columns are read)")
-    ap.add_argument("--human", type=Path, default=config.DATA_DIR / "human_items_chat.csv")
+    ap.add_argument("--human", type=Path, default=config.DATA_DIR / "human_items_chat.csv",
+                    help="from export_human_items.R (chat or journalism_seg)")
     ap.add_argument("--human-measure", default="human_p_ki",
                     choices=["human_p_ki", "human_signed"])
     ap.add_argument("--n-boot", type=int, default=1000)
     ap.add_argument("--seed", type=int, default=1)
     args = ap.parse_args()
 
-    items, judges = load_items(args.out_dir, args.features, args.human)
+    items, judges, feats = load_items(args.out_dir, args.features, args.human)
     n_all = len(items)
-    items = items.dropna(subset=[args.human_measure] + FEATURES[:1]).reset_index(drop=True)
+    items = items.dropna(subset=[args.human_measure, feats[0]]).reset_index(drop=True)
     print(f"{n_all} model-judged items; {len(items)} with human judgments and cues "
           f"({items.groupby('prompt_type').size().to_dict()}); judges: {judges}")
 
-    point = lens_stats(items, judges, args.human_measure)
-    boot = bootstrap(items, judges, args.human_measure, args.n_boot, args.seed)
+    print(f"{len(feats)} cues")
+    point = lens_stats(items, judges, args.human_measure, feats)
+    boot = bootstrap(items, judges, args.human_measure, args.n_boot, args.seed, feats)
 
     # differences between model conditions (each vs. the base model of its preset)
     for k in [c for c in boot.columns if "|" in c]:
@@ -196,7 +209,7 @@ def main() -> None:
         for k in boot.columns])
     summary.to_csv(args.out_dir / "lens_summary.csv", index=False)
 
-    prof = pd.DataFrame({"feature": FEATURES, "validity": point["_valid"]})
+    prof = pd.DataFrame({"feature": feats, "validity": point["_valid"]})
     for variant in ("raw", "within"):
         for k, v in point[f"_util_{variant}"].items():
             prof[f"util_{variant}|{k}"] = v

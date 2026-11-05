@@ -91,15 +91,40 @@ def _make_probe(groups_tr: np.ndarray, X_tr: np.ndarray, y_tr: np.ndarray, pca: 
     return make_pipeline(*steps)
 
 
-def residualize(X_tr: np.ndarray, X_te: np.ndarray, c_tr: np.ndarray, c_te: np.ndarray):
-    """Remove what a cubic spline of the covariate predicts, fit on training data only."""
-    basis = SplineTransformer(n_knots=4, degree=3, extrapolation="linear").fit(c_tr)
-    Z_tr, Z_te = basis.transform(c_tr), basis.transform(c_te)   # partition of unity: includes intercept
+def residualize(X_tr: np.ndarray, X_te: np.ndarray, c_tr: np.ndarray, c_te: np.ndarray,
+                cells_tr: np.ndarray | None = None):
+    """Remove a smooth function of the covariate (cubic spline of log length),
+    estimated on the training fold only.
+
+    cells_tr=None ("total"): regress on the spline alone and remove the fit. With
+        strongly length-imbalanced classes this overcorrects and leaves an inverted
+        length trend within each class.
+    cells_tr given ("ancova"): regress on spline + cell dummies (prompt type) and
+        remove only the spline term, i.e. the pooled *within-cell* length function.
+        The classes are thereby compared at equal length, as in an ANCOVA. Test
+        items need no labels: only the length term is subtracted.
+    """
     X_tr = np.where(np.isnan(X_tr), np.nanmedian(X_tr, axis=0), X_tr)
     X_te = np.where(np.isnan(X_te), np.nanmedian(X_tr, axis=0), X_te)
-    coef, *_ = np.linalg.lstsq(Z_tr, X_tr, rcond=None)
-    R_tr, R_te = X_tr - Z_tr @ coef, X_te - Z_te @ coef
-    # Dimensions that are constant or fully explained by the covariate leave only
+    if cells_tr is None:
+        basis = SplineTransformer(n_knots=4, degree=3, extrapolation="linear").fit(c_tr)
+        Z_tr, Z_te = basis.transform(c_tr), basis.transform(c_te)   # partition of unity: includes intercept
+        coef, *_ = np.linalg.lstsq(Z_tr, X_tr, rcond=None)
+        R_tr, R_te = X_tr - Z_tr @ coef, X_te - Z_te @ coef
+    else:
+        basis = SplineTransformer(n_knots=4, degree=3, extrapolation="linear",
+                                  include_bias=False).fit(c_tr)
+        B_tr, B_te = basis.transform(c_tr), basis.transform(c_te)
+        levels = np.unique(cells_tr)
+        if len(c_tr) < 4 * (len(levels) + B_tr.shape[1]):
+            # too few training items for a spline next to the cell intercepts:
+            # fall back to a linear length term (keeps the fit identified)
+            B_tr, B_te = c_tr - c_tr.mean(), c_te - c_tr.mean()
+        D_tr = (cells_tr[:, None] == levels[None, :]).astype(float)  # one dummy per cell = intercepts
+        coef, *_ = np.linalg.lstsq(np.hstack([D_tr, B_tr]), X_tr, rcond=None)
+        g = coef[len(levels):]                                       # length term only
+        R_tr, R_te = X_tr - B_tr @ g, X_te - B_te @ g
+    # Dimensions that are constant or fully explained by the covariate (and cells) leave only
     # rounding noise, which StandardScaler would blow up to unit variance (and
     # which is itself a function of the covariate). Zero them out.
     dead = R_tr.std(0) <= np.maximum(1e-6 * X_tr.std(0), 1e-8)
@@ -107,11 +132,24 @@ def residualize(X_tr: np.ndarray, X_te: np.ndarray, c_tr: np.ndarray, c_te: np.n
     return R_tr, R_te
 
 
+def _fit_probe(groups_tr, X_tr, y_tr, pca: bool):
+    """Fit; if LAPACK's SVD fails to converge in the PCA step (ill-conditioned
+    residualized data), refit without PCA — the same L2 model, only slower."""
+    try:
+        return _make_probe(groups_tr, X_tr, y_tr, pca).fit(X_tr, y_tr)
+    except np.linalg.LinAlgError:
+        if not pca:
+            raise
+        return _make_probe(groups_tr, X_tr, y_tr, pca=False).fit(X_tr, y_tr)
+
+
 def cv_logits(X: np.ndarray, y: np.ndarray, groups: np.ndarray, n_splits: int,
-              pca: bool = True, covar: np.ndarray | None = None) -> tuple[np.ndarray, float]:
+              pca: bool = True, covar: np.ndarray | None = None,
+              cells: np.ndarray | None = None) -> tuple[np.ndarray, float]:
     """Out-of-fold decision values (logits) with grouped K-fold CV.
 
-    covar: optional [n, 1] covariate (log length) residualized out within each fold.
+    covar: optional [n, 1] covariate (log length) removed within each fold;
+    cells: optional cell labels (prompt type) -> ANCOVA-style removal.
     """
     oof = np.full(len(y), np.nan)
     chosen = []
@@ -122,8 +160,9 @@ def cv_logits(X: np.ndarray, y: np.ndarray, groups: np.ndarray, n_splits: int,
         for tr, te in outer.split(X, y, groups):
             X_tr, X_te = X[tr], X[te]
             if covar is not None:
-                X_tr, X_te = residualize(X_tr, X_te, covar[tr], covar[te])
-            probe = _make_probe(groups[tr], X_tr, y[tr], pca).fit(X_tr, y[tr])
+                X_tr, X_te = residualize(X_tr, X_te, covar[tr], covar[te],
+                                         None if cells is None else cells[tr])
+            probe = _fit_probe(groups[tr], X_tr, y[tr], pca)
             oof[te] = probe.decision_function(X_te)
             chosen.append(float(probe[-1].C_[0]))
     return oof, float(np.median(chosen))
@@ -138,28 +177,32 @@ def shuffle_within_groups(y: np.ndarray, groups: np.ndarray, rng) -> np.ndarray:
 
 
 def directions(X: np.ndarray, y: np.ndarray, groups: np.ndarray,
-               covar: np.ndarray | None = None) -> tuple[np.ndarray, np.ndarray]:
+               covar: np.ndarray | None = None,
+               cells: np.ndarray | None = None) -> tuple[np.ndarray, np.ndarray]:
     """Difference of class means, and the probe weight mapped back to activation space."""
     if covar is not None:
-        X, _ = residualize(X, X[:1], covar, covar[:1])
+        X, _ = residualize(X, X[:1], covar, covar[:1], cells)
     diff = X[y == 1].mean(0) - X[y == 0].mean(0)
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", ConvergenceWarning)
         warnings.simplefilter("ignore", FutureWarning)
-        probe = _make_probe(groups, X, y, pca=True).fit(X, y)
-    _, scaler, pca, lr = probe.steps[0][1], probe.steps[1][1], probe.steps[2][1], probe.steps[3][1]
-    w_std = pca.components_.T @ lr.coef_[0]        # in standardized space
+        probe = _fit_probe(groups, X, y, pca=True)
+    steps = dict(probe.steps)
+    scaler, lr = steps["standardscaler"], steps["logisticregressioncv"]
+    w_std = (steps["pca"].components_.T @ lr.coef_[0] if "pca" in steps
+             else lr.coef_[0])                     # in standardized space
     w = w_std / scaler.scale_                      # in raw activation space
     return diff.astype(np.float32), (w / np.linalg.norm(w)).astype(np.float32)
 
 
 def run_layer(X: np.ndarray, y: np.ndarray, groups: np.ndarray, ptype: np.ndarray,
-              loglen: np.ndarray, resid: bool, n_splits: int, n_perm: int, seed: int,
+              loglen: np.ndarray, lc: str, n_splits: int, n_perm: int, seed: int,
               want_dirs: bool) -> dict:
-    covar = loglen if resid else None
-    oof, C = cv_logits(X, y, groups, n_splits, covar=covar)
+    covar = loglen if lc != "none" else None
+    cells = ptype if lc == "ancova" else None
+    oof, C = cv_logits(X, y, groups, n_splits, covar=covar, cells=cells)
     rng = np.random.default_rng(seed)
-    shuffled = [sdt(ys, cv_logits(X, ys, groups, n_splits, covar=covar)[0])["auc"]
+    shuffled = [sdt(ys, cv_logits(X, ys, groups, n_splits, covar=covar, cells=cells)[0])["auc"]
                 for ys in (shuffle_within_groups(y, groups, rng) for _ in range(n_perm))]
     out = dict(oof=oof, C=C, auc_shuffled=float(np.mean(shuffled)) if shuffled else np.nan)
     for cls, name in ((0, "rho_len_human"), (1, "rho_len_ai")):
@@ -169,7 +212,7 @@ def run_layer(X: np.ndarray, y: np.ndarray, groups: np.ndarray, ptype: np.ndarra
         m = np.isin(ptype, ["human", pt])
         out[f"auc_{pt}"] = sdt(y[m], oof[m])["auc"] if m.any() else np.nan
     if want_dirs:
-        out["diff"], out["w"] = directions(X, y, groups, covar)
+        out["diff"], out["w"] = directions(X, y, groups, covar, cells)
     return out
 
 
@@ -192,19 +235,20 @@ def output_level(out_dir: Path, stem: str) -> dict:
                 out_c=r["c0"], out_orders=len(dfs))
 
 
-def length_baseline(meta: pd.DataFrame, n_splits: int, resid: bool) -> dict:
+def length_baseline(meta: pd.DataFrame, n_splits: int, lc: str) -> dict:
     """Control: how well does log text length alone separate the classes?
-    (With resid=True this is a sanity check and should be ~0.)"""
+    (With length control this is a sanity check and should be ~0.)"""
     X = np.log(meta[["n_text_tokens"]].to_numpy(float))
     oof, _ = cv_logits(X, meta["is_ai"].to_numpy(), meta["source_id"].to_numpy(),
-                       n_splits, pca=False, covar=X if resid else None)
+                       n_splits, pca=False, covar=X if lc != "none" else None,
+                       cells=meta["prompt_type"].to_numpy() if lc == "ancova" else None)
     tmp = meta[["source_id", "is_ai"]].assign(dv=oof)
     ci = grouped_bootstrap(tmp, 1000, np.random.default_rng(0))
     return dict(len_d=sdt(tmp["is_ai"].to_numpy(), oof)["d_auc"],
                 len_d_lo=ci["d_auc_lo"], len_d_hi=ci["d_auc_hi"])
 
 
-def stylometric_baseline(path: Path, meta: pd.DataFrame, n_splits: int, resid: bool) -> dict:
+def stylometric_baseline(path: Path, meta: pd.DataFrame, n_splits: int, lc: str) -> dict:
     feats = pd.read_csv(path)
     feats["model_name"] = feats["model_name"].fillna("").astype(str)
     drop = {"source_id", "generator", "model_name", "is_ai"}
@@ -219,9 +263,11 @@ def stylometric_baseline(path: Path, meta: pd.DataFrame, n_splits: int, resid: b
     df = pd.concat([ai, hu], ignore_index=True)
     missing = df[cols].isna().all(axis=1).sum()
     df = df[~df[cols].isna().all(axis=1)]
-    covar = np.log(df[["n_text_tokens"]].to_numpy(float)) if resid else None
+    covar = np.log(df[["n_text_tokens"]].to_numpy(float)) if lc != "none" else None
+    cells = df["prompt_type"].to_numpy() if lc == "ancova" else None
     oof, _ = cv_logits(df[cols].to_numpy(float), df["is_ai"].to_numpy(),
-                       df["source_id"].to_numpy(), n_splits, pca=False, covar=covar)
+                       df["source_id"].to_numpy(), n_splits, pca=False, covar=covar,
+                       cells=cells)
     tmp = df[["source_id", "is_ai"]].assign(dv=oof)
     ci = grouped_bootstrap(tmp, 1000, np.random.default_rng(0))
     return dict(base_d=sdt(tmp["is_ai"].to_numpy(), oof)["d_auc"],
@@ -247,8 +293,12 @@ def main() -> None:
     ap.add_argument("--n-boot", type=int, default=1000)
     ap.add_argument("--baseline-csv", type=Path,
                     help="lab course detection_scores.csv for the stylometric baseline")
+    ap.add_argument("--length-control", choices=["none", "total", "ancova"], default="none",
+                    help="remove a spline of log text length within each fold: 'total' = "
+                         "regression on length alone; 'ancova' = pooled within-cell length "
+                         "function (prompt-type intercepts), i.e. comparison at equal length")
     ap.add_argument("--residualize-length", action="store_true",
-                    help="remove (spline of) log text length from activations within each fold")
+                    help="alias for --length-control total")
     ap.add_argument("--no-directions", action="store_true")
     ap.add_argument("--n-jobs", type=int, default=-1)
     ap.add_argument("--seed", type=int, default=1)
@@ -260,7 +310,8 @@ def main() -> None:
         raise SystemExit(f"No *_acts.npz in {args.out_dir} — run judge_logits.py first.")
 
     rows, oof_rows, baseline = [], [], None
-    sfx = "_lenres" if args.residualize_length else ""
+    _lc = "total" if args.residualize_length else args.length_control
+    sfx = {"none": "", "total": "_lenres", "ancova": "_lenanc"}[_lc]
     for stem in stems:
         z = np.load(args.out_dir / f"{stem}_acts.npz")
         meta = pd.DataFrame(dict(text_id=z["text_id"], source_id=z["source_id"],
@@ -270,13 +321,13 @@ def main() -> None:
                           on="text_id", how="left", validate="1:1")
         y, groups = meta["is_ai"].to_numpy(), meta["source_id"].to_numpy()
         loglen = np.log(meta[["n_text_tokens"]].to_numpy(float))
-        resid = args.residualize_length
+        lc = "total" if args.residualize_length else args.length_control
         ptype = meta["prompt_type"].to_numpy()
 
-        ref = output_level(args.out_dir, stem) | length_baseline(meta, args.n_splits, resid)
+        ref = output_level(args.out_dir, stem) | length_baseline(meta, args.n_splits, lc)
         print(f"length-only baseline: d' = {ref['len_d']:.2f} [{ref['len_d_lo']:.2f}, {ref['len_d_hi']:.2f}]")
         if args.baseline_csv and baseline is None:
-            baseline = stylometric_baseline(args.baseline_csv, meta, args.n_splits, resid)
+            baseline = stylometric_baseline(args.baseline_csv, meta, args.n_splits, lc)
             print(f"stylometric baseline: d' = {baseline['base_d']:.2f} "
                   f"[{baseline['base_d_lo']:.2f}, {baseline['base_d_hi']:.2f}], "
                   f"{baseline['base_n_features']} features, {baseline['base_unmatched']} texts unmatched")
@@ -288,7 +339,7 @@ def main() -> None:
             print(f"\n=== {stem} | {site} | {len(layers)} layers x {args.n_splits}-fold "
                   f"grouped CV (+{args.n_perm} shuffles) | n = {len(y)}, d = {acts.shape[2]}")
             res = Parallel(n_jobs=args.n_jobs, verbose=0)(
-                delayed(run_layer)(acts[:, l, :], y, groups, ptype, loglen, resid, args.n_splits,
+                delayed(run_layer)(acts[:, l, :], y, groups, ptype, loglen, lc, args.n_splits,
                                    args.n_perm, args.seed + l, not args.no_directions)
                 for l in layers)
             rng = np.random.default_rng(args.seed)
@@ -300,7 +351,7 @@ def main() -> None:
                                  d_auc_hi=ci["d_auc_hi"], auc_naive=r["auc_naive"],
                                  auc_optimized=r["auc_optimized"], auc_shuffled=r["auc_shuffled"],
                                  rho_len_human=r["rho_len_human"], rho_len_ai=r["rho_len_ai"],
-                                 residualized=resid,
+                                 length_control=lc,
                                  C=r["C"], **ref, **(baseline or {})))
                 oof_rows.append(meta[["text_id", "source_id", "is_ai", "prompt_type"]]
                                 .assign(condition=stem, site=site, layer=l, probe_logit=r["oof"]))

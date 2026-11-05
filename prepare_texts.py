@@ -15,6 +15,7 @@ Usage
     python prepare_texts.py --all-generators
     python prepare_texts.py --corpus chat --truncate-words 20    # length control
     python prepare_texts.py --corpus journalism --windows 80     # length control
+    python prepare_texts.py --corpus journalism_seg              # items as in the human experiment
 
 Length control: --truncate-words N keeps the first N words of every text and
 drops texts with fewer than N words; --windows N cuts every text into
@@ -28,6 +29,7 @@ from __future__ import annotations
 import argparse
 import re
 
+import numpy as np
 import pandas as pd
 
 import config
@@ -104,6 +106,59 @@ def load_journalism(all_generators: bool) -> pd.DataFrame:
     return _finish(rows)
 
 
+# Items excluded in the lab course preprocessing (analysis/preprocessing.qmd); mirrored here.
+SEGMENT_EXCLUDE = [("<excluded-item-id>", "openai_naive")]
+
+
+def load_journalism_segments(with_headline: bool = True) -> pd.DataFrame:
+    """The journalism items exactly as presented in the segment experiment.
+
+    Union of the 32 PsychoPy conditions files (ABAB/BABA x list A/B x 8
+    variants), deduplicated by trial_id. Participants saw headline +
+    subheadline above every segment; with_headline=True reproduces that in the
+    model input (text), while `segment` holds the body only (for features).
+    """
+    seg_dir = config.JOURNALISM_XLSX.parent
+    files = sorted(seg_dir.glob("segment_trials_ABAB_*.xlsx")) + \
+        sorted(seg_dir.glob("segment_trials_BABA_*.xlsx"))
+    if len(files) != 32:
+        print(f"warning: expected 32 segment conditions files, found {len(files)}")
+    cols = ["trial_id", "source_id", "seg_idx", "headline", "subheadline",
+            "generator", "prompt_type", "chat_message", "is_ai"]
+    raw = pd.concat([pd.read_excel(f, usecols=cols) for f in files], ignore_index=True)
+    # the same trial_id must carry the same content in every file
+    n_variants = raw.groupby("trial_id")[["chat_message", "headline"]].nunique().max().max()
+    if n_variants > 1:
+        raise ValueError("A trial_id has differing content across conditions files.")
+    df = raw.drop_duplicates("trial_id").copy()
+    for src, gen in SEGMENT_EXCLUDE:
+        df = df[~((df["source_id"] == src) & (df["generator"] == gen))]
+
+    def compose(r) -> str:
+        parts = [_clean(r["headline"]), _clean(r["subheadline"])] if with_headline else []
+        head = "\n".join(p for p in parts if p)
+        body = _clean(r["chat_message"]) or ""
+        return f"{head}\n\n{body}" if head else body
+
+    out = pd.DataFrame(dict(
+        text_id=df["trial_id"].astype(str),
+        source_id=df["source_id"].astype(str),
+        generator=df["generator"].astype(str),
+        gen_model=np.where(df["is_ai"].astype(int) == 1, "openai", ""),
+        prompt_type=df["prompt_type"].fillna("human").replace("", "human").astype(str),
+        is_ai=df["is_ai"].astype(int),
+        seg_idx=df["seg_idx"].astype(int),
+        text=df.apply(compose, axis=1),
+        segment=df["chat_message"].map(lambda x: _clean(x) or ""),
+    ))
+    out.loc[out["is_ai"] == 0, "prompt_type"] = "human"
+    # Diagnostic without showing text: do human and AI items of a source share the headline?
+    h = df.assign(ai=df["is_ai"].astype(int)).groupby(["source_id", "ai"])["headline"].first().unstack()
+    same = (h[0] == h[1]).sum() if {0, 1} <= set(h.columns) else 0
+    print(f"headline identical for human and AI version in {same}/{len(h)} sources")
+    return out.reset_index(drop=True)
+
+
 def _finish(rows: list[dict]) -> pd.DataFrame:
     out = pd.DataFrame(rows)
     out.insert(0, "text_id", out["source_id"] + "__" + out["generator"] + "__"
@@ -139,7 +194,11 @@ def windows(df: pd.DataFrame, n: int) -> pd.DataFrame:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--corpus", choices=["chat", "journalism", "both"], default="both")
+    ap.add_argument("--corpus", choices=["chat", "journalism", "journalism_seg", "both"],
+                    default="both",
+                    help="journalism_seg = the segment items exactly as shown to participants")
+    ap.add_argument("--no-headline", action="store_true",
+                    help="journalism_seg: give the model the segment body only")
     ap.add_argument("--all-generators", action="store_true",
                     help="include generators/models not used in the human experiment")
     lc = ap.add_mutually_exclusive_group()
@@ -150,9 +209,12 @@ def main() -> None:
     args = ap.parse_args()
 
     config.DATA_DIR.mkdir(exist_ok=True)
-    loaders = {"chat": load_chats, "journalism": load_journalism}
+    loaders = {"chat": load_chats, "journalism": load_journalism,
+               "journalism_seg": lambda _: load_journalism_segments(not args.no_headline)}
     corpora = ["chat", "journalism"] if args.corpus == "both" else [args.corpus]
     suffix = "_all" if args.all_generators else ""
+    if args.corpus == "journalism_seg" and args.no_headline:
+        suffix += "_nohead"
     if args.truncate_words:
         suffix += f"_tw{args.truncate_words}"
     elif args.windows:

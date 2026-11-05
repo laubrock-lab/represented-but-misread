@@ -68,6 +68,37 @@ python probe_layers.py outputs/chat --baseline-csv \
     $LABCOURSE_DIR/python/output/chat/detection_scores.csv
 ```
 
+### Length control
+
+The chat texts differ strongly in length (AI shorter; length alone gives AUC 0.91),
+so a probe can succeed by reading off length. The analyses to report are the
+**design-based** controls, which make no modelling assumptions:
+
+```bash
+python prepare_texts.py --corpus chat --truncate-words 25      # every text exactly 25 words
+python prepare_texts.py --corpus journalism --windows 80       # non-overlapping 80-word windows
+python prepare_texts.py --corpus journalism_seg                # segments exactly as shown to participants
+bash run_journalism_seg.sh                                     # full pipeline incl. lens model
+```
+
+Model-based alternatives (`probe_layers.py --length-control total|ancova`)
+only bracket the answer. `total` (regression on length alone) overcorrects when
+the classes differ in length. `ancova` (within-cell length function) is correct
+when lengths overlap, but with barely overlapping distributions it has to
+extrapolate. The within-class diagnostics `rho_len_human/ai` show this.
+
+### Humans vs. models: lens model
+
+```bash
+Rscript export_human_items.R chat               # item-level human judgments (no text)
+python lens_model.py outputs/chat --features $LABCOURSE_DIR/python/output/chat/features_raw.csv
+```
+
+This is a Brunswik lens model for humans, base and instruct: ecological
+validity of each cue, cue utilization by each judge, profile similarity, and
+item-level agreement. `segment_features.py` computes the lab course features for
+any item set (needs spaCy `de_core_news_lg`).
+
 Model presets live in `config.py` (`gemma3-4b`, `gemma3-12b`, `llama31-8b`,
 `qwen25-7b`). Any base/instruct pair can be given with `--base-id/--instruct-id`.
 
@@ -101,6 +132,8 @@ uncorrected value is kept as `dv_prefix`.
 ## Status
 
 - [x] Step 1: logit-level judgments + activation extraction (`judge_logits.py`, `sdt_summary.py`)
-- [x] Step 2: layer-wise probes with grouped CV and controls (`probe_layers.py`); stylometric-baseline join not yet tested on real data
+- [x] Step 2: layer-wise probes with grouped CV and controls (`probe_layers.py`), incl. length-only and stylometric baselines
+- [x] Length control: truncation, fixed windows, journalism segments; model-based residualization (total / ANCOVA)
+- [x] Lens model: humans vs. base vs. instruct (`lens_model.py`)
 - [ ] Step 3: steering along the probe direction
 - [ ] Write-up

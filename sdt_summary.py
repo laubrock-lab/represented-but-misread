@@ -92,7 +92,7 @@ def main() -> None:
     args = ap.parse_args()
 
     files = sorted(args.out_dir.glob("*.csv"))
-    files = [f for f in files if not f.name.startswith(("sdt_summary", "probe_"))]
+    files = [f for f in files if not f.name.startswith(("sdt_summary", "probe_", "lens_", "features_"))]
     if not files:
         raise SystemExit(f"No judgment CSVs in {args.out_dir}")
     df = pd.concat([pd.read_csv(f, keep_default_na=False) for f in files], ignore_index=True)
