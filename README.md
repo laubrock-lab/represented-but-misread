@@ -61,10 +61,23 @@ python judge_logits.py --texts data/texts_chat.parquet --preset gemma3-4b
 
 # 4. SDT summary with grouped-bootstrap CIs
 python sdt_summary.py outputs/chat
+python sdt_summary.py outputs/chat --dv dv_prefix    # without end-of-word correction
+
+# 5. layer-wise probes (step 2), with the lab course stylometric features as baseline
+python probe_layers.py outputs/chat --baseline-csv \
+    $LABCOURSE_DIR/python/output/chat/detection_scores.csv
 ```
 
 Model presets live in `config.py` (`gemma3-4b`, `gemma3-12b`, `llama31-8b`,
 `qwen25-7b`). Any base/instruct pair can be given with `--base-id/--instruct-id`.
+
+### Word probabilities
+
+The probability of the answer *word* includes the end-of-word correction of
+Pimentel & Meister (2024): P(tokens of "Mensch") × P(the next token starts a new
+word), so continuations such as "Menschen" or "KI-generiert" don't count. The
+beginning-of-word term is the same for both answers and cancels in `dv`. The
+uncorrected value is kept as `dv_prefix`.
 
 ### Reading the output
 
@@ -75,10 +88,19 @@ Model presets live in `config.py` (`gemma3-4b`, `gemma3-12b`, `llama31-8b`,
   mentioned first or last. Use the `avg` rows, which average `dv` over both orders.
 - `c0 > 0` means a conservative bias toward "Mensch", the sign convention of the
   lab course analyses.
+- Probes: `probe_layers.csv` has one row per condition × site × layer. Read the
+  whole layer curve, not just the best layer: picking the maximum over ~35–50
+  layers inflates it. Sanity check: at layer 0 the `last` site is the same token
+  for every text, so its d′ must be ≈ 0. `auc_shuffled` (labels permuted within
+  source groups) should be ≈ 0.5.
+- `probe_oof.csv` holds the out-of-fold probe score per text, which allows item-level
+  comparison with human detection rates.
+- On macOS with Python 3.12, joblib may print `ResourceTracker … No child
+  processes` at exit. This is harmless.
 
 ## Status
 
 - [x] Step 1: logit-level judgments + activation extraction (`judge_logits.py`, `sdt_summary.py`)
-- [ ] Step 2: layer-wise probes with grouped CV and controls (layer 0, shuffled labels, stylometric baseline)
+- [x] Step 2: layer-wise probes with grouped CV and controls (`probe_layers.py`); stylometric-baseline join not yet tested on real data
 - [ ] Step 3: steering along the probe direction
 - [ ] Write-up

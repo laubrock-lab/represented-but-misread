@@ -7,6 +7,9 @@ sampling an answer we read off the log-probabilities of the two answers,
 
 which gives a continuous decision variable per text: the full ROC, d' from
 the AUC, and the criterion (where dv = 0 falls) follow without any parsing.
+Word probabilities include the end-of-word correction of Pimentel & Meister
+(2024), so "Menschen" does not count as "Mensch"; the uncorrected prefix
+version is kept as dv_prefix.
 In the same forward pass, the hidden states of all layers are stored for the
 probe analysis (step 2):
 
@@ -119,6 +122,37 @@ def candidate_ids(tok) -> dict[str, list[tuple[int, ...]]]:
     return out
 
 
+# Token-string markers for "this token starts a new word" across tokenizer
+# families: SentencePiece (▁, <0x..> byte fallback) and byte-level BPE
+# (Ġ = space, Ċ = newline, ĉ = tab, č = carriage return).
+_WS_PREFIXES = ("▁", "Ġ", "Ċ", "ĉ", "č", " ", "\n", "\t", "\r")
+_WS_BYTES = {"<0x20>", "<0x0A>", "<0x09>", "<0x0D>"}
+_PUNCT = set(".,;:!?\"'»«“”„)]}…")   # not "-": "KI-generiert" continues the word
+
+
+def end_of_word_mask(tok, n_logits: int) -> torch.Tensor:
+    """Boolean mask over the vocabulary: tokens that can follow a complete word.
+
+    Used for the end-of-word correction of Pimentel & Meister (2024): the
+    probability of the *word* "Mensch" is P(tokens of "Mensch") times
+    P(next token starts a new word), so that continuations such as
+    "Menschen" or "menschlich" are not counted. Whitespace-initial,
+    punctuation-initial and special tokens (EOS, end-of-turn) qualify. The
+    matching beginning-of-word term is identical for both answers (same
+    context) and cancels in dv.
+    """
+    mask = torch.zeros(n_logits, dtype=torch.bool)
+    for i, t in enumerate(tok.convert_ids_to_tokens(list(range(min(len(tok), n_logits))))):
+        if t and (t.startswith(_WS_PREFIXES) or t in _WS_BYTES or t[0] in _PUNCT):
+            mask[i] = True
+    special = set(tok.all_special_ids)
+    special |= {i for i, a in getattr(tok, "added_tokens_decoder", {}).items() if a.special}
+    for i in special:
+        if i < n_logits:
+            mask[i] = True
+    return mask
+
+
 # ---------------------------------------------------------------------------
 # Scoring
 # ---------------------------------------------------------------------------
@@ -133,34 +167,44 @@ def _forward(model, input_ids: torch.Tensor, keep: int, hidden: bool):
 
 @torch.no_grad()
 def score_one(model, tok, prompt: str, add_special: bool, text_span: tuple[int, int] | None,
-              cands: dict[str, list[tuple[int, ...]]], device: str, want_acts: bool) -> dict:
+              cands: dict[str, list[tuple[int, ...]]], eow: dict, device: str,
+              want_acts: bool) -> dict:
     enc = tok(prompt, add_special_tokens=add_special, return_tensors="pt",
               return_offsets_mapping=text_span is not None and want_acts)
     input_ids = enc["input_ids"].to(device)
     n_prompt = input_ids.shape[1]
 
-    out = _forward(model, input_ids, keep=1, hidden=want_acts)
-    logp_next = torch.log_softmax(out.logits[0, -1].float(), dim=-1)
+    out = _forward(model, input_ids, keep=1, hidden=True) if want_acts else None
 
-    # log P(answer class) = logsumexp over its token sequences
-    class_lp = {}
+    # For each answer token sequence: one pass over prompt + answer gives the
+    # log-prob of the answer tokens and the next-token distribution after it.
+    lp_prefix, lp_word, logp_next = {}, {}, None
     for label, seqs in cands.items():
-        seq_lps = []
+        pre, word = [], []
         for seq in seqs:
-            lp = logp_next[seq[0]].item()
-            if len(seq) > 1:  # rare: score remaining tokens with one extra pass
-                ids = torch.cat([input_ids, torch.tensor([seq], device=device)], dim=1)
-                o2 = _forward(model, ids, keep=len(seq) + 1, hidden=False)
-                lps = torch.log_softmax(o2.logits[0, -(len(seq) + 1):-1].float(), dim=-1)
-                lp = sum(lps[i, t].item() for i, t in enumerate(seq))
-            seq_lps.append(lp)
-        class_lp[label] = float(torch.logsumexp(torch.tensor(seq_lps), dim=0))
+            ids = torch.cat([input_ids, torch.tensor([seq], device=device)], dim=1)
+            o = _forward(model, ids, keep=len(seq) + 1, hidden=False)
+            lps = torch.log_softmax(o.logits[0, -(len(seq) + 1):].float(), dim=-1)  # [len+1, V]
+            if logp_next is None:
+                logp_next = lps[0]                      # distribution right after the prompt
+            if "mask" not in eow:
+                eow["mask"] = end_of_word_mask(tok, lps.shape[-1]).to(lps.device)
+            lp_seq = sum(lps[i, t].item() for i, t in enumerate(seq))
+            lp_end = torch.logsumexp(lps[-1][eow["mask"]], dim=0).item()
+            pre.append(lp_seq)
+            word.append(lp_seq + lp_end)
+        # log P(answer class) = logsumexp over its token sequences
+        lp_prefix[label] = float(torch.logsumexp(torch.tensor(pre), dim=0))
+        lp_word[label] = float(torch.logsumexp(torch.tensor(word), dim=0))
 
     res = dict(
-        lp_mensch=class_lp["Mensch"],
-        lp_ki=class_lp["KI"],
-        dv=class_lp["KI"] - class_lp["Mensch"],
-        p_mass=float(np.exp(class_lp["Mensch"]) + np.exp(class_lp["KI"])),
+        lp_mensch=lp_word["Mensch"],
+        lp_ki=lp_word["KI"],
+        dv=lp_word["KI"] - lp_word["Mensch"],               # with end-of-word correction
+        lp_mensch_prefix=lp_prefix["Mensch"],
+        lp_ki_prefix=lp_prefix["KI"],
+        dv_prefix=lp_prefix["KI"] - lp_prefix["Mensch"],    # uncorrected, for comparison
+        p_mass=float(np.exp(lp_prefix["Mensch"]) + np.exp(lp_prefix["KI"])),
         n_prompt_tokens=n_prompt,
         top_tokens=[tok.decode([i]) for i in torch.topk(logp_next, 5).indices.tolist()],
     )
@@ -188,6 +232,7 @@ def run_condition(model, tok, texts: pd.DataFrame, *, preset: str, variant: str,
     stem = f"{preset}_{variant}_{fmt}_{order}" + (f"_{system}" if fmt == "chat" else "")
     csv_path = out_dir / f"{stem}.csv"
     cands = candidate_ids(tok)
+    eow: dict = {}  # end-of-word mask, built lazily once the logit size is known
     print(f"\n=== {stem}  ({model_id})")
     print("    answer token sequences:",
           {k: [tok.decode(list(s)) for s in v] for k, v in cands.items()})
@@ -199,7 +244,7 @@ def run_condition(model, tok, texts: pd.DataFrame, *, preset: str, variant: str,
         prompt, add_special = build_prompt(tok, text, fmt, order, system)
         start = prompt.find(text)
         span = (start, start + len(text)) if start >= 0 else None
-        res = score_one(model, tok, prompt, add_special, span, cands, device, want_acts)
+        res = score_one(model, tok, prompt, add_special, span, cands, eow, device, want_acts)
         if i < 3:  # format sanity check — prints answer tokens only, never text
             print(f"    text {i}: top-5 next tokens {res['top_tokens']}  "
                   f"P(Mensch)+P(KI) = {res['p_mass']:.3f}")

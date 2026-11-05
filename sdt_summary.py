@@ -18,6 +18,7 @@ Also reports AUC separately for human vs. naive and human vs. optimized texts.
 Usage
 -----
     python sdt_summary.py outputs/chat
+    python sdt_summary.py outputs/chat --dv dv_prefix   # without end-of-word correction
 """
 
 from __future__ import annotations
@@ -86,14 +87,17 @@ def main() -> None:
     ap.add_argument("out_dir", type=Path)
     ap.add_argument("--n-boot", type=int, default=2000)
     ap.add_argument("--seed", type=int, default=1)
+    ap.add_argument("--dv", default="dv", choices=["dv", "dv_prefix"],
+                    help="dv = with end-of-word correction (default); dv_prefix = uncorrected")
     args = ap.parse_args()
 
     files = sorted(args.out_dir.glob("*.csv"))
-    files = [f for f in files if f.name != "sdt_summary.csv"]
+    files = [f for f in files if not f.name.startswith(("sdt_summary", "probe_"))]
     if not files:
         raise SystemExit(f"No judgment CSVs in {args.out_dir}")
     df = pd.concat([pd.read_csv(f, keep_default_na=False) for f in files], ignore_index=True)
     df["system"] = df["system"].astype(str)
+    df["dv"] = df[args.dv]
 
     # order-averaged decision variable (only where both orders exist)
     k = [c for c in KEYS if c != "order"]
@@ -104,13 +108,14 @@ def main() -> None:
     df = pd.concat([df, avg], ignore_index=True)
 
     res = summarise(df, args.n_boot, args.seed)
-    res.to_csv(args.out_dir / "sdt_summary.csv", index=False)
+    out_csv = args.out_dir / ("sdt_summary.csv" if args.dv == "dv" else f"sdt_summary_{args.dv}.csv")
+    res.to_csv(out_csv, index=False)
     show = ["preset", "variant", "fmt", "order", "system", "n", "auc", "d_auc", "d_auc_lo",
             "d_auc_hi", "c0", "c0_lo", "c0_hi", "H", "F", "p_mass", "auc_naive", "auc_optimized"]
     with pd.option_context("display.width", 200, "display.max_columns", None,
                            "display.float_format", "{:.2f}".format):
         print(res[show].to_string(index=False))
-    print(f"\n-> {args.out_dir / 'sdt_summary.csv'}")
+    print(f"\n-> {out_csv}")
 
 
 if __name__ == "__main__":
