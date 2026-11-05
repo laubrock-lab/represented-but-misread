@@ -1,0 +1,9 @@
+torch>=2.5
+transformers>=4.56
+pandas>=2.0
+pyarrow
+openpyxl
+numpy
+scipy
+scikit-learn
+tqdm

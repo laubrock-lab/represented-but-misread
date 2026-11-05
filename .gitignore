@@ -1,0 +1,11 @@
+# Never commit texts or anything derived at the text level
+data/
+outputs/
+*.parquet
+*.xlsx
+*.npz
+# environments / caches
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
