@@ -299,6 +299,8 @@ def main() -> None:
                          "function (prompt-type intercepts), i.e. comparison at equal length")
     ap.add_argument("--residualize-length", action="store_true",
                     help="alias for --length-control total")
+    ap.add_argument("--suffix", default="",
+                    help="appended to output file names, e.g. _gemma3-12b (avoids overwriting)")
     ap.add_argument("--no-directions", action="store_true")
     ap.add_argument("--n-jobs", type=int, default=-1)
     ap.add_argument("--seed", type=int, default=1)
@@ -311,7 +313,7 @@ def main() -> None:
 
     rows, oof_rows, baseline = [], [], None
     _lc = "total" if args.residualize_length else args.length_control
-    sfx = {"none": "", "total": "_lenres", "ancova": "_lenanc"}[_lc]
+    sfx = {"none": "", "total": "_lenres", "ancova": "_lenanc"}[_lc] + args.suffix
     for stem in stems:
         z = np.load(args.out_dir / f"{stem}_acts.npz")
         meta = pd.DataFrame(dict(text_id=z["text_id"], source_id=z["source_id"],
