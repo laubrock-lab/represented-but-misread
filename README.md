@@ -99,6 +99,43 @@ validity of each cue, cue utilization by each judge, profile similarity, and
 item-level agreement. `segment_features.py` computes the lab course features for
 any item set (needs spaCy `de_core_news_lg`).
 
+### Base-rate instruction (priors)
+
+```bash
+python judge_logits.py --texts data/texts_journalism_seg.parquet --preset gemma3-4b --priors 50 20 80
+python prior_analysis.py outputs/journalism_seg
+```
+
+One sentence in the prompt states the share of AI texts (50 / 20 / 80 %; `none`
+leaves the prompt unchanged). The prediction for a Bayesian observer: `dv` shifts
+by the prior log-odds for every text (±ln 4 = ±1.39 for 80 % / 20 % vs. 50 %),
+and d′ stays unchanged. `prior_analysis.py` reports the shifts, the "Bayesian
+gain" (slope of `dv` on the prior log-odds; 1 = Bayesian, 0 = ignored), the
+implicit prior (no statement vs. 50 %), d′ per prior, and the item-level
+uniformity of the shift. It works on `dv`, not on c, because c saturates when a
+model almost never answers "KI".
+
+### Steering (step 3)
+
+```bash
+python steer_logits.py outputs/journalism_seg --preset gemma3-4b --variant instruct --layer 5
+```
+
+This intervenes on the residual stream after decoder layer L (= `hidden_states[L]`)
+at the last prompt token, along the class direction. That direction is the
+difference of class means, **cross-fitted** over sources, so no text steers
+itself.
+
+- `add` (bias): `h + α·Δ`. If the readout uses the direction, c shifts and d′ stays.
+- `scale` (gain): amplifies the text's own component along the direction around
+  the class midpoint. If the readout uses the direction, d′ rises. If it doesn't,
+  the information is represented but not read out, which makes the dissociation causal.
+- Control: a random direction with the same step size (`--controls random --only-controls`).
+
+transformers records `hidden_states` before user hooks run, so the steered
+state doesn't appear there. `verify_alignment` checks at startup that the hook
+acts on the representation the directions were estimated from.
+
 Model presets live in `config.py` (`gemma3-4b`, `gemma3-12b`, `llama31-8b`,
 `qwen25-7b`). Any base/instruct pair can be given with `--base-id/--instruct-id`.
 
@@ -135,5 +172,7 @@ uncorrected value is kept as `dv_prefix`.
 - [x] Step 2: layer-wise probes with grouped CV and controls (`probe_layers.py`), incl. length-only and stylometric baselines
 - [x] Length control: truncation, fixed windows, journalism segments; model-based residualization (total / ANCOVA)
 - [x] Lens model: humans vs. base vs. instruct (`lens_model.py`)
-- [ ] Step 3: steering along the probe direction
+- [x] Replication with gemma3-12b (`run_replication.sh`)
+- [ ] Base-rate instruction (`--priors`, counterbalanced mention order; `prior_analysis.py`) — running for gemma3-4b (v1 had a mention-order confound, archived in `flawed_priors_v1/`)
+- [ ] Step 3: steering (`steer_logits.py`) — running for gemma3-4b
 - [ ] Write-up

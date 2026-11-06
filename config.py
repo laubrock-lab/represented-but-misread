@@ -43,7 +43,7 @@ ORDERS = {
 # base-vs-instruct difference cannot be due to the chat template.
 RAW_TEMPLATE = (
     "Im Folgenden steht ein Text. Er wurde entweder von einem Menschen "
-    "geschrieben oder von einer KI generiert.\n\n"
+    "geschrieben oder von einer KI generiert.{prior}\n\n"
     "Text:\n\"\"\"\n{text}\n\"\"\"\n\n"
     "Frage: Wurde dieser Text von einem Menschen geschrieben oder von einer "
     "KI generiert? Antworte mit einem Wort ({opts}).\n"
@@ -61,11 +61,34 @@ SYSTEM_PROMPTS = {
     ),
 }
 CHAT_USER_TEMPLATE = (
-    "Lies den folgenden Text sorgfältig. Wurde dieser Text von einem Menschen "
+    "Lies den folgenden Text sorgfältig.{prior} Wurde dieser Text von einem Menschen "
     "geschrieben oder von einer KI generiert?\n\n"
     "Text:\n\"\"\"\n{text}\n\"\"\"\n\n"
     "Antworte ausschließlich mit einem Wort: {opts}."
 )
+
+# Base-rate instruction (key = stated percentage of AI texts). One sentence,
+# identical in structure for every level, inserted into both prompt formats;
+# "none" leaves the prompts unchanged. The order in which AI and humans are
+# mentioned is counterbalanced (prior_order "ai" / "hu"), because the models
+# react strongly to the order of mention (cf. answer-order bias).
+# Bayesian prediction: dv shifts by the prior log-odds, ln(p/(1-p)), for every
+# text, i.e. +/-ln 4 = +/-1.39 for 80 % / 20 % relative to 50 %; d' unchanged.
+PRIORS = ["none", "50", "20", "80"]
+PRIOR_ORDERS = {
+    "ai": " In dieser Studie wurden etwa {ai} % der Texte von einer KI generiert "
+          "und etwa {hu} % von Menschen geschrieben.",
+    "hu": " In dieser Studie wurden etwa {hu} % der Texte von Menschen geschrieben "
+          "und etwa {ai} % von einer KI generiert.",
+}
+
+
+def prior_sentence(prior: str, prior_order: str = "ai") -> str:
+    if prior == "none":
+        return ""
+    ai = int(prior)
+    return PRIOR_ORDERS[prior_order].format(ai=ai, hu=100 - ai)
+
 
 # Answer strings whose probabilities are summed per class. Variants with and
 # without a leading space cover both completion and chat contexts; duplicate

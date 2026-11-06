@@ -31,6 +31,8 @@ Usage
     python judge_logits.py --texts data/texts_chat.parquet --preset gemma3-4b \\
         --variants instruct --formats chat --system expert
     python judge_logits.py --texts data/texts_chat.parquet --limit 10   # smoke test
+    python judge_logits.py --texts data/texts_chat_tw25.parquet --variants instruct \\
+        --priors 50 20 80          # both mention orders of the base-rate sentence
 """
 
 from __future__ import annotations
@@ -92,14 +94,24 @@ def truncate_text(tok, text: str, max_tokens: int) -> tuple[str, int, bool]:
     return tok.decode(ids[:max_tokens]), max_tokens, True
 
 
-def build_prompt(tok, text: str, fmt: str, order: str, system: str) -> tuple[str, bool]:
+def condition_stem(preset: str, variant: str, fmt: str, order: str, system: str,
+                   prior: str = "none", prior_order: str = "ai") -> str:
+    """File stem of one condition; prior 'none' keeps the original names."""
+    stem = f"{preset}_{variant}_{fmt}_{order}" + (f"_{system}" if fmt == "chat" else "")
+    return stem + (f"_p{prior}{prior_order}" if prior != "none" else "")
+
+
+def build_prompt(tok, text: str, fmt: str, order: str, system: str,
+                 prior: str = "none", prior_order: str = "ai") -> tuple[str, bool]:
     """Return (prompt string, add_special_tokens flag for tokenization)."""
     opts = " oder ".join(config.ORDERS[order])
+    pri = config.prior_sentence(prior, prior_order)
     if fmt == "raw":
-        return config.RAW_TEMPLATE.format(text=text, opts=opts), True
+        return config.RAW_TEMPLATE.format(text=text, opts=opts, prior=pri), True
     messages = [
         {"role": "system", "content": config.SYSTEM_PROMPTS[system]},
-        {"role": "user", "content": config.CHAT_USER_TEMPLATE.format(text=text, opts=opts)},
+        {"role": "user", "content": config.CHAT_USER_TEMPLATE.format(text=text, opts=opts,
+                                                                     prior=pri)},
     ]
     try:
         prompt = tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True,
@@ -228,8 +240,9 @@ def score_one(model, tok, prompt: str, add_special: bool, text_span: tuple[int, 
 
 def run_condition(model, tok, texts: pd.DataFrame, *, preset: str, variant: str,
                   model_id: str, fmt: str, order: str, system: str, max_text_tokens: int,
-                  device: str, want_acts: bool, out_dir: Path) -> None:
-    stem = f"{preset}_{variant}_{fmt}_{order}" + (f"_{system}" if fmt == "chat" else "")
+                  device: str, want_acts: bool, out_dir: Path, prior: str = "none",
+                  prior_order: str = "ai") -> None:
+    stem = condition_stem(preset, variant, fmt, order, system, prior, prior_order)
     csv_path = out_dir / f"{stem}.csv"
     cands = candidate_ids(tok)
     eow: dict = {}  # end-of-word mask, built lazily once the logit size is known
@@ -241,7 +254,7 @@ def run_condition(model, tok, texts: pd.DataFrame, *, preset: str, variant: str,
     t0 = time.time()
     for i, r in enumerate(tqdm(texts.itertuples(index=False), total=len(texts), desc=stem)):
         text, n_tok, truncated = truncate_text(tok, r.text, max_text_tokens)
-        prompt, add_special = build_prompt(tok, text, fmt, order, system)
+        prompt, add_special = build_prompt(tok, text, fmt, order, system, prior, prior_order)
         start = prompt.find(text)
         span = (start, start + len(text)) if start >= 0 else None
         res = score_one(model, tok, prompt, add_special, span, cands, eow, device, want_acts)
@@ -256,7 +269,8 @@ def run_condition(model, tok, texts: pd.DataFrame, *, preset: str, variant: str,
             text_id=r.text_id, source_id=r.source_id, generator=r.generator,
             gen_model=r.gen_model, prompt_type=r.prompt_type, is_ai=r.is_ai,
             preset=preset, variant=variant, model_id=model_id, fmt=fmt, order=order,
-            system=system if fmt == "chat" else "", n_text_tokens=n_tok,
+            system=system if fmt == "chat" else "", prior=prior,
+            prior_order=prior_order if prior != "none" else "", n_text_tokens=n_tok,
             truncated=truncated, **res,
         ))
 
@@ -291,6 +305,11 @@ def main() -> None:
     ap.add_argument("--formats", nargs="+", default=["raw", "chat"], choices=["raw", "chat"])
     ap.add_argument("--orders", nargs="+", default=["mk", "km"], choices=list(config.ORDERS))
     ap.add_argument("--system", default="neutral", choices=list(config.SYSTEM_PROMPTS))
+    ap.add_argument("--prior-orders", nargs="+", default=list(config.PRIOR_ORDERS),
+                    choices=list(config.PRIOR_ORDERS),
+                    help="order of mention in the base-rate sentence (ai first / humans first)")
+    ap.add_argument("--priors", nargs="+", default=["none"], choices=config.PRIORS,
+                    help="base-rate instruction(s): stated %% of AI texts (none = no statement)")
     ap.add_argument("--acts-orders", nargs="*", default=["mk"],
                     help="orders for which activations are saved (none: pass no value)")
     ap.add_argument("--max-text-tokens", type=int, default=2048)
@@ -320,23 +339,26 @@ def main() -> None:
     print(f"{len(texts)} texts ({texts['is_ai'].sum()} AI) | device {device} | {args.dtype}")
 
     for variant in args.variants:
-        conditions = [(f, o) for f in args.formats for o in args.orders
+        conditions = [(f, o, p, po) for p in args.priors
+                      for po in (args.prior_orders if p != "none" else ["ai"])
+                      for f in args.formats for o in args.orders
                       if not (f == "chat" and variant == "base")]
         todo = []
-        for fmt, order in conditions:
-            stem = f"{args.preset}_{variant}_{fmt}_{order}" + (f"_{args.system}" if fmt == "chat" else "")
+        for fmt, order, prior, po in conditions:
+            stem = condition_stem(args.preset, variant, fmt, order, args.system, prior, po)
             if (out_dir / f"{stem}.csv").exists() and not args.overwrite:
                 print(f"skip {stem} (exists; --overwrite to redo)")
             else:
-                todo.append((fmt, order))
+                todo.append((fmt, order, prior, po))
         if not todo:
             continue
         tok, model = load_model(ids[variant], device, dtype)
-        for fmt, order in todo:
+        for fmt, order, prior, po in todo:
             run_condition(model, tok, texts, preset=args.preset, variant=variant,
                           model_id=ids[variant], fmt=fmt, order=order, system=args.system,
                           max_text_tokens=args.max_text_tokens, device=device,
-                          want_acts=order in (args.acts_orders or []), out_dir=out_dir)
+                          want_acts=order in (args.acts_orders or []), out_dir=out_dir,
+                          prior=prior, prior_order=po)
         del model
         gc.collect()
         if device == "mps":

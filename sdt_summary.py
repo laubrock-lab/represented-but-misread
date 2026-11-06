@@ -31,7 +31,15 @@ import pandas as pd
 from scipy.stats import norm
 from sklearn.metrics import roc_auc_score
 
-KEYS = ["preset", "variant", "fmt", "order", "system"]
+def is_judgment_csv(path) -> bool:
+    """True for per-text judgment tables written by judge_logits.py (by columns,
+    not by file name, so summaries and feature files in the same folder are ignored)."""
+    import pandas as _pd
+    cols = set(_pd.read_csv(path, nrows=0).columns)
+    return {"text_id", "dv", "preset", "variant", "order"} <= cols
+
+
+KEYS = ["preset", "variant", "fmt", "order", "system", "prior", "prior_order"]
 
 
 def sdt(is_ai: np.ndarray, dv: np.ndarray) -> dict:
@@ -52,8 +60,10 @@ def sdt(is_ai: np.ndarray, dv: np.ndarray) -> dict:
 
 
 def grouped_bootstrap(df: pd.DataFrame, n_boot: int, rng: np.random.Generator) -> dict:
-    groups = df["source_id"].unique()
     by_group = {g: idx for g, idx in df.groupby("source_id").indices.items()}
+    groups = np.array(list(by_group), dtype=object)     # NaN-free by construction
+    if df["source_id"].isna().any():
+        print(f"warning: {df['source_id'].isna().sum()} rows without source_id left out of bootstrap")
     stats = []
     for _ in range(n_boot):
         draw = rng.choice(groups, size=len(groups), replace=True)
@@ -92,11 +102,16 @@ def main() -> None:
     args = ap.parse_args()
 
     files = sorted(args.out_dir.glob("*.csv"))
-    files = [f for f in files if not f.name.startswith(("sdt_summary", "probe_", "lens_", "features_"))]
+    files = [f for f in files if is_judgment_csv(f)]
     if not files:
         raise SystemExit(f"No judgment CSVs in {args.out_dir}")
-    df = pd.concat([pd.read_csv(f, keep_default_na=False) for f in files], ignore_index=True)
+    df = pd.concat([pd.read_csv(f, keep_default_na=False, dtype={"prior": str, "prior_order": str}) for f in files], ignore_index=True)
     df["system"] = df["system"].astype(str)
+    # runs from before the base-rate variant have no prior column
+    df["prior"] = (df["prior"] if "prior" in df else pd.Series(index=df.index, dtype=object))
+    df["prior"] = df["prior"].fillna("none").astype(str).replace({"": "none"})
+    df["prior_order"] = (df["prior_order"] if "prior_order" in df
+                         else pd.Series(index=df.index, dtype=object)).fillna("").astype(str)
     df["dv"] = df[args.dv]
 
     # order-averaged decision variable (only where both orders exist)
@@ -110,7 +125,7 @@ def main() -> None:
     res = summarise(df, args.n_boot, args.seed)
     out_csv = args.out_dir / ("sdt_summary.csv" if args.dv == "dv" else f"sdt_summary_{args.dv}.csv")
     res.to_csv(out_csv, index=False)
-    show = ["preset", "variant", "fmt", "order", "system", "n", "auc", "d_auc", "d_auc_lo",
+    show = ["preset", "variant", "fmt", "order", "system", "prior", "prior_order", "n", "auc", "d_auc", "d_auc_lo",
             "d_auc_hi", "c0", "c0_lo", "c0_hi", "H", "F", "p_mass", "auc_naive", "auc_optimized"]
     with pd.option_context("display.width", 200, "display.max_columns", None,
                            "display.float_format", "{:.2f}".format):

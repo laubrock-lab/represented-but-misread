@@ -38,6 +38,7 @@ import numpy as np
 import pandas as pd
 
 import config
+from sdt_summary import is_judgment_csv
 
 FEATURES = [
     "word_count", "sent_count", "mean_sent_len_tokens", "std_sent_len_tokens",
@@ -63,9 +64,10 @@ GROUP_MODEL = {"gpt": "gpt-5.4", "claude": "claude-opus-4-6"}
 
 def load_items(out_dir: Path, features_csv: Path, human_csv: Path) -> tuple[pd.DataFrame, list[str]]:
     # model judgments, averaged over answer orders per condition
-    files = [f for f in out_dir.glob("*.csv")
-             if not f.name.startswith(("sdt_summary", "probe_", "lens_", "features_"))]
+    files = [f for f in out_dir.glob("*.csv") if is_judgment_csv(f)]
     j = pd.concat([pd.read_csv(f, keep_default_na=False) for f in files], ignore_index=True)
+    if "prior" in j:   # lens model uses the judgments without base-rate statement only
+        j = j[j["prior"].fillna("none").astype(str).isin(["none", ""])]
     j["judge"] = j["preset"] + "_" + j["variant"] + "_" + j["fmt"]
     keys = ["text_id", "source_id", "generator", "gen_model", "prompt_type", "is_ai"]
     wide = (j.groupby(keys + ["judge"])["dv"].mean().unstack("judge").reset_index())
