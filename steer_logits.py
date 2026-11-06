@@ -24,8 +24,11 @@ the following layers (checked at startup by verify_alignment).
 
 Directions are cross-fitted: for each text, Delta is estimated from the
 activations (judge_logits.py *_acts.npz) of texts from *other* sources
-(grouped K-fold), so no text steers itself. Control: a random direction with the
-same length and the same procedure (--controls random).
+(grouped K-fold), so no text steers itself. Controls with the same step size and procedure: a random direction (null
+control, --controls random) and the decision direction, i.e. the direction
+along which the model's own unsteered dv varies (positive control, --controls
+decision). A class null effect only means "not used" if the decision direction
+moves the answer at the same site.
 
 Output: <out_dir>/steer_<stem>_L<layer>[_<positions>].csv (dv per text x order x
 setting) and a summary with d' (AUC), c, mean dv per setting, grouped-bootstrap CIs.
@@ -135,23 +138,43 @@ def verify_alignment(model, tok, layers, layer: int, device: str) -> None:
 # ---------------------------------------------------------------------------
 
 def crossfit_directions(X: np.ndarray, y: np.ndarray, groups: np.ndarray, n_splits: int,
-                        control: str, seed: int) -> list[dict]:
-    """Per text: unit direction u, class distance delta and midpoint along u,
-    estimated without the text's own source."""
+                        control: str, seed: int, score: np.ndarray | None = None,
+                        unit: str = "sd") -> list[dict]:
+    """Per text: unit direction u, step size delta and midpoint along u,
+    estimated without the text's own source.
+
+    class     u = mean(AI) - mean(human)                     (what is represented)
+    decision  u = mean(dv above median) - mean(dv below)     (what the answer follows;
+              positive control: same site, same step size as the class direction)
+    random    random unit vector                             (null control)
+    The step unit (delta) is common to all directions, so they take equal steps:
+    unit "sd"    = pooled within-class SD of the projections onto the class
+                   direction (natural spread; default)
+    unit "delta" = class-mean distance (first runs; turned out to be only
+                   0.2-0.5 SD, i.e. too small to be a strong intervention)
+    """
     rng = np.random.default_rng(seed)
     out: list[dict | None] = [None] * len(y)
     for tr, te in GroupKFold(n_splits=min(n_splits, len(np.unique(groups)))).split(X, y, groups):
         mu1, mu0 = X[tr][y[tr] == 1].mean(0), X[tr][y[tr] == 0].mean(0)
         diff = mu1 - mu0
+        dist = float(np.linalg.norm(diff))
+        u_class = diff / dist
+        p = X[tr] @ u_class
+        sd = float(np.sqrt((p[y[tr] == 1].var() + p[y[tr] == 0].var()) / 2))
+        delta = sd if unit == "sd" else dist               # common step size
         if control == "random":
             r = rng.standard_normal(X.shape[1])
-            u = r / np.linalg.norm(r)
-            delta = float(np.linalg.norm(diff))            # same step size as the class direction
+            u, a, b = r / np.linalg.norm(r), mu1, mu0
+        elif control == "decision":
+            hi = score[tr] > np.median(score[tr])
+            a, b = X[tr][hi].mean(0), X[tr][~hi].mean(0)
+            u = (a - b) / np.linalg.norm(a - b)
         else:
-            delta = float(np.linalg.norm(diff))
-            u = diff / delta
-        mid = float(((mu1 + mu0) / 2) @ u)
-        d = dict(u=torch.tensor(u, dtype=torch.float32), delta=delta, mid=mid)
+            u, a, b = u_class, mu1, mu0
+        mid = float(((a + b) / 2) @ u)
+        d = dict(u=torch.tensor(u, dtype=torch.float32), delta=delta, mid=mid,
+                 cos_class=float(u @ u_class), dist=dist, sd=sd)
         for i in te:
             out[i] = d
     return out
@@ -188,9 +211,16 @@ def main() -> None:
                     help="alphas for additive steering (units of the class-mean distance)")
     ap.add_argument("--scale", type=float, nargs="*", default=[0, 0.5, 2, 4],
                     help="gains k for the class component (1 = unchanged)")
-    ap.add_argument("--controls", nargs="*", default=["random"], choices=["random"])
+    ap.add_argument("--controls", nargs="*", default=["random"], choices=["random", "decision"],
+                    help="random = null control; decision = positive control (direction the "
+                         "model's own dv follows, same site and step size)")
+    ap.add_argument("--n-random", type=int, default=1,
+                    help="number of independent random directions (null distribution)")
     ap.add_argument("--only-controls", action="store_true",
                     help="run the control directions only (class run done separately)")
+    ap.add_argument("--unit", default="sd", choices=["sd", "delta"],
+                    help="step unit for --add: within-class SD along the class direction "
+                         "(default) or the class-mean distance")
     ap.add_argument("--n-splits", type=int, default=7)
     ap.add_argument("--max-text-tokens", type=int, default=2048)
     ap.add_argument("--device", default="auto")
@@ -215,15 +245,31 @@ def main() -> None:
 
     X = acts["acts_last"][:, layer, :].astype(np.float64)
     y, groups = meta["is_ai"].to_numpy(), meta["source_id"].to_numpy()
-    dirs = {"class": crossfit_directions(X, y, groups, args.n_splits, "class", args.seed)}
+    score = None
+    if "decision" in args.controls:   # the model's own unsteered dv, averaged over answer orders
+        js = [pd.read_csv(args.out_dir / f"{condition_stem(args.preset, args.variant, args.fmt, o, args.system)}.csv")
+              for o in ("mk", "km")]
+        dv = pd.concat(js).groupby("text_id")["dv"].mean()
+        score = meta["text_id"].map(dv).to_numpy(float)
+        if np.isnan(score).any():
+            raise SystemExit("Unsteered dv missing for some texts.")
+    dirs = {"class": crossfit_directions(X, y, groups, args.n_splits, "class", args.seed,
+                                         unit=args.unit)}
     for c in args.controls:
-        dirs[c] = crossfit_directions(X, y, groups, args.n_splits, c, args.seed)
+        names = ([f"random{r + 1}" for r in range(args.n_random)] if c == "random" else [c])
+        for r, name in enumerate(names):
+            dirs[name] = crossfit_directions(X, y, groups, args.n_splits, c, args.seed + 1000 * r,
+                                             score, unit=args.unit)
+            print(f"  {name} direction: mean cosine with class direction "
+                  f"{np.mean([d['cos_class'] for d in dirs[name]]):+.2f}")
     if args.limit:
         meta = meta.head(args.limit)
 
     use = [d for d in dirs if not (args.only_controls and d == "class")]
     settings = [(d, "add", a) for d in use for a in args.add if d == "class" or a != 0] + \
                [(d, "scale", k) for d in use for k in args.scale if k != 1]
+    if args.only_controls:           # unsteered reference, needed for the decomposition
+        settings = [("class", "add", 0.0)] + settings
     device = pick_device(args.device)
     model_id = config.MODEL_PRESETS[args.preset][args.variant]
     tok, model = load_model(model_id, device, getattr(torch, args.dtype))
@@ -233,7 +279,10 @@ def main() -> None:
     cands, eow = candidate_ids(tok), {}
     print(f"{stem}: layer {layer}, positions {args.positions}, {len(meta)} texts, "
           f"{len(settings)} settings x {len(args.orders)} orders; "
-          f"mean class distance {np.mean([d['delta'] for d in dirs['class']]):.1f}")
+          f"step unit ({args.unit}) {np.mean([d['delta'] for d in dirs['class']]):.1f}; "
+          f"class distance {np.mean([d['dist'] for d in dirs['class']]):.1f} = "
+          f"{np.mean([d['dist'] / d['sd'] for d in dirs['class']]):.2f} SD; "
+          f"mean residual norm {np.linalg.norm(X, axis=1).mean():.1f}")
 
     rows, t0 = [], time.time()
     for order in args.orders:
@@ -255,7 +304,8 @@ def main() -> None:
     print(f"{len(rows)} scorings in {time.time() - t0:.0f}s")
 
     df = pd.DataFrame(rows)
-    sfx = f"_L{layer}" + ("_prompt" if args.positions == "prompt" else "") + \
+    sfx = f"_L{layer}" + ("_sd" if args.unit == "sd" else "") + \
+          ("_prompt" if args.positions == "prompt" else "") + \
           ("_ctrl-" + "-".join(args.controls) if args.only_controls else "") + \
           ("_smoke" if args.limit else "")
     df.to_csv(args.out_dir / f"steer_{stem}{sfx}.csv", index=False)
@@ -272,6 +322,27 @@ def main() -> None:
                          d_lo=ci.get("d_auc_lo"), d_hi=ci.get("d_auc_hi"), c0=s["c0"],
                          mean_dv=g["dv"].mean(), n=len(g)))
     summ = pd.DataFrame(summ)
+    # directional vs. non-specific part of each additive effect (vs. unsteered mean dv)
+    ref = df[(df["mode"] == "add") & (df["alpha"] == 0)]
+    if len(ref):
+        base_dv = ref.groupby("text_id")["dv"].mean().mean()
+        add = summ[summ["mode"] == "add"].set_index(["direction", "alpha"])["mean_dv"]
+        decomp = []
+        for (direction, a), v in add.items():
+            if a > 0 and (direction, -a) in add.index:
+                neg = add[(direction, -a)]
+                decomp.append(dict(direction=direction, alpha=a,
+                                   directional=(v - neg) / 2,
+                                   nonspecific=(v + neg) / 2 - base_dv))
+        decomp = pd.DataFrame(decomp)
+        if len(decomp):
+            decomp.to_csv(args.out_dir / f"steer_decomp_{stem}{sfx}.csv", index=False)
+            rnd = decomp[decomp["direction"].str.startswith("random")]
+            with pd.option_context("display.float_format", "{:+.2f}".format):
+                print(decomp[~decomp["direction"].str.startswith("random")].to_string(index=False))
+                if len(rnd):
+                    print(rnd.groupby("alpha")[["directional", "nonspecific"]]
+                          .agg(["mean", "std", "min", "max"]).to_string())
     summ.to_csv(args.out_dir / f"steer_summary_{stem}{sfx}.csv", index=False)
     with pd.option_context("display.width", 200, "display.float_format", "{:+.2f}".format):
         print(summ.to_string(index=False))
