@@ -28,6 +28,11 @@ MODEL_PRESETS: dict[str, dict[str, str]] = {
     "gemma3-12b": {"base": "google/gemma-3-12b-pt",   "instruct": "google/gemma-3-12b-it"},
     "llama31-8b": {"base": "meta-llama/Llama-3.1-8B", "instruct": "meta-llama/Llama-3.1-8B-Instruct"},
     "qwen25-7b":  {"base": "Qwen/Qwen2.5-7B",         "instruct": "Qwen/Qwen2.5-7B-Instruct"},
+    # Qwen3 (Apr 2025): standard dense transformer (Qwen3ForCausalLM, 36 layers),
+    # base + instruct published, Apache 2.0, not gated. The instruct model is a
+    # hybrid reasoner; judge_logits passes enable_thinking=False on the chat
+    # template, and the raw completion prompt is unaffected by thinking mode.
+    "qwen3-8b":   {"base": "Qwen/Qwen3-8B-Base",      "instruct": "Qwen/Qwen3-8B"},
 }
 
 # ---------------------------------------------------------------------------
