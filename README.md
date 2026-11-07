@@ -88,7 +88,11 @@ The transfer is **asymmetric**: a probe trained on chat transfers to
 journalism (mean d′ ≈ +0.5 at the last token, +0.8 for text-mean pooling), while
 a probe trained on the 14 journalism sources does not transfer to chat (mean
 d′ < 0). In-domain d′ ≈ 3.1 in both directions, so a high within-corpus probe
-number is not by itself evidence of a generalisable axis. See
+number is not by itself evidence of a generalisable axis. The reverse contrast
+is confounded with authorship — the journalism corpus has a single human author,
+the chat corpus about ten — so it cannot test author generalisation. Author-held-out
+CV in chat leaves the forward result intact (d′ 3.02 → 2.83 at the last
+token, 3.39 → 3.27 for text-mean): the chat axis is not an author detector. See
 `PLAN_probe_transfer.md` and `outputs/transfer/`.
 
 
