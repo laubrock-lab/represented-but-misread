@@ -66,7 +66,31 @@ python sdt_summary.py outputs/chat --dv dv_prefix    # without end-of-word corre
 # 5. layer-wise probes (step 2), with the lab course stylometric features as baseline
 python probe_layers.py outputs/chat --baseline-csv \
     $LABCOURSE_DIR/python/output/chat/detection_scores.csv
+
+# 6. cross-corpus transfer: fit on one corpus, evaluate unchanged on another
+python probe_transfer.py                       # source-selected layer, independent pairs
+python probe_transfer.py --mode curve          # transfer over depth
+python probe_transfer.py --pairs chat:journalism_seg --n-perm 199
 ```
+
+### Cross-corpus probe transfer
+
+The in-domain probe is selected on the corpus it is evaluated on, and with
+n = 103–305 and d ≈ 2 560–3 840 it can separate any two corpora that differ in
+source, topic, register or length. `probe_transfer.py` closes that loophole: it
+fits the readout on one corpus and evaluates it on another one with different
+sources, and it chooses the layer on the **source** only. `probe` is the
+supervised pipeline, `diff`/`diff_std` the unsupervised difference of class
+means, and `oracle_diff` the target's own direction (upper bound). Overlapping
+`source_id`s are dropped, so only chat ↔ journalism is an independent pair.
+
+The transfer is **asymmetric**: a probe trained on chat transfers to
+journalism (mean d′ ≈ +0.5 at the last token, +0.8 for text-mean pooling), while
+a probe trained on the 14 journalism sources does not transfer to chat (mean
+d′ < 0). In-domain d′ ≈ 3.1 in both directions, so a high within-corpus probe
+number is not by itself evidence of a generalisable axis. See
+`PLAN_probe_transfer.md` and `outputs/transfer/`.
+
 
 ### Length control
 
@@ -172,6 +196,7 @@ uncorrected value is kept as `dv_prefix`.
 - [x] Step 2: layer-wise probes with grouped CV and controls (`probe_layers.py`), incl. length-only and stylometric baselines
 - [x] Length control: truncation, fixed windows, journalism segments; model-based residualization (total / ANCOVA)
 - [x] Lens model: humans vs. base vs. instruct (`lens_model.py`)
+- [x] Cross-corpus probe transfer (`probe_transfer.py`, `PLAN_probe_transfer.md`)
 - [x] Replication with gemma3-12b (`run_replication.sh`)
 - [ ] Base-rate instruction (`--priors`, counterbalanced mention order; `prior_analysis.py`) — running for gemma3-4b (v1 had a mention-order confound, archived in `flawed_priors_v1/`)
 - [ ] Step 3: steering (`steer_logits.py`) — running for gemma3-4b
