@@ -151,6 +151,12 @@ The three follow-up controls are in `probe_controls.py`:
   style-matched contrast yields the generalisable readout; the easy one does
   not. See `PLAN_probe_transfer.md` and `outputs/controls/`.
 
+A manuscript draft of the transfer and controls analysis is in
+`paper/cross_corpus_transfer.md` (Methods, Results, interpretation, and
+limitations, ready to integrate into `paper/outline.md`); the
+transfer-versus-depth figure is produced by `plots/fig_transfer_depth.R` and
+written to `paper/figures/`.
+
 
 ### Length control
 
@@ -258,6 +264,7 @@ uncorrected value is kept as `dv_prefix`.
 - [x] Lens model: humans vs. base vs. instruct (`lens_model.py`)
 - [x] Cross-corpus probe transfer (`probe_transfer.py`, `PLAN_probe_transfer.md`)
 - [x] Author-, generator-, and prompt-type controls (`probe_controls.py`, `run_controls.sh`)
+- [x] Manuscript draft of the transfer/controls analysis (`paper/cross_corpus_transfer.md`) and depth figure
 - [x] Replication with gemma3-12b (`run_replication.sh`)
 - [ ] Base-rate instruction (`--priors`, counterbalanced mention order; `prior_analysis.py`) — running for gemma3-4b (v1 had a mention-order confound, archived in `flawed_priors_v1/`)
 - [ ] Step 3: steering (`steer_logits.py`) — running for gemma3-4b
