@@ -134,10 +134,27 @@ number is not by itself evidence of a generalisable axis. The reverse contrast
 is confounded with authorship — the journalism corpus has a single human author,
 the chat corpus about ten — so it cannot test author generalisation.
 
+The same asymmetry replicates in **Qwen3-8B**, the third family (three
+conditions): every forward pair is positive at at least one site (last-token
+d′ −0.04 to +1.26, text-mean +0.44 to +0.93), and all eight reverse cells are
+negative (−0.38 to −0.98). The unsupervised mean shift, however, does not
+replicate: it transfers in Gemma 3 (text-mean d′ +0.93) but not in Qwen3
+(−0.53), where the source and target class-mean directions are negatively
+aligned (cosine −0.16 on average) while the supervised probe still transfers
+(+0.65). The direction that generalises therefore differs between families; the
+supervised probe is the primary readout in both.
+
+The in-domain maximum is a poor proxy for the transfer optimum. Across the
+forward rows, transfer at the selected layer averages 60 % (Gemma 3) and 53 %
+(Qwen3) of the value the same pipeline reaches at the best layer in hindsight.
+Part of the reason is mechanical: d′ is censored at the class-balance ceiling
+(3.39 with 61 human texts, 3.14 with 38, 3.58 with 89), so the argmax rule is
+ill-conditioned wherever several layers separate perfectly.
+
 The three follow-up controls are in `probe_controls.py`:
 
-- **Authors.** Leave-one-author-out CV costs almost nothing (mean d′ 2.95 →
-  2.83 at the last token, 3.38 → 3.28 for text-mean), so the chat axis is not
+- **Authors.** Leave-one-author-out CV costs almost nothing (mean d′ 2.83 →
+  2.95 at the last token, 3.28 → 3.38 for text-mean), so the chat axis is not
   an author detector.
 - **Generators.** Cross-generator transfer (Claude-trained probe, GPT test
   texts, unseen authors) is 0.3–1.4 d′ below the same-generator baseline and
@@ -150,6 +167,14 @@ The three follow-up controls are in `probe_controls.py`:
   human vs. naive; the fixed-length control replicates the ordering. The hard,
   style-matched contrast yields the generalisable readout; the easy one does
   not. See `PLAN_probe_transfer.md` and `outputs/controls/`.
+
+All three controls replicate in Qwen3-8B: author-held-out CV changes d′ by at
+most 0.13, cross-generator transfer stays above 1.8 d′, and the naive-trained
+probe again collapses on style-matched texts (1.07 at the last token, 1.31 at
+text mean) while the reverse direction holds (2.45 and 2.45). The stratified
+transfer ordering replicates as well, more sharply than in Gemma: +0.65 (all
+AI), −0.06 (naive), +0.88 (style-matched) at text mean, and the naive-trained
+mean shift no longer transfers (−0.88).
 
 A manuscript draft of the transfer and controls analysis is in
 `paper/cross_corpus_transfer.md` (Methods, Results, interpretation, and
