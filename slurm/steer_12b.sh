@@ -10,21 +10,21 @@
 #SBATCH -e slurm/steer_12b_%j.err
 
 source slurm/cluster_env.sh
+export TRANSFORMERS_OFFLINE=1
+export HF_HUB_OFFLINE=1
 
 echo "$(date) — start on $(hostname), GPU: $(nvidia-smi --query-gpu=name,memory.total --format=csv,noheader)"
 
-# 1) Steering on journalism segments (the primary corpus)
-#    Layers 20 and 31 are the 12B equivalents of 4B L14 (pre-flip) and L22 (post-flip)
-python steer_logits.py outputs/journalism_seg \
-    --preset gemma3-12b --layers 20 31 \
-    --steps -6 -3 0 3 6 --unit sd --n-random 5
+# Usage: sbatch slurm/steer_12b.sh <corpus> <layer>
+# e.g.:  sbatch slurm/steer_12b.sh journalism_seg 31
+#        sbatch slurm/steer_12b.sh chat_tw25 20
+CORPUS="${1:?Usage: sbatch steer_12b.sh <corpus> <layer>}"
+LAYER="${2:?Usage: sbatch steer_12b.sh <corpus> <layer>}"
 
-echo "$(date) — journalism_seg steering done"
+echo "$(date) — ${CORPUS} layer ${LAYER}"
+python steer_logits.py "outputs/${CORPUS}" \
+    --preset gemma3-12b --layer "$LAYER" \
+    --add -6 -3 0 3 6 --scale 0 0.5 1 3 6 \
+    --unit sd --n-random 5
 
-# 2) Steering on chat_tw25 (length-controlled chat corpus)
-python steer_logits.py outputs/chat_tw25 \
-    --preset gemma3-12b --layers 20 31 \
-    --steps -6 -3 0 3 6 --unit sd --n-random 5
-
-echo "$(date) — chat_tw25 steering done"
-echo "$(date) — all done, exit $?"
+echo "$(date) — done, exit $?"

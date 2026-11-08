@@ -7,8 +7,8 @@ set -euo pipefail
 export WORK=/work/$USER/latent-detection
 cd "$WORK"
 
-# Activate conda env (adjust path if miniconda is elsewhere)
-source ~/miniconda3/etc/profile.d/conda.sh
+module load lang/Miniconda3/4.9.2
+eval "$(conda shell.bash hook)"
 conda activate latent-detection
 
 # HuggingFace cache on /work (not quota-limited $HOME)
