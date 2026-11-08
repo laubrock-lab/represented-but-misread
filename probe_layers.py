@@ -235,11 +235,14 @@ def output_level(out_dir: Path, stem: str) -> dict:
                 out_c=r["c0"], out_orders=len(dfs))
 
 
-def length_baseline(meta: pd.DataFrame, n_splits: int, lc: str) -> dict:
+def length_baseline(meta: pd.DataFrame, n_splits: int, lc: str,
+                    groups: np.ndarray | None = None) -> dict:
     """Control: how well does log text length alone separate the classes?
     (With length control this is a sanity check and should be ~0.)"""
     X = np.log(meta[["n_text_tokens"]].to_numpy(float))
-    oof, _ = cv_logits(X, meta["is_ai"].to_numpy(), meta["source_id"].to_numpy(),
+    if groups is None:
+        groups = meta["source_id"].to_numpy()
+    oof, _ = cv_logits(X, meta["is_ai"].to_numpy(), groups,
                        n_splits, pca=False, covar=X if lc != "none" else None,
                        cells=meta["prompt_type"].to_numpy() if lc == "ancova" else None)
     tmp = meta[["source_id", "is_ai"]].assign(dv=oof)
@@ -289,6 +292,10 @@ def main() -> None:
                     choices=["last", "textmean"])
     ap.add_argument("--layer-step", type=int, default=1, help="probe every k-th layer")
     ap.add_argument("--n-splits", type=int, default=10, help="outer grouped CV folds")
+    ap.add_argument("--group-by", choices=["source", "author"], default="source",
+                    help="grouping for the outer CV and the shuffled-label control. "
+                         "'author' holds out whole human authors (chat only; author = "
+                         "the source_id prefix, ~10 people). Files get suffix _authgrp.")
     ap.add_argument("--n-perm", type=int, default=2, help="shuffled-label runs per layer")
     ap.add_argument("--n-boot", type=int, default=1000)
     ap.add_argument("--baseline-csv", type=Path,
@@ -314,6 +321,8 @@ def main() -> None:
     rows, oof_rows, baseline = [], [], None
     _lc = "total" if args.residualize_length else args.length_control
     sfx = {"none": "", "total": "_lenres", "ancova": "_lenanc"}[_lc] + args.suffix
+    if args.group_by == "author":
+        sfx = "_authgrp" + sfx
     for stem in stems:
         z = np.load(args.out_dir / f"{stem}_acts.npz")
         meta = pd.DataFrame(dict(text_id=z["text_id"], source_id=z["source_id"],
@@ -322,11 +331,16 @@ def main() -> None:
         meta = meta.merge(judg[["text_id", "generator", "gen_model", "prompt_type", "n_text_tokens"]],
                           on="text_id", how="left", validate="1:1")
         y, groups = meta["is_ai"].to_numpy(), meta["source_id"].to_numpy()
+        if args.group_by == "author":
+            groups = np.array([g.split("__")[0] for g in groups])
+            if len(np.unique(groups)) < 3:
+                raise SystemExit(f"author grouping needs >= 3 authors, got "
+                                 f"{len(np.unique(groups))} in {stem}")
         loglen = np.log(meta[["n_text_tokens"]].to_numpy(float))
         lc = "total" if args.residualize_length else args.length_control
         ptype = meta["prompt_type"].to_numpy()
 
-        ref = output_level(args.out_dir, stem) | length_baseline(meta, args.n_splits, lc)
+        ref = output_level(args.out_dir, stem) | length_baseline(meta, args.n_splits, lc, groups)
         print(f"length-only baseline: d' = {ref['len_d']:.2f} [{ref['len_d_lo']:.2f}, {ref['len_d_hi']:.2f}]")
         if args.baseline_csv and baseline is None:
             baseline = stylometric_baseline(args.baseline_csv, meta, args.n_splits, lc)
@@ -339,7 +353,8 @@ def main() -> None:
             acts = z[f"acts_{site}"]                    # [n, L+1, d]
             layers = list(range(0, acts.shape[1], args.layer_step))
             print(f"\n=== {stem} | {site} | {len(layers)} layers x {args.n_splits}-fold "
-                  f"grouped CV (+{args.n_perm} shuffles) | n = {len(y)}, d = {acts.shape[2]}")
+                  f"grouped CV by {args.group_by} (+{args.n_perm} shuffles) | "
+                  f"n = {len(y)}, d = {acts.shape[2]}")
             res = Parallel(n_jobs=args.n_jobs, verbose=0)(
                 delayed(run_layer)(acts[:, l, :], y, groups, ptype, loglen, lc, args.n_splits,
                                    args.n_perm, args.seed + l, not args.no_directions)

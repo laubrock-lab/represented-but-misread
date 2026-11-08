@@ -71,7 +71,49 @@ python probe_layers.py outputs/chat --baseline-csv \
 python probe_transfer.py                       # source-selected layer, independent pairs
 python probe_transfer.py --mode curve          # transfer over depth
 python probe_transfer.py --pairs chat:journalism_seg --n-perm 199
+
+# 7. within-corpus controls: authors, generators, naive vs. style-matched
+python probe_controls.py --corpus chat         # author-held-out CV, generator transfer
+python probe_controls.py --corpus journalism_seg
+python probe_transfer.py --train-stratum naive --tag _naive   # stratified transfer
+bash run_controls.sh                           # all of the above, all item sets
 ```
+
+### Item structure and the two AI versions
+
+Every source contributes one human text and several AI rewrites, so class is a
+**generation-procedure contrast** with content held roughly constant:
+
+| corpus | human | naive AI | style-matched AI | AI generators |
+|---|---|---|---|---|
+| `chat` | 61 texts, 14 author IDs (~10 people) | `basic` | `feedback_optimized` | Claude Opus 4.6 and GPT-5.4, fully crossed |
+| `journalism_seg` | 38 segments, **one** journalist | `openai_naive` | `openai_style_matched_refined` | OpenAI |
+
+The style-matched version was generated from an AI-extracted semantic
+description of the original plus the author's other texts as style templates,
+then corrected by human feedback. `prompt_type` (`human` / `naive` /
+`optimized`) is in the judgment CSVs, not in the activation arrays, so
+`probe_controls.py` and `probe_transfer.py --train-stratum` merge it by
+`text_id`.
+
+### Within-corpus controls
+
+`probe_controls.py` asks the three questions the transfer matrix leaves open:
+
+1. **Author-held-out CV.** `probe_layers.py` holds out `source_id` (all texts
+   derived from one human original) but the same person contributes 2–5 chats,
+   so an author-level shortcut is still possible. `--group-by author` in
+   `probe_layers.py` and the `cv` analysis in `probe_controls.py` repeat the CV
+   with whole authors held out (14 folds).
+2. **Generator-held-out transfer.** Fit on human + Claude rewrites, test on
+   human + GPT rewrites *of unseen authors*, against the same-generator
+   baseline. If cross-generator transfer matches the baseline, the axis is not
+   one model's fingerprint.
+3. **Naive vs. style-matched.** In-domain CV per stratum, cross-stratum
+   transfer (naive → optimized and back, authors held out), a naive-vs-optimized
+   classifier on the AI texts alone (how distinguishable are the two versions?),
+   and the model's own output d′ per stratum.
+
 
 ### Cross-corpus probe transfer
 
@@ -90,10 +132,30 @@ a probe trained on the 14 journalism sources does not transfer to chat (mean
 d′ < 0). In-domain d′ ≈ 3.1 in both directions, so a high within-corpus probe
 number is not by itself evidence of a generalisable axis. The reverse contrast
 is confounded with authorship — the journalism corpus has a single human author,
-the chat corpus about ten — so it cannot test author generalisation. Author-held-out
-CV in chat leaves the forward result intact (d′ 3.02 → 2.83 at the last
-token, 3.39 → 3.27 for text-mean): the chat axis is not an author detector. See
-`PLAN_probe_transfer.md` and `outputs/transfer/`.
+the chat corpus about ten — so it cannot test author generalisation.
+
+The three follow-up controls are in `probe_controls.py`:
+
+- **Authors.** Leave-one-author-out CV costs almost nothing (mean d′ 2.95 →
+  2.83 at the last token, 3.38 → 3.28 for text-mean), so the chat axis is not
+  an author detector.
+- **Generators.** Cross-generator transfer (Claude-trained probe, GPT test
+  texts, unseen authors) is 0.3–1.4 d′ below the same-generator baseline and
+  far above chance: mostly generic LLM-ness, not one model's fingerprint.
+- **Naive vs. style-matched.** The two AI versions are separately decodable
+  (d′ 2.7–2.8). A probe fitted on **style-matched** texts transfers best
+  (text-mean d′ 1.07 vs. 0.84 for all AI text), while a **naive**-only probe
+  collapses (+0.02) even though its unsupervised mean shift still transfers.
+  The naive chat texts are much shorter, and length alone gives AUC 0.988 for
+  human vs. naive; the fixed-length control replicates the ordering. The hard,
+  style-matched contrast yields the generalisable readout; the easy one does
+  not. See `PLAN_probe_transfer.md` and `outputs/controls/`.
+
+A manuscript draft of the transfer and controls analysis is in
+`paper/cross_corpus_transfer.md` (Methods, Results, interpretation, and
+limitations, ready to integrate into `paper/outline.md`); the
+transfer-versus-depth figure is produced by `plots/fig_transfer_depth.R` and
+written to `paper/figures/`.
 
 
 ### Length control
@@ -201,6 +263,8 @@ uncorrected value is kept as `dv_prefix`.
 - [x] Length control: truncation, fixed windows, journalism segments; model-based residualization (total / ANCOVA)
 - [x] Lens model: humans vs. base vs. instruct (`lens_model.py`)
 - [x] Cross-corpus probe transfer (`probe_transfer.py`, `PLAN_probe_transfer.md`)
+- [x] Author-, generator-, and prompt-type controls (`probe_controls.py`, `run_controls.sh`)
+- [x] Manuscript draft of the transfer/controls analysis (`paper/cross_corpus_transfer.md`) and depth figure
 - [x] Replication with gemma3-12b (`run_replication.sh`)
 - [ ] Base-rate instruction (`--priors`, counterbalanced mention order; `prior_analysis.py`) — running for gemma3-4b (v1 had a mention-order confound, archived in `flawed_priors_v1/`)
 - [ ] Step 3: steering (`steer_logits.py`) — running for gemma3-4b
