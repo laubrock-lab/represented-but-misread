@@ -120,7 +120,8 @@ def build_prompt(tok, text: str, fmt: str, order: str, system: str,
         # templates without a system role: fold the system prompt into the user turn
         merged = [{"role": "user",
                    "content": messages[0]["content"] + "\n\n" + messages[1]["content"]}]
-        prompt = tok.apply_chat_template(merged, tokenize=False, add_generation_prompt=True)
+        prompt = tok.apply_chat_template(merged, tokenize=False, add_generation_prompt=True,
+                                         enable_thinking=False)  # ignored unless Qwen3
     # The chat template already contains BOS; do not add it twice.
     return prompt, False
 
