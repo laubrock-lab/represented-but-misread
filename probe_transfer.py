@@ -34,6 +34,7 @@ Usage
     python probe_transfer.py --mode curve --layer-step 2
     python probe_transfer.py --pairs chat:journalism_seg --n-perm 100
     python probe_transfer.py --include-overlap --n-perm 0
+    python probe_transfer.py --train-stratum naive --tag _naive
 
 Outputs (outputs/transfer/):
     transfer_selected.csv   one row per pair x condition x site x method
@@ -77,6 +78,16 @@ def condition_info(condition: str) -> dict:
     return dict(preset=parts[0], variant=parts[1], fmt=parts[2])
 
 
+def load_meta(root: Path, corpus: str, condition: str) -> pd.DataFrame | None:
+    """Item metadata from the judgment table; prompt_type/gen_model are not in the npz."""
+    f = root / corpus / f"{condition}.csv"
+    if not f.exists():
+        return None
+    d = pd.read_csv(f, keep_default_na=False)
+    d["text_id"] = d["text_id"].astype(str)
+    return d[["text_id", "prompt_type", "gen_model"]].drop_duplicates("text_id")
+
+
 def load_corpus(root: Path, corpus: str, condition: str, site: str) -> dict | None:
     path = root / corpus / f"{condition}_acts.npz"
     if not path.exists():
@@ -85,8 +96,18 @@ def load_corpus(root: Path, corpus: str, condition: str, site: str) -> dict | No
     X = z[f"acts_{site}"]
     if np.isnan(X).any():
         raise SystemExit(f"NaN in activations: {path} [{site}]")
-    return dict(X=X, y=z["is_ai"].astype(int),
-                sid=z["source_id"].astype(str), tid=z["text_id"].astype(str))
+    tid = z["text_id"].astype(str)
+    out = dict(X=X, y=z["is_ai"].astype(int),
+               sid=z["source_id"].astype(str), tid=tid)
+    meta = load_meta(root, corpus, condition)
+    if meta is None:
+        out["pt"] = np.full(len(tid), "", dtype=object)
+        out["gm"] = np.full(len(tid), "", dtype=object)
+    else:
+        m = meta.set_index("text_id").reindex(tid)
+        out["pt"] = m["prompt_type"].fillna("").to_numpy(dtype=object)
+        out["gm"] = m["gen_model"].fillna("").to_numpy(dtype=object)
+    return out
 
 
 def probe_table(root: Path, corpus: str, preset: str) -> pd.DataFrame:
@@ -220,8 +241,22 @@ def analyze_pair(args, src: str, tgt: str, condition: str, site: str) -> list[di
     trow = ttbl[(ttbl["condition"] == condition) & (ttbl["site"] == site)]
     target_out = float(trow["out_d"].iloc[0]) if len(trow) and "out_d" in trow else np.nan
 
-    Xs, ys, gs = s["X"][:, layer, :], s["y"], s["sid"]
+    Xs_all, ys_all, gs_all = s["X"][:, layer, :], s["y"], s["sid"]
     Xt, yt, gt = t["X"][:, layer, :], t["y"], t["sid"]
+    opt = t["pt"]
+
+    # Training stratum: human rows plus AI rows of one prompt type. The layer is
+    # *not* re-selected per stratum; it comes from the full source CV, which is
+    # the conservative choice (no stratum gets its own best layer).
+    if args.train_stratum == "all":
+        tr = np.ones(len(ys_all), bool)
+    else:
+        tr = (ys_all == 0) | (s["pt"] == args.train_stratum)
+        if tr.sum() < 10 or len(np.unique(ys_all[tr])) < 2:
+            print(f"skip {src}->{tgt} {condition} {site}: no source rows for "
+                  f"stratum {args.train_stratum}")
+            return []
+    Xs, ys, gs = Xs_all[tr], ys_all[tr], gs_all[tr]
 
     d_src, d_std = mean_diff(Xs, ys), std_diff(Xs, ys)
     d_tgt = mean_diff(Xt, yt)
@@ -232,7 +267,8 @@ def analyze_pair(args, src: str, tgt: str, condition: str, site: str) -> list[di
 
     base = dict(source=src, target=tgt, condition=condition, **info, site=site,
                 layer=layer, independent=independent, n=int(len(yt)),
-                n_dropped=n_dropped, source_cv_d=sel["source_cv_d"],
+                n_dropped=n_dropped, train_stratum=args.train_stratum,
+                n_train=int(tr.sum()), source_cv_d=sel["source_cv_d"],
                 source_cv_lo=sel["source_cv_lo"], source_cv_hi=sel["source_cv_hi"],
                 target_cv_d=ceiling, target_out_d=target_out,
                 cos_dir=cos_dir, C=C, n_perm=args.n_perm,
@@ -241,8 +277,22 @@ def analyze_pair(args, src: str, tgt: str, condition: str, site: str) -> list[di
     rows = []
 
     def add(method: str, dv: np.ndarray, **extra):
-        rows.append({**base, "method": method,
-                     **metrics(yt, dv, gt, args.n_boot, args.seed), **extra})
+        row = {**base, "method": method,
+               **metrics(yt, dv, gt, args.n_boot, args.seed), **extra}
+        if not args.no_target_strata:
+            for st in ("naive", "optimized"):
+                m = (yt == 0) | (opt == st)
+                if m.sum() >= 10 and len(np.unique(yt[m])) == 2 \
+                        and len(np.unique(gt[m])) >= 3:
+                    mm = metrics(yt[m], dv[m], gt[m], args.n_boot, args.seed)
+                else:
+                    mm = dict(auc=np.nan, d_auc=np.nan,
+                              d_auc_lo=np.nan, d_auc_hi=np.nan)
+                row.update({f"auc_{st}": mm["auc"], f"d_auc_{st}": mm["d_auc"],
+                            f"d_auc_{st}_lo": mm["d_auc_lo"],
+                            f"d_auc_{st}_hi": mm["d_auc_hi"],
+                            f"n_{st}": int(m.sum())})
+        rows.append(row)
 
     add("probe", model.decision_function(Xt.astype(float)))
     add("probe_recenter", ((Xt - Xt.mean(0)) / np.where(Xt.std(0) > 0, Xt.std(0), 1.0)) @ w_std + b)
@@ -354,6 +404,15 @@ def main() -> None:
                     help="global = shuffle all labels (standard); group = within "
                          "source groups (weaker; keeps class balance)")
     ap.add_argument("--n-boot", type=int, default=1000)
+    ap.add_argument("--train-stratum", choices=["all", "naive", "optimized"],
+                    default="all",
+                    help="fit the source probe on human + AI of one prompt type only "
+                         "(the layer stays the full-corpus one; the target is scored "
+                         "overall and split by its own prompt type)")
+    ap.add_argument("--no-target-strata", action="store_true",
+                    help="skip the target naive/optimized d' columns")
+    ap.add_argument("--tag", default="",
+                    help="suffix for the output file name, e.g. _naive")
     ap.add_argument("--include-overlap", action="store_true",
                     help="also run non-independent pairs (same items/articles)")
     ap.add_argument("--n-jobs", type=int, default=-1)
@@ -399,15 +458,18 @@ def main() -> None:
 
     out = root / "transfer"
     out.mkdir(exist_ok=True)
-    name = "transfer_selected.csv" if args.mode == "selected" else "transfer_curve.csv"
+    base = "transfer_selected" if args.mode == "selected" else "transfer_curve"
+    name = f"{base}{args.tag}.csv"
     df.to_csv(out / name, index=False)
     print(f"\n-> {out / name}  ({len(df)} rows)")
 
     if args.mode == "selected":
         cols = ["source", "target", "preset", "variant", "fmt", "site", "method",
-                "layer", "d_auc", "d_auc_lo", "d_auc_hi", "p_perm", "q_bh",
+                "train_stratum", "layer", "d_auc", "d_auc_lo", "d_auc_hi",
+                "d_auc_naive", "d_auc_optimized", "p_perm", "q_bh",
                 "q_bh_pair", "source_cv_d", "target_cv_d", "target_out_d",
-                "cos_dir", "n", "independent"]
+                "cos_dir", "n", "n_train", "independent"]
+        cols = [c for c in cols if c in df.columns]
         top = df[df["method"].isin(["probe", "diff"])].sort_values(
             ["method", "d_auc"], ascending=[True, False])
         with pd.option_context("display.width", 220, "display.max_rows", 60,
