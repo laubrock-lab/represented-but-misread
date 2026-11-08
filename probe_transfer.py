@@ -394,6 +394,9 @@ def main() -> None:
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--out-dir", type=Path, default=config.OUTPUT_DIR)
     ap.add_argument("--corpora", nargs="+", default=CORPORA)
+    ap.add_argument("--conditions", nargs="*",
+                    help="restrict to these condition names (default: all in the "
+                         "first corpus, typically chat)")
     ap.add_argument("--pairs", nargs="*", help="restrict to 'src:tgt' pairs")
     ap.add_argument("--mode", choices=["selected", "curve"], default="selected")
     ap.add_argument("--sites", nargs="+", default=["last", "textmean"],
@@ -425,12 +428,16 @@ def main() -> None:
     else:
         pairs = [(a, b) for a in args.corpora for b in args.corpora if a != b]
 
-    conditions = sorted(
+    conditions = args.conditions or sorted(
         p.name.removesuffix("_acts.npz")
         for p in (root / args.corpora[0]).glob("*_acts.npz")
     )
     if not conditions:
         raise SystemExit(f"no *_acts.npz in {root / args.corpora[0]}")
+    missing = [c for c in conditions
+               if not (root / args.corpora[0] / f"{c}_acts.npz").exists()]
+    if missing:
+        raise SystemExit(f"no activations for {missing} in {args.corpora[0]}")
 
     jobs = []
     for src, tgt in pairs:

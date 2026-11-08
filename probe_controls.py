@@ -310,6 +310,7 @@ def main() -> None:
     ap.add_argument("--n-boot", type=int, default=1000)
     ap.add_argument("--n-jobs", type=int, default=-1)
     ap.add_argument("--seed", type=int, default=1)
+    ap.add_argument("--tag", default="", help="suffix for the output file name")
     args = ap.parse_args()
 
     root = args.out_dir
@@ -330,7 +331,7 @@ def main() -> None:
     df = pd.DataFrame(rows)
     out = root / "controls"
     out.mkdir(exist_ok=True)
-    name = f"controls_{args.corpus}.csv"
+    name = f"controls_{args.corpus}{args.tag}.csv"
     df.to_csv(out / name, index=False)
     print(f"\n-> {out / name}  ({len(df)} rows)")
 
