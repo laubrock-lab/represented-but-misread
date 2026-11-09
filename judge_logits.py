@@ -71,16 +71,17 @@ def pick_device(requested: str) -> str:
 
 
 def load_model(model_id: str, device: str, dtype: torch.dtype):
-    tok = AutoTokenizer.from_pretrained(model_id)
     import transformers
     cfg = transformers.PretrainedConfig.get_config_dict(model_id)[0]
     if cfg.get("model_type") == "olmo2-retrofit":
         # OLMo 3 RL-Zero checkpoints carry the pre-release name of the OLMo 3
         # architecture (config otherwise identical to Olmo3ForCausalLM).
         conf = transformers.Olmo3Config.from_dict({**cfg, "model_type": "olmo3"})
+        tok = AutoTokenizer.from_pretrained(model_id, config=conf)
         model = transformers.Olmo3ForCausalLM.from_pretrained(model_id, config=conf, dtype=dtype)
         model.to(device).eval()
         return tok, model
+    tok = AutoTokenizer.from_pretrained(model_id)
     try:
         model = AutoModelForCausalLM.from_pretrained(model_id, dtype=dtype)
     except ValueError:
