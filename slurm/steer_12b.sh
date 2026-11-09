@@ -15,16 +15,19 @@ export HF_HUB_OFFLINE=1
 
 echo "$(date) — start on $(hostname), GPU: $(nvidia-smi --query-gpu=name,memory.total --format=csv,noheader)"
 
-# Usage: sbatch slurm/steer_12b.sh <corpus> <layer>
+# Usage: sbatch slurm/steer_12b.sh <corpus> <layer> [extra steer_logits.py args]
 # e.g.:  sbatch slurm/steer_12b.sh journalism_seg 31
-#        sbatch slurm/steer_12b.sh chat_tw25 20
+#        sbatch slurm/steer_12b.sh chat_tw25 20 --only-controls --controls decision
+#        sbatch slurm/steer_12b.sh journalism_seg 32 --fmt chat --controls random decision
+# Extra args come last, so they override the defaults below.
 CORPUS="${1:?Usage: sbatch steer_12b.sh <corpus> <layer>}"
 LAYER="${2:?Usage: sbatch steer_12b.sh <corpus> <layer>}"
+shift 2
 
-echo "$(date) — ${CORPUS} layer ${LAYER}"
+echo "$(date) — ${CORPUS} layer ${LAYER} $*"
 python steer_logits.py "outputs/${CORPUS}" \
     --preset gemma3-12b --layer "$LAYER" \
     --add -6 -3 0 3 6 --scale 0 0.5 1 3 6 \
-    --unit sd --n-random 5
+    --unit sd --n-random 5 "$@"
 
 echo "$(date) — done, exit $?"
