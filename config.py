@@ -40,6 +40,7 @@ MODEL_PRESETS: dict[str, dict[str, str]] = {
     "olmo2-7b":   {"base": "allenai/OLMo-2-1124-7B", "sft": "allenai/OLMo-2-1124-7B-SFT",
                    "dpo": "allenai/OLMo-2-1124-7B-DPO", "instruct": "allenai/OLMo-2-1124-7B-Instruct"},
     "apertus15-8b": {"base": "swiss-ai/Apertus-v1.5-8B-base", "sft": "swiss-ai/Apertus-v1.5-8B-SFT",
+                     "rl": "swiss-ai/Apertus-v1.5-8B-RL",  # SFT -> RLVR -> DPO -> SDPO (final)
                      "dpo": "swiss-ai/Apertus-v1.5-8B-DPO", "instruct": "swiss-ai/Apertus-v1.5-8B"},
 }
 

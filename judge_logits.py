@@ -306,7 +306,7 @@ def main() -> None:
     ap.add_argument("--base-id", help="override the base model id of the preset")
     ap.add_argument("--instruct-id", help="override the instruct model id of the preset")
     ap.add_argument("--variants", nargs="+", default=["base", "instruct"],
-                    choices=["base", "sft", "dpo", "instruct"],
+                    choices=["base", "sft", "rl", "dpo", "instruct"],
                     help="sft/dpo only for presets with published post-training stages")
     ap.add_argument("--formats", nargs="+", default=["raw", "chat"], choices=["raw", "chat"])
     ap.add_argument("--orders", nargs="+", default=["mk", "km"], choices=list(config.ORDERS))

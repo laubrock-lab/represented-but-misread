@@ -1,7 +1,7 @@
 """Where along the post-training pipeline does AI-text discrimination change?
 
 For model families with public intermediate checkpoints (OLMo 2 7B, Apertus 1.5
-8B: base -> SFT -> DPO -> final), reports per corpus and prompt format the
+8B: base -> SFT -> [RL] -> DPO -> final), reports per corpus and prompt format the
 order-averaged output-level d' (AUC-based, as in sdt_summary.py) and the
 criterion c0 of every stage, plus paired differences between consecutive
 stages and final - base. CIs from a grouped bootstrap over source_id, using
@@ -25,7 +25,8 @@ import pandas as pd
 
 from sdt_summary import is_judgment_csv, sdt
 
-STAGES = ["base", "sft", "dpo", "instruct"]
+STAGES = ["base", "sft", "rl", "dpo", "instruct"]   # in training order; OLMo has no rl
+# (OLMo 2: SFT -> DPO -> RLVR = final; Apertus 1.5: SFT -> RLVR (rl) -> DPO -> SDPO = final)
 PRESETS = ["olmo2-7b", "apertus15-8b"]
 
 
