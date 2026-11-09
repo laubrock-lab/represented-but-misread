@@ -3,7 +3,9 @@
 Prints, per corpus: the output-level d'/c of each condition (order-averaged,
 from the probe CSV's out_* columns) and the best probe layer at the `last`
 site (readout position), with grouped-bootstrap CI, shuffled-label AUC, and
-the layer-0 sanity check (d' must be ~ 0 there).
+the layer-0 sanity check (d' must be ~ 0 there). Also prints the steering
+summary for journalism_seg (class vs decision vs random) at the steered
+layers.
 
 Usage:  python readout_qwen3.py
 """
@@ -14,6 +16,7 @@ from pathlib import Path
 import pandas as pd
 
 CORPORA = ["journalism_seg", "chat_tw25", "journalism_win80", "chat"]
+STEER_LAYERS = [24, 30]          # inversion band: onset (67%) and deep (83%)
 
 
 def main() -> None:
@@ -38,5 +41,22 @@ def main() -> None:
                   f"  shuf={best.auc_shuffled:.3f}  L0 d'={l0.d_auc:+.2f}")
 
 
+def steering_readout() -> None:
+    """Steering summary (journalism_seg, instruct raw) at the steered layers."""
+    out = Path("outputs/journalism_seg")
+    for layer in STEER_LAYERS:
+        sfx = f"qwen3-8b_instruct_raw_mk_L{layer}_sd"
+        s = pd.read_csv(out / f"steer_summary_{sfx}.csv")
+        d = pd.read_csv(out / f"steer_decomp_{sfx}.csv")
+        r = d[d.direction.str.startswith("random")]
+        print(f"\n===== steering L{layer} (random directional "
+              f"{r.directional.mean():+.3f} ± {r.directional.std():.3f})")
+        key = s[s.direction.isin(["class", "decision"])]
+        with pd.option_context("display.width", 200, "display.float_format",
+                               "{:+.2f}".format):
+            print(key.to_string(index=False))
+
+
 if __name__ == "__main__":
     main()
+    steering_readout()
