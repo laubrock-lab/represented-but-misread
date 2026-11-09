@@ -80,13 +80,17 @@ def main() -> None:
     ap.add_argument("--corpora", nargs="+",
                     default=["chat", "chat_tw25", "journalism_win80", "journalism_seg"])
     ap.add_argument("--presets", nargs="+", default=["gemma3-4b", "gemma3-12b"])
+    ap.add_argument("--out", default="alignment_profile.csv",
+                    help="file name in outputs/ (overwritten; use a separate name for subsets)")
     args = ap.parse_args()
 
     rows = []
     for corpus in args.corpora:
         out_dir = config.OUTPUT_DIR / corpus
         for preset in args.presets:
-            for variant, fmt in (("base", "raw"), ("instruct", "raw"), ("instruct", "chat")):
+            # base (raw only), then every post-training stage the preset defines, in training order
+            stages = [v for v in ("sft", "rl", "dpo", "instruct") if v in config.MODEL_PRESETS[preset]]
+            for variant, fmt in [("base", "raw")] + [(v, f) for v in stages for f in ("raw", "chat")]:
                 stem = condition_stem(preset, variant, fmt, "mk", "neutral")
                 f = out_dir / f"{stem}_acts.npz"
                 if not f.exists():
@@ -112,7 +116,7 @@ def main() -> None:
                                      output_d=float(out_d), n=len(y)))
                 print(f"{corpus:16s} {stem:40s} output d' {out_d:+.2f}")
     df = pd.DataFrame(rows)
-    path = config.OUTPUT_DIR / "alignment_profile.csv"
+    path = config.OUTPUT_DIR / args.out
     df.to_csv(path, index=False)
     print(f"{len(df)} rows -> {path}")
     summ = (df.groupby(["corpus", "preset", "variant", "fmt"])["alignment"]
