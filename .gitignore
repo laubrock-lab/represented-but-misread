@@ -9,3 +9,5 @@ outputs/
 __pycache__/
 *.pyc
 .DS_Store
+# literature PDFs (copyrighted; never commit)
+paper/references/pdf/
