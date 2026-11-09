@@ -201,7 +201,7 @@ def main() -> None:
     ap.add_argument("out_dir", type=Path, help="corpus output dir with *_acts.npz")
     ap.add_argument("--texts", type=Path, help="default: data/texts_<out_dir name>.parquet")
     ap.add_argument("--preset", default="gemma3-4b", choices=list(config.MODEL_PRESETS))
-    ap.add_argument("--variant", default="instruct", choices=["base", "instruct"])
+    ap.add_argument("--variant", default="instruct", choices=["base", "sft", "rl", "dpo", "instruct"])
     ap.add_argument("--fmt", default="raw", choices=["raw", "chat"])
     ap.add_argument("--system", default="neutral", choices=list(config.SYSTEM_PROMPTS))
     ap.add_argument("--orders", nargs="+", default=["mk", "km"], choices=list(config.ORDERS))
