@@ -27,7 +27,7 @@ from sdt_summary import is_judgment_csv, sdt
 
 STAGES = ["base", "sft", "rl", "dpo", "instruct"]   # in training order; OLMo has no rl
 # (OLMo 2: SFT -> DPO -> RLVR = final; Apertus 1.5: SFT -> RLVR (rl) -> DPO -> SDPO = final)
-PRESETS = ["olmo2-7b", "apertus15-8b"]
+PRESETS = ["olmo2-7b", "apertus15-8b", "olmo3-7b-think", "olmo3-7b-instruct", "olmo3-7b-rlzero"]
 
 
 def load(out_dir: Path, preset: str) -> pd.DataFrame:
@@ -61,6 +61,8 @@ def main() -> None:
     rows = []
     for out_dir in args.out_dirs:
         for preset in PRESETS:
+            if not list(out_dir.glob(f"{preset}_*.csv")):
+                continue
             avg = load(out_dir, preset)
             meta = avg.drop_duplicates("text_id").set_index("text_id")[["source_id", "is_ai"]]
             for fmt in ("raw", "chat"):

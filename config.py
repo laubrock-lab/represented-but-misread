@@ -42,6 +42,14 @@ MODEL_PRESETS: dict[str, dict[str, str]] = {
     "apertus15-8b": {"base": "swiss-ai/Apertus-v1.5-8B-base", "sft": "swiss-ai/Apertus-v1.5-8B-SFT",
                      "rl": "swiss-ai/Apertus-v1.5-8B-RL",  # SFT -> RLVR -> DPO -> SDPO (final)
                      "dpo": "swiss-ai/Apertus-v1.5-8B-DPO", "instruct": "swiss-ai/Apertus-v1.5-8B"},
+    # OLMo 3 7B: two post-training lines from the same base (open data). Think: SFT
+    # on reasoning traces -> DPO -> RLVR; Instruct: SFT on chat/instruction data ->
+    # DPO -> RLVR. RL-Zero: RLVR applied directly to the base, without SFT.
+    "olmo3-7b-think":    {"base": "allenai/Olmo-3-1025-7B", "sft": "allenai/Olmo-3-7B-Think-SFT",
+                          "dpo": "allenai/Olmo-3-7B-Think-DPO", "instruct": "allenai/Olmo-3-7B-Think"},
+    "olmo3-7b-instruct": {"base": "allenai/Olmo-3-1025-7B", "sft": "allenai/Olmo-3-7B-Instruct-SFT",
+                          "dpo": "allenai/Olmo-3-7B-Instruct-DPO", "instruct": "allenai/Olmo-3-7B-Instruct"},
+    "olmo3-7b-rlzero":   {"base": "allenai/Olmo-3-1025-7B", "rl": "allenai/Olmo-3-7B-RL-Zero-Mix"},
 }
 
 # ---------------------------------------------------------------------------

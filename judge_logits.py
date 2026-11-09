@@ -72,13 +72,21 @@ def pick_device(requested: str) -> str:
 
 def load_model(model_id: str, device: str, dtype: torch.dtype):
     tok = AutoTokenizer.from_pretrained(model_id)
+    import transformers
+    cfg = transformers.PretrainedConfig.get_config_dict(model_id)[0]
+    if cfg.get("model_type") == "olmo2-retrofit":
+        # OLMo 3 RL-Zero checkpoints carry the pre-release name of the OLMo 3
+        # architecture (config otherwise identical to Olmo3ForCausalLM).
+        conf = transformers.Olmo3Config.from_dict({**cfg, "model_type": "olmo3"})
+        model = transformers.Olmo3ForCausalLM.from_pretrained(model_id, config=conf, dtype=dtype)
+        model.to(device).eval()
+        return tok, model
     try:
         model = AutoModelForCausalLM.from_pretrained(model_id, dtype=dtype)
     except ValueError:
         # Gemma 3 >= 4B is registered as an image-text-to-text model in some
         # transformers versions; Apertus 1.5 only as a multimodal LM. The text
         # path is identical.
-        import transformers
         try:
             model = transformers.AutoModelForImageTextToText.from_pretrained(model_id, dtype=dtype)
         except ValueError:
@@ -126,6 +134,11 @@ def build_prompt(tok, text: str, fmt: str, order: str, system: str,
                    "content": messages[0]["content"] + "\n\n" + messages[1]["content"]}]
         prompt = tok.apply_chat_template(merged, tokenize=False, add_generation_prompt=True,
                                          enable_thinking=False)  # ignored unless Qwen3
+    # Reasoning templates (OLMo 3 Think) open a <think> block in the generation
+    # prompt; close it empty so that the next token is the answer, as with
+    # enable_thinking=False for Qwen3.
+    if prompt.rstrip().endswith("<think>"):
+        prompt = prompt.rstrip() + "\n\n</think>\n\n"
     # The chat template already contains BOS; do not add it twice.
     return prompt, False
 
