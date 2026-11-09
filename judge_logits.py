@@ -76,9 +76,13 @@ def load_model(model_id: str, device: str, dtype: torch.dtype):
         model = AutoModelForCausalLM.from_pretrained(model_id, dtype=dtype)
     except ValueError:
         # Gemma 3 >= 4B is registered as an image-text-to-text model in some
-        # transformers versions; the text path is identical.
-        from transformers import AutoModelForImageTextToText
-        model = AutoModelForImageTextToText.from_pretrained(model_id, dtype=dtype)
+        # transformers versions; Apertus 1.5 only as a multimodal LM. The text
+        # path is identical.
+        import transformers
+        try:
+            model = transformers.AutoModelForImageTextToText.from_pretrained(model_id, dtype=dtype)
+        except ValueError:
+            model = transformers.AutoModelForMultimodalLM.from_pretrained(model_id, dtype=dtype)
     model.to(device).eval()
     return tok, model
 
@@ -302,7 +306,8 @@ def main() -> None:
     ap.add_argument("--base-id", help="override the base model id of the preset")
     ap.add_argument("--instruct-id", help="override the instruct model id of the preset")
     ap.add_argument("--variants", nargs="+", default=["base", "instruct"],
-                    choices=["base", "instruct"])
+                    choices=["base", "sft", "dpo", "instruct"],
+                    help="sft/dpo only for presets with published post-training stages")
     ap.add_argument("--formats", nargs="+", default=["raw", "chat"], choices=["raw", "chat"])
     ap.add_argument("--orders", nargs="+", default=["mk", "km"], choices=list(config.ORDERS))
     ap.add_argument("--system", default="neutral", choices=list(config.SYSTEM_PROMPTS))
