@@ -96,7 +96,9 @@ def main() -> None:
                         rows.append(tag | dict(stat=k, contrast=s, est=point[s][k], lo=lo, hi=hi,
                                                p_mass=pm[s]))
                 stages = [s for s in STAGES if s in cond]
-                pairs = list(zip(stages[:-1], stages[1:])) + [("base", stages[-1])]
+                pairs = list(zip(stages[:-1], stages[1:]))
+                if len(stages) > 2:
+                    pairs.append(("base", stages[-1]))
                 for a, b in pairs:
                     for k in ("d_auc", "c0"):
                         lo, hi = ci(lambda r: r[b][k] - r[a][k])
