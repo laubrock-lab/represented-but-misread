@@ -115,24 +115,31 @@ def condition_stem(preset: str, variant: str, fmt: str, order: str, system: str,
 
 
 def build_prompt(tok, text: str, fmt: str, order: str, system: str,
-                 prior: str = "none", prior_order: str = "ai") -> tuple[str, bool]:
-    """Return (prompt string, add_special_tokens flag for tokenization)."""
+                 prior: str = "none", prior_order: str = "ai",
+                 examples: list[tuple[str, str]] | None = None) -> tuple[str, bool]:
+    """Return (prompt string, add_special_tokens flag for tokenization).
+
+    examples: optional few-shot demonstrations [(text, "Mensch"|"KI"), ...],
+    shown before the target in the same format (raw: completed question-answer
+    blocks; chat: earlier user/assistant turns)."""
     opts = " oder ".join(config.ORDERS[order])
     pri = config.prior_sentence(prior, prior_order)
+    examples = examples or []
     if fmt == "raw":
-        return config.RAW_TEMPLATE.format(text=text, opts=opts, prior=pri), True
-    messages = [
-        {"role": "system", "content": config.SYSTEM_PROMPTS[system]},
-        {"role": "user", "content": config.CHAT_USER_TEMPLATE.format(text=text, opts=opts,
-                                                                     prior=pri)},
-    ]
+        shots = "".join(config.RAW_TEMPLATE.format(text=t, opts=opts, prior=pri) + f" {lab}\n\n"
+                        for t, lab in examples)
+        return shots + config.RAW_TEMPLATE.format(text=text, opts=opts, prior=pri), True
+    user = lambda t: {"role": "user",
+                      "content": config.CHAT_USER_TEMPLATE.format(text=t, opts=opts, prior=pri)}
+    turns = [m for t, lab in examples for m in (user(t), {"role": "assistant", "content": lab})]
+    messages = [{"role": "system", "content": config.SYSTEM_PROMPTS[system]}] + turns + [user(text)]
     try:
         prompt = tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True,
                                          enable_thinking=False)  # ignored unless Qwen3
     except Exception:
-        # templates without a system role: fold the system prompt into the user turn
-        merged = [{"role": "user",
-                   "content": messages[0]["content"] + "\n\n" + messages[1]["content"]}]
+        # templates without a system role: fold the system prompt into the first user turn
+        merged = [dict(messages[1])] + messages[2:]
+        merged[0]["content"] = messages[0]["content"] + "\n\n" + merged[0]["content"]
         prompt = tok.apply_chat_template(merged, tokenize=False, add_generation_prompt=True,
                                          enable_thinking=False)  # ignored unless Qwen3
     # Reasoning templates (OLMo 3 Think) open a <think> block in the generation
@@ -257,11 +264,43 @@ def score_one(model, tok, prompt: str, add_special: bool, text_span: tuple[int, 
     return res
 
 
+def example_pool(texts: pd.DataFrame, seed: int) -> pd.DataFrame:
+    """Fixed, shuffled pool of candidate demonstrations for one seed."""
+    pool = texts.sample(frac=1.0, random_state=seed).reset_index(drop=True)
+    # held-out unit: the source pair; for chats the author (prefix before "__")
+    pool["unit"] = pool["source_id"].astype(str).str.split("__").str[0]
+    return pool
+
+
+def pick_examples(pool: pd.DataFrame, target_source: str, k: int, seed: int, tok,
+                  max_tokens: int) -> list[tuple[str, str]]:
+    """k/2 AI and k/2 human demonstrations from units other than the target's,
+    in a seed-fixed mixed order. The last demonstration's label alternates with
+    the seed (even: Mensch, odd: KI), so that recency effects cancel over an
+    even number of seeds."""
+    unit = str(target_source).split("__")[0]
+    ok = pool[pool["unit"] != unit]
+    ai = ok[ok["is_ai"] == 1].head(k // 2)
+    hu = ok[ok["is_ai"] == 0].head(k - k // 2)
+    ex = pd.concat([ai, hu]).sample(frac=1.0, random_state=seed).reset_index(drop=True)
+    want_last = 1 if seed % 2 else 0
+    if len(ex) > 1 and ex["is_ai"].iloc[-1] != want_last:
+        j = ex.index[ex["is_ai"] == want_last][-1]          # swap a matching item to the end
+        order = [i for i in ex.index if i != j] + [j]
+        ex = ex.loc[order]
+    return [(truncate_text(tok, t, max_tokens)[0], "KI" if a else "Mensch")
+            for t, a in zip(ex["text"], ex["is_ai"])]
+
+
 def run_condition(model, tok, texts: pd.DataFrame, *, preset: str, variant: str,
                   model_id: str, fmt: str, order: str, system: str, max_text_tokens: int,
                   device: str, want_acts: bool, out_dir: Path, prior: str = "none",
-                  prior_order: str = "ai") -> None:
+                  prior_order: str = "ai", fewshot: int = 0, fewshot_seed: int = 0,
+                  fewshot_max_tokens: int = 200) -> None:
     stem = condition_stem(preset, variant, fmt, order, system, prior, prior_order)
+    if fewshot:
+        stem += f"_fs{fewshot}s{fewshot_seed}"
+        pool = example_pool(texts, fewshot_seed)
     csv_path = out_dir / f"{stem}.csv"
     cands = candidate_ids(tok)
     eow: dict = {}  # end-of-word mask, built lazily once the logit size is known
@@ -273,8 +312,11 @@ def run_condition(model, tok, texts: pd.DataFrame, *, preset: str, variant: str,
     t0 = time.time()
     for i, r in enumerate(tqdm(texts.itertuples(index=False), total=len(texts), desc=stem)):
         text, n_tok, truncated = truncate_text(tok, r.text, max_text_tokens)
-        prompt, add_special = build_prompt(tok, text, fmt, order, system, prior, prior_order)
-        start = prompt.find(text)
+        examples = (pick_examples(pool, r.source_id, fewshot, fewshot_seed, tok, fewshot_max_tokens)
+                    if fewshot else None)
+        prompt, add_special = build_prompt(tok, text, fmt, order, system, prior, prior_order,
+                                           examples)
+        start = prompt.rfind(text)   # the target is the last text in the prompt
         span = (start, start + len(text)) if start >= 0 else None
         res = score_one(model, tok, prompt, add_special, span, cands, eow, device, want_acts)
         if i < 3:  # format sanity check — prints answer tokens only, never text
@@ -290,7 +332,8 @@ def run_condition(model, tok, texts: pd.DataFrame, *, preset: str, variant: str,
             preset=preset, variant=variant, model_id=model_id, fmt=fmt, order=order,
             system=system if fmt == "chat" else "", prior=prior,
             prior_order=prior_order if prior != "none" else "", n_text_tokens=n_tok,
-            truncated=truncated, **res,
+            truncated=truncated, fewshot=fewshot, fewshot_seed=fewshot_seed if fewshot else "",
+            **res,
         ))
 
     df = pd.DataFrame(rows)
@@ -338,7 +381,15 @@ def main() -> None:
     ap.add_argument("--limit", type=int, help="score only the first N texts (smoke test)")
     ap.add_argument("--out-dir", type=Path, help="default: outputs/<texts file stem>")
     ap.add_argument("--overwrite", action="store_true")
+    ap.add_argument("--fewshot", type=int, default=0,
+                    help="k labelled demonstrations (k/2 AI, k/2 human) from other sources/authors; "
+                         "use a separate --out-dir (e.g. outputs/fewshot/<corpus>)")
+    ap.add_argument("--fewshot-seeds", type=int, nargs="+", default=[0])
+    ap.add_argument("--fewshot-max-tokens", type=int, default=200,
+                    help="truncate each demonstration to this many tokens")
     args = ap.parse_args()
+    if args.fewshot and args.out_dir is None:
+        raise SystemExit("--fewshot needs an explicit --out-dir (keep few-shot runs separate)")
 
     texts = (pd.read_parquet(args.texts) if args.texts.suffix == ".parquet"
              else pd.read_csv(args.texts))
@@ -359,26 +410,29 @@ def main() -> None:
     print(f"{len(texts)} texts ({texts['is_ai'].sum()} AI) | device {device} | {args.dtype}")
 
     for variant in args.variants:
-        conditions = [(f, o, p, po) for p in args.priors
+        seeds = args.fewshot_seeds if args.fewshot else [0]
+        conditions = [(f, o, p, po, sd) for p in args.priors
                       for po in (args.prior_orders if p != "none" else ["ai"])
-                      for f in args.formats for o in args.orders
+                      for f in args.formats for o in args.orders for sd in seeds
                       if not (f == "chat" and variant == "base")]
         todo = []
-        for fmt, order, prior, po in conditions:
+        for fmt, order, prior, po, sd in conditions:
             stem = condition_stem(args.preset, variant, fmt, order, args.system, prior, po)
+            stem += f"_fs{args.fewshot}s{sd}" if args.fewshot else ""
             if (out_dir / f"{stem}.csv").exists() and not args.overwrite:
                 print(f"skip {stem} (exists; --overwrite to redo)")
             else:
-                todo.append((fmt, order, prior, po))
+                todo.append((fmt, order, prior, po, sd))
         if not todo:
             continue
         tok, model = load_model(ids[variant], device, dtype)
-        for fmt, order, prior, po in todo:
+        for fmt, order, prior, po, sd in todo:
             run_condition(model, tok, texts, preset=args.preset, variant=variant,
                           model_id=ids[variant], fmt=fmt, order=order, system=args.system,
                           max_text_tokens=args.max_text_tokens, device=device,
                           want_acts=order in (args.acts_orders or []), out_dir=out_dir,
-                          prior=prior, prior_order=po)
+                          prior=prior, prior_order=po, fewshot=args.fewshot, fewshot_seed=sd,
+                          fewshot_max_tokens=args.fewshot_max_tokens)
         del model
         gc.collect()
         if device == "mps":
