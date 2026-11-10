@@ -62,6 +62,10 @@ def main() -> None:
     ap.add_argument("--lower", required=True, help="variant providing embedding + layers 1..split")
     ap.add_argument("--upper", required=True, help="variant providing layers split+1..L + head")
     ap.add_argument("--split", type=int, required=True, help="number of decoder layers from the lower model")
+    ap.add_argument("--component", default="all", choices=["all", "attn", "mlp"],
+                    help="all: embedding + whole layers 1..split from the lower model; attn / mlp: "
+                         "only the attention (or MLP) block incl. its norm in layers 1..split, "
+                         "everything else (incl. embedding) from the upper model")
     ap.add_argument("--n-ppl", type=int, default=40)
     ap.add_argument("--limit", type=int)
     ap.add_argument("--device", default="auto")
@@ -81,9 +85,29 @@ def main() -> None:
 
     _, lower = load_model(ids[args.lower], "cpu", torch.bfloat16)              # lower model A on CPU
     layers_a = find_decoder_layers(lower)
-    in_emb.weight.data.copy_(lower.get_input_embeddings().weight.data.to(device))
+    def block(name: str) -> str:
+        if "self_attn" in name or "attention_layernorm" in name:
+            return "attn"
+        if "mlp" in name or "feedforward_layernorm" in name:
+            return "mlp"
+        return "other"
+
+    if args.component == "all":
+        in_emb.weight.data.copy_(lower.get_input_embeddings().weight.data.to(device))
+    copied = set()
     for i in range(args.split):
-        layers_b[i].load_state_dict(layers_a[i].state_dict())
+        sd_a = layers_a[i].state_dict()
+        if args.component == "all":
+            layers_b[i].load_state_dict(sd_a)
+            continue
+        sd_b = layers_b[i].state_dict()
+        for k, v in sd_a.items():
+            if block(k) == args.component:
+                sd_b[k] = v
+                copied.add(k)
+        layers_b[i].load_state_dict(sd_b)
+    if args.component != "all":
+        print(f"copied {args.component} parameters per layer: {sorted(copied)}")
     del lower, layers_a
     gc.collect()
     model.eval()
@@ -95,12 +119,12 @@ def main() -> None:
         texts = texts.head(args.limit)
     out_dir = config.OUTPUT_DIR / "stitch" / args.corpus
     out_dir.mkdir(parents=True, exist_ok=True)
-    label = f"{args.lower}-{args.upper}_L{args.split}"
+    label = f"{args.lower}-{args.upper}_L{args.split}" + ("" if args.component == "all" else f"_{args.component}")
     ppl_texts = texts.sample(min(args.n_ppl, len(texts)), random_state=1)["text"].tolist()
     ppl = perplexity(model, tok, ppl_texts, device)
     print(f"perplexity on {len(ppl_texts)} texts: {ppl:.2f}")
     with open(out_dir / "perplexity.csv", "a") as f:
-        f.write(f"{args.preset},{args.lower},{args.upper},{args.split},{L},{ppl:.4f},{len(ppl_texts)}\n")
+        f.write(f"{args.preset},{args.lower},{args.upper},{args.split},{L},{ppl:.4f},{len(ppl_texts)},{args.component}\n")
     for order in ("mk", "km"):
         run_condition(model, tok, texts, preset=args.preset, variant=label,
                       model_id=f"{ids[args.lower]}|{ids[args.upper]}@{args.split}", fmt="raw",
