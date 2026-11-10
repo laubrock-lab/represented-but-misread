@@ -97,8 +97,18 @@ def main() -> None:
     for p in model.parameters():
         p.requires_grad_(False)
     if args.checkpointing:
+        # HF only checkpoints in training mode; switch dropout off so the
+        # gradients are identical to eval mode
+        for m in model.modules():
+            if isinstance(m, torch.nn.Dropout):
+                m.p = 0.0
+        for k in ("attention_dropout", "hidden_dropout", "dropout"):
+            for cfg in (model.config, getattr(model.config, "text_config", None)):
+                if cfg is not None and getattr(cfg, k, 0):
+                    setattr(cfg, k, 0.0)
         model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
         model.config.use_cache = False
+        model.train()
     cands, eow = candidate_ids(tok), {}
 
     dvs, grads, t0 = [], [], time.time()
