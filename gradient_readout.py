@@ -81,6 +81,9 @@ def main() -> None:
     ap.add_argument("--device", default="auto")
     ap.add_argument("--dtype", default="bfloat16", choices=["bfloat16", "float16", "float32"])
     ap.add_argument("--limit", type=int)
+    ap.add_argument("--checkpointing", action="store_true",
+                    help="gradient checkpointing (recompute activations in the backward pass; "
+                         "same gradients, much less memory — needed for 12B on 40 GB)")
     args = ap.parse_args()
 
     stem = condition_stem(args.preset, args.variant, args.fmt, "mk", args.system)
@@ -93,6 +96,9 @@ def main() -> None:
                             getattr(torch, args.dtype))
     for p in model.parameters():
         p.requires_grad_(False)
+    if args.checkpointing:
+        model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
+        model.config.use_cache = False
     cands, eow = candidate_ids(tok), {}
 
     dvs, grads, t0 = [], [], time.time()
