@@ -31,7 +31,7 @@ summaries: AUC ≥ .99), and a probe on the average input embedding of the text,
 before any processing by the network, performed about as well as probes on deep layers
 (short chats: d′ = 1.48). Holding out whole authors instead of single originals did not
 change this picture (word frequencies: d′ = 1.79). A detector that was trained by
-others to recognize AI-edited English text (EditLens; Thai et al., 2026) transferred to
+others to recognize AI-edited English text (EditLens; Thai et al., 2025) transferred to
 our German material in a graded manner, reaching an AUC of .99 for the textbook
 summaries, .73 for the newspaper segments, and .57 for the short chats (Figure 1). Thus,
 the cues that distinguish AI from human texts are present and readily accessible, both
