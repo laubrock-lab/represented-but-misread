@@ -140,6 +140,7 @@ def main() -> None:
     out["quant"] = quant
     out["emoji_norm"] = emoji is not None
     path = config.OUTPUT_DIR / args.corpus / "editlens_llama32-3b.csv"
+    path.parent.mkdir(parents=True, exist_ok=True)
     if args.limit:
         path = path.with_name("editlens_llama32-3b_smoke.csv")
     out.to_csv(path, index=False)
