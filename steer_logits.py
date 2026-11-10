@@ -146,7 +146,14 @@ def crossfit_directions(X: np.ndarray, y: np.ndarray, groups: np.ndarray, n_spli
     class     u = mean(AI) - mean(human)                     (what is represented)
     decision  u = mean(dv above median) - mean(dv below)     (what the answer follows;
               positive control: same site, same step size as the class direction)
-    random    random unit vector                             (null control)
+    random    random unit vector                             (null control, isotropic)
+    pcrandom  random unit vector within the top-20 principal components of the
+              within-class-centred activations (matched null: lives in the
+              high-variance subspace like the class direction does)
+    split     mean difference between two random halves within each class
+              (matched null: structured like a mean difference, no class info)
+    classorth class direction with the decision direction projected out
+              (does the class component act beyond the decision direction?)
     The step unit (delta) is common to all directions, so they take equal steps:
     unit "sd"    = pooled within-class SD of the projections onto the class
                    direction (natural spread; default)
@@ -166,10 +173,27 @@ def crossfit_directions(X: np.ndarray, y: np.ndarray, groups: np.ndarray, n_spli
         if control == "random":
             r = rng.standard_normal(X.shape[1])
             u, a, b = r / np.linalg.norm(r), mu1, mu0
-        elif control == "decision":
+        elif control == "pcrandom":
+            Xc = X[tr] - np.where((y[tr] == 1)[:, None], mu1, mu0)    # within-class centred
+            _, _, Vt = np.linalg.svd(Xc - Xc.mean(0), full_matrices=False)
+            r = rng.standard_normal(min(20, Vt.shape[0])) @ Vt[:min(20, Vt.shape[0])]
+            u, a, b = r / np.linalg.norm(r), mu1, mu0
+        elif control == "split":
+            half = np.zeros(len(tr), bool)
+            for c in (0, 1):
+                idx = np.where(y[tr] == c)[0]
+                half[rng.permutation(idx)[: len(idx) // 2]] = True
+            a, b = X[tr][half].mean(0), X[tr][~half].mean(0)
+            u = (a - b) / np.linalg.norm(a - b)
+        elif control in ("decision", "classorth"):
             hi = score[tr] > np.median(score[tr])
             a, b = X[tr][hi].mean(0), X[tr][~hi].mean(0)
-            u = (a - b) / np.linalg.norm(a - b)
+            u_dec = (a - b) / np.linalg.norm(a - b)
+            if control == "decision":
+                u = u_dec
+            else:
+                v = u_class - (u_class @ u_dec) * u_dec
+                u, a, b = v / np.linalg.norm(v), mu1, mu0
         else:
             u, a, b = u_class, mu1, mu0
         mid = float(((a + b) / 2) @ u)
@@ -211,11 +235,13 @@ def main() -> None:
                     help="alphas for additive steering (units of the class-mean distance)")
     ap.add_argument("--scale", type=float, nargs="*", default=[0, 0.5, 2, 4],
                     help="gains k for the class component (1 = unchanged)")
-    ap.add_argument("--controls", nargs="*", default=["random"], choices=["random", "decision"],
+    ap.add_argument("--controls", nargs="*", default=["random"],
+                    choices=["random", "decision", "pcrandom", "split", "classorth"],
                     help="random = null control; decision = positive control (direction the "
                          "model's own dv follows, same site and step size)")
     ap.add_argument("--n-random", type=int, default=1,
                     help="number of independent random directions (null distribution)")
+    ap.add_argument("--suffix", default="", help="extra output suffix (e.g. _mnull), avoids overwriting")
     ap.add_argument("--only-controls", action="store_true",
                     help="run the control directions only (class run done separately)")
     ap.add_argument("--unit", default="sd", choices=["sd", "delta"],
@@ -246,7 +272,7 @@ def main() -> None:
     X = acts["acts_last"][:, layer, :].astype(np.float64)
     y, groups = meta["is_ai"].to_numpy(), meta["source_id"].to_numpy()
     score = None
-    if "decision" in args.controls:   # the model's own unsteered dv, averaged over answer orders
+    if {"decision", "classorth"} & set(args.controls):   # model's own unsteered dv, order-averaged
         js = [pd.read_csv(args.out_dir / f"{condition_stem(args.preset, args.variant, args.fmt, o, args.system)}.csv")
               for o in ("mk", "km")]
         dv = pd.concat(js).groupby("text_id")["dv"].mean()
@@ -256,7 +282,8 @@ def main() -> None:
     dirs = {"class": crossfit_directions(X, y, groups, args.n_splits, "class", args.seed,
                                          unit=args.unit)}
     for c in args.controls:
-        names = ([f"random{r + 1}" for r in range(args.n_random)] if c == "random" else [c])
+        names = ([f"{c}{r + 1}" for r in range(args.n_random)]
+                 if c in ("random", "pcrandom", "split") else [c])
         for r, name in enumerate(names):
             dirs[name] = crossfit_directions(X, y, groups, args.n_splits, c, args.seed + 1000 * r,
                                              score, unit=args.unit)
@@ -307,7 +334,7 @@ def main() -> None:
     sfx = f"_L{layer}" + ("_sd" if args.unit == "sd" else "") + \
           ("_prompt" if args.positions == "prompt" else "") + \
           ("_ctrl-" + "-".join(args.controls) if args.only_controls else "") + \
-          ("_smoke" if args.limit else "")
+          ("_smoke" if args.limit else "") + args.suffix
     df.to_csv(args.out_dir / f"steer_{stem}{sfx}.csv", index=False)
 
     # summary: order-averaged dv per text and setting
