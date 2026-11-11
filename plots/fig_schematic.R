@@ -41,14 +41,14 @@ grid_panel <- function(fill_fun, title) {
 
 # A: how the answer reads the text — text -> question -> answer, layer by layer
 hiA <- data.frame(x = c(7, 12, 15), y = c(2, 3, 4))
-pA <- grid_panel(function(d) TILE, "A  The answer reads the text via the question") +
+pA <- grid_panel(function(d) TILE, "A  Information flow: later positions read earlier ones") +
   geom_tile(data = hiA, aes(x = x, y = y), fill = "#9a9994", width = 0.86, height = 0.8) +
   annotate("curve", x = 7.3, xend = 11.7, y = 2.2, yend = 2.85, curvature = -0.25, colour = DARK,
            linewidth = 0.45, arrow = arr()) +
   annotate("curve", x = 12.3, xend = 14.7, y = 3.2, yend = 3.85, curvature = -0.3, colour = DARK,
            linewidth = 0.45, arrow = arr()) +
-  annotate("label", x = 9.2, y = 4.55, label = "attention: later positions\nread earlier positions",
-           size = 2.2, colour = INK, lineheight = 0.9, fill = "white", linewidth = 0)
+  annotate("label", x = 9.2, y = 4.4, label = "attention", size = 2.2, colour = INK,
+           fontface = "italic", fill = "white", linewidth = 0)
 
 # B: steering in a 2-D sketch of the representation space
 set.seed(3)

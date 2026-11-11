@@ -9,10 +9,10 @@ references.
 **Figure 1 (methods schematic, `fig0_methods_schematic`).** How the interventions work.
 In panels A, C, and D, the horizontal axis shows the positions of the prompt in reading
 order (the instruction, the text to be judged, the question, and the position at which
-the answer is produced), and the vertical axis shows the layers of the network. (A) The
-answer can access the text only indirectly: through attention, later positions read
-information from earlier ones, so information from the text reaches the answer position
-via the question positions (dark tiles). (B) Steering, sketched in a two-dimensional
+the answer is produced), and the vertical axis shows the layers of the network. (A) Information
+flow: through attention, later positions read information from earlier ones. The answer
+is produced at the last position, so information from the text can reach it only via
+the positions in between, i.e., the question (dark tiles). (B) Steering, sketched in a two-dimensional
 version of the high-dimensional representation space: human texts (open circles) and AI
 texts (triangles) differ along an AI–human direction (arrow between the class means).
 Steering moves the state of one text along this direction (diamonds) and measures how
