@@ -158,3 +158,23 @@ p3b <- ggplot(pa, aes(x = set, y = d, colour = dir)) +
 p3 <- p3a / p3b + plot_annotation(tag_levels = "A")
 save_fig(p3, "fig3_stitching_patching", 7, 6.2)
 cat("figures written to", OUT, "\n")
+
+# ---------------------------------------------------------------- Figure S1
+pS <- read_csv(file.path(D, "fig3_patch.csv"), show_col_types = FALSE) |>
+  mutate(set = factor(set, c("none", "pre", "text", "post", "last", "all"),
+                      c("unpatched", "instruction", "text", "question", "final token", "all")),
+         dir = ifelse(donor == "base", "Base states into the SFT model", "SFT states into the base model"),
+         layer = factor(paste("Layer", layer), c("Layer 8", "Layer 16")))
+pS1 <- ggplot(pS, aes(x = set, y = d, colour = dir)) +
+  geom_hline(yintercept = 0, colour = GREY, linewidth = 0.4) +
+  geom_pointrange(aes(ymin = lo, ymax = hi), position = position_dodge(width = 0.5),
+                  size = 0.25, linewidth = 0.5) +
+  scale_colour_manual(values = c("Base states into the SFT model" = BLUE,
+                                 "SFT states into the base model" = ORANGE)) +
+  facet_grid(layer ~ family) +
+  labs(x = "Positions whose states were exchanged", y = "Sensitivity d′") +
+  theme_paper() + theme(panel.grid.major.y = element_line(colour = "#e6e5e1", linewidth = 0.3),
+                        panel.grid.major.x = element_blank(),
+                        strip.text.y = element_text(face = "bold", angle = 0, hjust = 0))
+save_fig(pS1, "figS1_patching_layers", 7, 4.6)
+cat("figure S1 written\n")

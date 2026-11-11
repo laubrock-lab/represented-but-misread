@@ -32,8 +32,7 @@ the network depth, and an externally trained detector (EditLens). Lines show 95%
 bootstrap confidence intervals, except for the two probe rows, where they show the
 range across models. Lower rows: sensitivity of the models' own answers (raw prompt),
 one small dot per model family, large dot = median. The dashed line marks the maximum
-d′ that can be estimated with the given number of texts. TODO: news baselines were
-computed on the article body without headline; rerun on the exact model input.
+d′ that can be estimated with the given number of texts.
 
 **Figure 3 (`fig2_answers_and_fewshot`).** Post-training mostly lowers the sensitivity
 of the answers; labelled examples help almost all models. (A) Sensitivity of the base
@@ -62,8 +61,17 @@ exchanging the internal states at the indicated positions. Blue: base model's st
 inserted into the SFT model; orange: SFT model's states inserted into the base model.
 "Unpatched" shows the recipient model without any exchange. Error bars are 95%
 bootstrap confidence intervals. Patching at layer 8 (more mixed; text positions
-contribute somewhat) is shown in Supplementary Figure S1 (TODO).
+contribute somewhat) is shown in Supplementary Figure S1.
 
 Numbering note: the schematic is planned as Figure 1 (Method), so the data figures
 become Figures 2–4; the results draft still refers to them as Figures 1–3 (TODO: update
 when assembling the manuscript).
+
+**Figure S1 (`figS1_patching_layers`).** Activation patching at layers 8 and 16
+(textbook summaries). As Figure 4B, with layer 8 added. At layer 8 the picture is
+mixed: in Apertus, exchanging the states of the text positions still has a partial
+effect; in OLMo 2, even exchanging all positions transfers only part of the difference
+(the change is not yet complete at layer 8; cf. the stitching curve in Figure 4A). At
+layer 16, the whole difference between base and SFT model is carried by the question
+positions. Error bars
+are 95% bootstrap confidence intervals.

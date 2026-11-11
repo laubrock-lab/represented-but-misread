@@ -45,7 +45,7 @@ from sklearn.preprocessing import StandardScaler
 
 import config
 
-TEXT_COL = {"journalism_seg": "segment"}          # all other corpora: "text"
+TEXT_COL: dict = {}   # all corpora: "text" = the exact model input (news: headline + subheadline + segment)
 
 
 def surface_features(texts: pd.Series) -> np.ndarray:

@@ -176,17 +176,17 @@ against the model's decision direction: after this part had been removed, the re
 authorship component moved the answer in the correct direction (newspaper segments,
 layer 22: +4.16 nats; layer 28: +4.63 nats).
 
-Steering also revealed what post-training changes. In Apertus, shifting toward "AI"
-moved the answer of the base model in the correct direction (+0.63 nats at layer 21;
-random directions −0.02 ± 0.01), but this effect had vanished after SFT (−0.08; random
-0.00 ± 0.02), while the positive control continued to work in both models (+1.68 and
-+1.11). In OLMo 3 Think, the base model did not use the authorship direction at this
-layer (−0.04), whereas the model after SFT used it in the wrong direction (−0.27; random
-+0.03 ± 0.09). Thus, supervised fine-tuning turned a correct use of the authorship
-information into no use (Apertus) or into a reversed use (OLMo 3). Note that these
-stage comparisons are based on isotropic random directions as controls; the comparison
-with the stricter controls is ongoing (TODO: update when the remaining Apertus runs are
-complete).
+Steering also revealed what post-training changes. In the Apertus base model, shifting
+toward "AI" moved the answer in the correct direction, increasingly so with depth
+(+0.22, +0.63, and +1.07 nats at layers 16, 21, and 27), and clearly beyond the
+strict control directions (at most ±0.32 nats). After SFT, this effect had vanished
+(−0.08 and −0.12 nats at layers 21 and 27, within the range of the controls), whereas
+the positive control continued to work in both models (base: +1.03 to +2.06; SFT: +0.94
+to +1.11). In OLMo 3 Think, the base model did not use the authorship direction at layer
+21 (−0.04), whereas the model after SFT used it in the wrong direction (−0.27; isotropic
+random directions +0.03 ± 0.09; this pair was tested with isotropic controls only).
+Thus, supervised fine-tuning turned a correct use of the authorship information into no
+use (Apertus) or into a reversed use (OLMo 3).
 
 ## 3.4 The change originates in the early layers
 
@@ -244,9 +244,12 @@ question positions transferred the full difference in both directions: the base 
 question states restored discrimination in the SFT model (Apertus: +0.41; OLMo 2: +0.04,
 from −0.50), and the SFT model's question states abolished it in the base model
 (Apertus: −0.42; OLMo 2: −0.61, from −0.12). The final position alone carried only part
-of this effect. At layer 8, the text positions still contributed somewhat, consistent
-with a difference that is produced in the early layers and has fully moved into the
-question positions by the middle of the network.
+of this effect. At layer 8, the picture was mixed (Figure S1): in Apertus, the text
+positions still had a partial effect, and in OLMo 2 even exchanging all positions
+transferred only part of the difference, consistent with the stitching result that in
+OLMo 2 the change accumulates up to about layer 14. Thus, the difference is
+produced in the early layers and has fully moved into the question positions by the
+middle of the network.
 
 In summary, post-training did not change what the models represent about a text. It
 changed how the question takes up this representation, through a change that originates
