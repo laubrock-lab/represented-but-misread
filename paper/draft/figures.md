@@ -7,12 +7,18 @@ checkpoint, orange = post-trained model / SFT checkpoint, grey = baselines and
 references.
 
 **Figure 1 (methods schematic, `fig0_methods_schematic`).** How the interventions work.
-Each grid shows the positions of the prompt (instruction, text, question, answer
-position) from left to right and the layers of the network from bottom to top. (A) The
-answer is produced at the last position; it can access the text only through the
-positions that follow it, i.e., the question. (B) Steering adds a step along the
-direction that separates AI from human texts to the internal state at the answer
-position. (C) Model stitching combines the lower layers of one checkpoint (here the
+In panels A, C, and D, the horizontal axis shows the positions of the prompt in reading
+order (the instruction, the text to be judged, the question, and the position at which
+the answer is produced), and the vertical axis shows the layers of the network. (A) The
+answer can access the text only indirectly: through attention, later positions read
+information from earlier ones, so information from the text reaches the answer position
+via the question positions (dark tiles). (B) Steering, sketched in a two-dimensional
+version of the high-dimensional representation space: human texts (open circles) and AI
+texts (triangles) differ along an AI–human direction (arrow between the class means).
+Steering moves the state of one text along this direction (diamonds) and measures how
+the model's answer changes; the dashed line marks where the answer switches. If the
+model read the direction correctly, a shift toward the AI texts would move the answer
+toward "KI". (C) Model stitching combines the lower layers of one checkpoint (here the
 base model, blue) with the upper layers of another (here the SFT model, orange). (D)
 Activation patching replaces the internal states of one model (here SFT) at selected
 positions and one layer with those of the other model (here the base model's states at
