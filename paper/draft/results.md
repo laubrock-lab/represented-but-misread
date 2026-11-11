@@ -111,15 +111,22 @@ was already complete after imitation learning.
 Could the post-trained models simply hold a wrong belief about what AI texts look like,
 a belief that a few correctly labeled examples would correct? We tested this by placing
 2, 8, or 16 labeled examples from other sources before each text (four example sets
-with balanced answer order). Base models learned quickly from these examples: on the
-short chats with 16 examples, d′ rose from −0.21 to +0.66 for Gemma 3 4B, from −0.68 to
-+0.21 for Qwen3, and from −0.07 to +0.57 for OLMo 2, and on the textbook summaries from
-+0.01 to +0.77 for Gemma 3 4B. Post-trained models also improved, but considerably less,
-and most remained below chance (Gemma 3 4B, short chats: −0.72 to −0.31; Qwen3 with chat
-prompt: −0.76 to −0.54; Gemma 3 4B, textbook summaries: −0.49 to −0.19). This pattern
-is difficult to reconcile with a false belief that examples can easily override. It
-suggests instead that post-training changed how the models map what they represent onto
-their answer, in a way that resists evidence presented in context.
+with balanced answer order). Examples improved the judgments of almost all models. With
+16 examples on the short chats, d′ rose from −0.21 to +0.66 for the base model of Gemma
+3 4B, from −0.68 to +0.21 for Qwen3, and from −0.07 to +0.57 for OLMo 2, whereas the
+post-trained models of Gemma 3 4B and Qwen3 remained below chance (−0.72 to −0.31 and
+−0.80 to −0.17, raw prompt). Whether base models profit more from examples than
+post-trained models is, however, a question about the difference between the two gains,
+which we tested with a paired grouped bootstrap. Base models gained significantly more in
+three of five comparisons (Gemma 3 4B, short chats: difference +0.46 [0.12, 0.85],
+p = .012; OLMo 2, short chats: +0.61 [0.29, 0.90], p = .001; Gemma 3 4B, textbook
+summaries: +0.47 [0.17, 0.75], p = .002), but not for Qwen3 on the short chats (+0.26
+[−0.05, 0.58], p = .11), and for Qwen3 on the textbook summaries the post-trained model
+gained more (−0.27 [−0.52, −0.03], p = .026), its base model being already above chance
+without examples. Thus, labeled examples reduce the deficit of the post-trained models
+but do not consistently remove it, and the evidence that post-training makes the
+judgments less responsive to examples is mixed. A simple false belief that examples
+override can therefore neither be ruled out nor be taken as the full explanation.
 
 > **Figure 2 (placeholder).** Summary across all cells (model family × corpus × prompt
 > format): probe sensitivity, base-model answer, and post-trained answer; few-shot

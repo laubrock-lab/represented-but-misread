@@ -29,14 +29,20 @@ one small dot per model family, large dot = median. The dashed line marks the ma
 d′ that can be estimated with the given number of texts. TODO: news baselines were
 computed on the article body without headline; rerun on the exact model input.
 
-**Figure 3 (`fig2_answers_and_fewshot`).** Post-training lowers the sensitivity of the
-answers, and labelled examples help base models more. (A) Sensitivity of the base
+**Figure 3 (`fig2_answers_and_fewshot`).** Post-training mostly lowers the sensitivity
+of the answers; labelled examples help almost all models. (A) Sensitivity of the base
 model (blue) and of the final post-trained model with the identical raw prompt (filled
 orange) and with its chat template (open orange), per model family and corpus.
-Asterisks mark decreases that survive Holm correction across all tested contrasts.
-(B) Sensitivity as a function of the number of labelled examples placed before each
-text (raw prompt; base vs. final post-trained model). Vertical lines show the range
-across four example sets. On the textbook summaries, only 0, 8, and 16 examples were
+Asterisks mark contrasts between the base and the final model on the identical raw
+prompt that survive Holm correction across all 111 tested contrasts; all of them are
+decreases. The increase of OLMo 3 Think on the textbook summaries is significant only
+without correction or under false-discovery-rate control (p_Holm = .67), in a condition
+with low answer probability (≈ .30). (B) Sensitivity as a function of the number of
+labelled examples placed before each text (raw prompt; base vs. final post-trained
+model). Vertical lines show the range across four example sets. Whether base models
+profit more than post-trained models (difference of gains, 0 vs. 16 examples) is tested
+in the text: significantly so in three of five comparisons, reversed for Qwen3 on the
+textbook summaries. On the textbook summaries, only 0, 8, and 16 examples were
 tested (OLMo 2: 0 and 8).
 
 **Figure 4 (`fig3_stitching_patching`).** Post-training changes how the question reads
@@ -48,7 +54,8 @@ bootstrap confidence intervals. (B) Activation patching at layer 16: sensitivity
 exchanging the internal states at the indicated positions. Blue: base model's states
 inserted into the SFT model; orange: SFT model's states inserted into the base model.
 "Unpatched" shows the recipient model without any exchange. Error bars are 95%
-bootstrap confidence intervals.
+bootstrap confidence intervals. Patching at layer 8 (more mixed; text positions
+contribute somewhat) is shown in Supplementary Figure S1 (TODO).
 
 Numbering note: the schematic is planned as Figure 1 (Method), so the data figures
 become Figures 2–4; the results draft still refers to them as Figures 1–3 (TODO: update
