@@ -87,16 +87,32 @@ chance where their post-trained counterparts did not (e.g., Gemma 3 12B on the t
 summaries, d′ = +1.64; OLMo 3 on the newspaper segments, +0.60; Qwen3 on the textbook
 summaries, +0.55). To test the effect of post-training without confounding it with the
 prompt format, we compared each final model with its base model on the identical plain
-prompt. Of 18 such comparisons, 14 showed a decrease. Five decreases survived Holm
-correction across all 111 contrasts we tested (all p_Holm ≤ .007): Gemma 3 12B
-(Δd′ = −0.95 [−1.28, −0.66]), Qwen3 (−0.57 [−0.79, −0.36]), Gemma 3 4B (−0.50
-[−0.72, −0.29]) and Apertus (−0.47 [−0.71, −0.25]) on the textbook summaries, and Qwen3
-on the newspaper segments (−0.65 [−0.93, −0.42]). No increase survived this correction;
-under the more lenient false-discovery-rate control, two increases reached significance,
-OLMo 2 on the short chats (+0.35 [0.06, 0.63]) and OLMo 3 Think on the textbook
-summaries, the latter in a condition with low answer probability. Hence, post-training
-mostly lowered the sensitivity of the answers, but neither uniformly nor in a single
-direction across model families and text types.
+prompt. Of these 18 comparisons, 14 showed a decrease. A random-effects summary across
+all 18 comparisons yielded a mean change of Δd′ = −0.33 [−0.50, −0.17] (z = −3.95,
+p < .001), with considerable heterogeneity between cells (I² = 82%). Because the same
+model families contribute to several corpora, we repeated the summary after averaging
+within each family; the result was the same (−0.34 [−0.49, −0.18], p < .001), and all
+six families showed a decrease on average. Per corpus, the decrease was reliable for the
+newspaper segments (−0.42 [−0.67, −0.16], p = .002) and the textbook summaries (−0.41
+[−0.70, −0.11], p = .007), but not for the short chats (−0.19 [−0.45, 0.07], p = .15).
+
+Among the individual comparisons, six decreases survived Holm correction within this
+family of 18 tests (all p_Holm ≤ .013): Gemma 3 12B (Δd′ = −0.95 [−1.28, −0.66]),
+Qwen3 (−0.57 [−0.79, −0.36]), Gemma 3 4B (−0.50 [−0.72, −0.29]), Apertus (−0.47
+[−0.71, −0.25]) and OLMo 2 (−0.32 [−0.52, −0.12]) on the textbook summaries, and Qwen3
+on the newspaper segments (−0.65 [−0.93, −0.42]). On the short chats, three decreases of
+similar size (Gemma 3 4B: −0.51; Apertus: −0.47; Gemma 3 12B: −0.45; uncorrected
+p ≤ .008) did not survive Holm correction (p_Holm = .059–.074), because the chat estimates
+were less precise (61 independent originals compared with 119 pairs for the textbook
+summaries); they remained significant under false-discovery-rate control. Two increases
+were significant only without correction or under false-discovery-rate control: OLMo 2
+on the short chats (+0.35 [0.06, 0.63]) and OLMo 3 Think on the textbook summaries, the
+latter in a condition with low answer probability. Note that we defined the family of
+tests post hoc as the comparisons that address our hypothesis; Holm correction across
+all 111 contrasts we computed, including comparisons between adjacent post-training
+stages and across prompt formats, left five of the six decreases significant. Hence,
+post-training lowered the sensitivity of the answers on average, but neither uniformly
+nor in a single direction across model families and text types.
 
 For OLMo 2 and Apertus 1.5, the developers released checkpoints after each stage of
 post-training, which allowed us to ask when the change occurs. In both families it

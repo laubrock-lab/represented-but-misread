@@ -39,11 +39,12 @@ computed on the article body without headline; rerun on the exact model input.
 of the answers; labelled examples help almost all models. (A) Sensitivity of the base
 model (blue) and of the final post-trained model with the identical raw prompt (filled
 orange) and with its chat template (open orange), per model family and corpus.
-Asterisks mark contrasts between the base and the final model on the identical raw
-prompt that survive Holm correction across all 111 tested contrasts; all of them are
-decreases. The increase of OLMo 3 Think on the textbook summaries is significant only
-without correction or under false-discovery-rate control (p_Holm = .67), in a condition
-with low answer probability (≈ .30). (B) Sensitivity as a function of the number of
+Asterisks mark differences between the base and the final model on the identical raw
+prompt that survive Holm correction within the family of 18 final-vs-base comparisons;
+all of them are decreases. The increases of OLMo 2 on the short chats and of OLMo 3
+Think on the textbook summaries are significant only without correction or under
+false-discovery-rate control (the latter in a condition with low answer probability,
+≈ .30). Random-effects summary across all 18 comparisons: Δd′ = −0.33 [−0.50, −0.17]. (B) Sensitivity as a function of the number of
 labelled examples placed before each text (raw prompt; base vs. final post-trained
 model). Vertical lines show the range across four example sets. Whether base models
 profit more than post-trained models (difference of gains, 0 vs. 16 examples) is tested

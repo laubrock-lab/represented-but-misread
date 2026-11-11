@@ -169,10 +169,12 @@ def main() -> None:
     models = model_rows()
     models.to_csv(OUT / "fig2_models.csv", index=False)
     fig1(models).to_csv(OUT / "fig1_info.csv", index=False)
-    c = pd.read_csv(config.OUTPUT_DIR / "contrasts_pmass30.csv")
-    c = c[c.tested & (c.kind == "clean") & c.contrast.str.startswith("instruct_raw") & c.preset.isin(FAMILIES)]
+    # primary family = the final-vs-base contrasts (meta_contrasts.py); Holm/BH within it
+    c = pd.read_csv(config.OUTPUT_DIR / "contrasts_primary.csv")
+    c = c[c.preset.isin(FAMILIES)]
     c.assign(corpus=c.corpus.map(CORPORA), family=c.preset.map(FAMILIES))[
-        ["corpus", "family", "d_a", "d_b", "diff", "lo", "hi", "p", "p_holm", "p_bh"]].to_csv(OUT / "fig2_contrasts.csv", index=False)
+        ["corpus", "family", "d_a", "d_b", "diff", "lo", "hi", "p", "p_holm_primary", "p_bh_primary"]].rename(
+        columns={"p_holm_primary": "p_holm", "p_bh_primary": "p_bh"}).to_csv(OUT / "fig2_contrasts.csv", index=False)
     fewshot().to_csv(OUT / "fig2_fewshot.csv", index=False)
     stitch().to_csv(OUT / "fig3_stitch.csv", index=False)
     patch().to_csv(OUT / "fig3_patch.csv", index=False)
