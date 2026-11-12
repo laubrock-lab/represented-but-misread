@@ -1,8 +1,9 @@
 # 4 Discussion
 
 
-In the present study we investigated why language models fail to recognize AI-written
-text. Across eight families of open-weight models and three corpora of German texts,
+In the present study we used authorship judgments as a test case for the question of
+whether post-training changes what a language model represents or how it reads this
+representation out. Across eight families of open-weight models and three corpora of German texts,
 the information that distinguishes AI from human texts was readily available, both in
 the texts themselves and in the models' internal representations, but the models'
 answers did not use it, and often used it with the wrong sign. Post-training lowered
@@ -34,13 +35,20 @@ opposite effect: It created rather than abolished the ability of a model to reco
 its own texts (Ackerman & Panickssery, 2025). Recognizing one's own output and judging
 whether an arbitrary text was written by an AI are different tasks, and it is
 conceivable that post-training sharpens the first while it distorts the second. Third,
-the locus of the change is consistent with the view that post-training alters how a
-model expresses what it knows more than what it encodes (Lin et al., 2023; Waldis et
-al., 2026; Zhou et al., 2023), and with the observation that a property tracked across
-the stages of post-training is shaped mainly during supervised fine-tuning (Heidari et
-al., 2026). Our results specify this view for one judgment: The text representation was
-interchangeable between base and post-trained checkpoints, whereas the processing of
-the question was not.
+our results bear on the superficial alignment hypothesis, according to which a model's
+knowledge is acquired during pretraining, whereas post-training mainly teaches it which
+formats to use (Zhou et al., 2023; see also Lin et al., 2023; Waldis et al., 2026). To
+our knowledge, this hypothesis has been supported mainly by behavioral evidence. Our
+stitching and patching results provide causal evidence for it in one respect: The
+representation of the text was interchangeable between base and post-trained
+checkpoints, so post-training did not change what the models encode about a text. In
+another respect, our results qualify it. The change was not superficial in the sense of
+affecting only the final stages of processing or the output format; it originated in
+the early layers and altered how the question takes up the text, and it had substantive
+consequences for the quality of the judgment. This is consistent with the observation
+that a property tracked across the stages of post-training is shaped mainly during
+supervised fine-tuning (Heidari et al., 2026). [TODO-LIT: relate to model diffing with
+crosscoders and to prior cross-checkpoint stitching and patching.]
 
 ## The question reads the text
 
