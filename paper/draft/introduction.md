@@ -85,17 +85,28 @@ Another line of work shows that steering along a direction that discriminates a 
 can promote the opposite behavior (Torop et al., 2026), which suggests that the readout
 of represented information can itself be reversed.
 
-What post-training does to this relation has rarely been tested directly. The
-representation of whether a model is being evaluated, tracked across the published
+What post-training does to this relation has been studied mainly by comparing base and
+post-trained models. Representations learned during pretraining largely transfer to the
+post-trained model (Kissane et al., 2024), fine-tuning tends to enhance existing
+mechanisms rather than to create new ones (Prakash et al., 2024), and model diffing with
+crosscoders (Lindsey et al., 2024) suggests that much of what chat fine-tuning adds is
+concentrated at the tokens of the chat template (Minder et al., 2026; see also Leong et
+al., 2025). Exchanging the key-value cache between fine-tuned and base models transfers
+fine-tuned behaviors mainly through system-prompt and template positions (Loos & Eberle,
+2026), and crossing the lower and upper layers of base and post-trained models has shown
+that changes in the late layers can depend on altered earlier computation (Zhou, 2026a).
+The representation of whether a model is being evaluated, tracked across the published
 checkpoints of one model family, is already present in the base model and amplified
-during supervised fine-tuning (Heidari et al., 2026). [TODO-LIT: model diffing between
-base and chat models with crosscoders, and what it says about where fine-tuning changes
-live.] To our knowledge, however, it has not been tested with causal interventions
-whether post-training changes the representation of a property or the way in which the
-answer reads it out, nor where in the network such a change is located. Model families
-whose developers released checkpoints after every stage of post-training now make this
-possible. [TODO-LIT: origins of model stitching and of (cross-model) activation
-patching.]
+during supervised fine-tuning (Heidari et al., 2026). To our knowledge, however, these
+approaches have not been combined to ask, for a judgment with known ground truth, whether
+post-training changes the representation of a property or the way in which the answer
+reads it out, and where in the network this happens. Model families whose developers
+released checkpoints after every stage of post-training make this possible. Combining
+the lower layers of one checkpoint with the upper layers of another, a technique known
+as model stitching (Lenc & Vedaldi, 2015; Bansal et al., 2021), locates a change in
+depth; exchanging internal states between checkpoints at selected positions of the
+prompt, an application of activation patching (Vig et al., 2020; Meng et al., 2023;
+Heimersheim & Nanda, 2024), locates it in the prompt.
 
 Here we use authorship judgments as a test case for representation versus readout under
 post-training. We studied eight families of open-weight models with three corpora of

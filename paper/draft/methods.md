@@ -150,7 +150,8 @@ directions. As a positive control, we used the direction along which the model's
 answers vary (the decision direction), and we also steered with the authorship
 direction after removing its component along the decision direction.
 
-*Model stitching.* For the families with stage-wise checkpoints, we combined the
+*Model stitching.* Model stitching combines parts of different networks (Lenc &
+Vedaldi, 2015; Bansal et al., 2021). For the families with stage-wise checkpoints, we combined the
 embedding and the first ℓ layers of one checkpoint with the remaining layers, final
 normalization and output layer of another, passing the residual stream at the junction
 on unchanged. Stitching without an adapter is justified because both checkpoints derive
@@ -160,8 +161,12 @@ each stitched model on 40 texts, and by checking that stitching at ℓ = 0 and �
 reproduced the parent models. We also exchanged only the attention blocks or only the
 feed-forward blocks (each with its normalization) of the first ℓ layers.
 
-*Activation patching.* To separate the representation of the text from the processing of
-the question, we ran the donor checkpoint over every prompt, stored its residual stream
+*Activation patching.* Activation patching replaces internal states of a model with
+those obtained under different conditions (Vig et al., 2020; Meng et al., 2023;
+Heimersheim & Nanda, 2024); here, the states came from a different checkpoint (cf.
+Prakash et al., 2024). Stitching without an adapter at layer ℓ is the special case in
+which the full residual stream is exchanged at all positions. To separate the
+representation of the text from the processing of the question, we ran the donor checkpoint over every prompt, stored its residual stream
 after layer k at all prompt positions, and then ran the recipient checkpoint with its
 residual stream replaced by the donor's at a selected set of positions: the tokens of the
 text, the instruction before the text, the question and answer cue after the text, the

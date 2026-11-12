@@ -37,8 +37,13 @@ whether an arbitrary text was written by an AI are different tasks, and it is
 conceivable that post-training sharpens the first while it distorts the second. Third,
 our results bear on the superficial alignment hypothesis, according to which a model's
 knowledge is acquired during pretraining, whereas post-training mainly teaches it which
-formats to use (Zhou et al., 2023; see also Lin et al., 2023; Waldis et al., 2026). To
-our knowledge, this hypothesis has been supported mainly by behavioral evidence. Our
+formats to use (Zhou et al., 2023). This hypothesis has been supported by behavioral
+evidence (Lin et al., 2023) and by comparisons of representations between base and
+post-trained models (Kissane et al., 2024; Lee et al., 2024; Prakash et al., 2024;
+Waldis et al., 2026), and it has been qualified by the observation that post-training
+gains continue to grow with the amount of fine-tuning data (Raghavendra et al., 2024;
+see also Vergara-Browne et al., 2026). To our knowledge, it has not yet been tested with
+causal interventions across checkpoints. Our
 stitching and patching results provide causal evidence for it in one respect: The
 representation of the text was interchangeable between base and post-trained
 checkpoints, so post-training did not change what the models encode about a text. In
@@ -47,8 +52,26 @@ affecting only the final stages of processing or the output format; it originate
 the early layers and altered how the question takes up the text, and it had substantive
 consequences for the quality of the judgment. This is consistent with the observation
 that a property tracked across the stages of post-training is shaped mainly during
-supervised fine-tuning (Heidari et al., 2026). [TODO-LIT: relate to model diffing with
-crosscoders and to prior cross-checkpoint stitching and patching.]
+supervised fine-tuning (Heidari et al., 2026).
+
+Our localization agrees with previous comparisons of base and post-trained models in
+one respect and departs from them in another. That the effect of post-training resided
+in the positions of the question rather than in those of the text agrees with model
+diffing and cache patching, in which much of what fine-tuning adds was concentrated at
+chat-template and system-prompt tokens (Leong et al., 2025; Loos & Eberle, 2026; Minder
+et al., 2026). Because our prompts used no chat template, our results suggest that the
+relevant positions are those at which the task is posed, whether in template tokens or
+in a question phrased in natural language. In contrast, the early origin of the change
+departs from the common picture that fine-tuning mainly alters the upper layers
+(Merchant et al., 2020; Zhao et al., 2026; Zhou, 2026b). It is compatible, however, with
+evidence that changes in the late layers can depend on altered earlier computation
+(Zhou, 2026a), that post-training retunes routing mechanisms formed in pretraining
+(Gupta et al., 2026), and that task representations formed early select later
+processing pathways (Bigoulaeva et al., 2026). Note that stitching without an adapter
+at layer ℓ is equivalent to exchanging the full residual stream at all positions at
+that layer, so that our stitching and patching results are two views of one family of
+interventions rather than independent tests; their convergence with steering, which
+does not exchange states between checkpoints, is the stronger argument.
 
 ## The question reads the text
 
