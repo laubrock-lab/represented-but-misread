@@ -63,9 +63,8 @@ inserted into the SFT model; orange: SFT model's states inserted into the base m
 bootstrap confidence intervals. Patching at layer 8 (more mixed; text positions
 contribute somewhat) is shown in Supplementary Figure S1.
 
-Numbering note: the schematic is planned as Figure 1 (Method), so the data figures
-become Figures 2–4; the results draft still refers to them as Figures 1–3 (TODO: update
-when assembling the manuscript).
+Numbering: the schematic is Figure 1 (Method); the data figures are Figures 2–4
+(results.md updated 12 Nov).
 
 **Figure S1 (`figS1_patching_layers`).** Activation patching at layers 8 and 16
 (textbook summaries). As Figure 4B, with layer 8 added. At layer 8 the picture is

@@ -33,13 +33,13 @@ before any processing by the network, performed about as well as probes on deep 
 change this picture (word frequencies: d′ = 1.79). A detector that was trained by
 others to recognize AI-edited English text (EditLens; Thai et al., 2025) transferred to
 our German material in a graded manner, reaching an AUC of .99 for the textbook
-summaries, .73 for the newspaper segments, and .57 for the short chats (Figure 1). Thus,
+summaries, .73 for the newspaper segments, and .57 for the short chats (Figure 2). Thus,
 the cues that distinguish AI from human texts are present and readily accessible, both
 in the texts themselves and in the models' representations; they consist largely of
 ordinary lexical and stylistic regularities. In terms of Brunswik's lens model, the
 environment offers valid cues.
 
-> **Figure 1 (placeholder).** Sensitivity of probes and baselines (word and character
+> **Figure 2 (placeholder).** Sensitivity of probes and baselines (word and character
 > n-grams, surface statistics, average input embedding, EditLens) compared with the
 > sensitivity of the models' own answers, per corpus.
 
@@ -144,7 +144,7 @@ but do not consistently remove it, and the evidence that post-training makes the
 judgments less responsive to examples is mixed. A simple false belief that examples
 override can therefore neither be ruled out nor be taken as the full explanation.
 
-> **Figure 2 (placeholder).** Summary across all cells (model family × corpus × prompt
+> **Figure 3 (placeholder).** Summary across all cells (model family × corpus × prompt
 > format): probe sensitivity, base-model answer, and post-trained answer; few-shot
 > curves as an inset.
 
@@ -204,7 +204,7 @@ text (perplexity 6.0–6.7 for Apertus, 8.2–9.4 for OLMo 2), and stitching at 
 bottom or the very top reproduced the respective parent model.
 
 If post-training changed only the final readout stage, the upper layers should decide
-the outcome. The opposite was the case (Figure 3, left). When the first 8 of 32 layers of
+the outcome. The opposite was the case (Figure 4, left). When the first 8 of 32 layers of
 Apertus came from the base model and all layers above from the SFT model, the combined
 model discriminated at least as well as the base model (d′ = +0.59 [0.41, 0.80]; base
 +0.43). Conversely, the first 8 layers of the SFT model sufficed to abolish the base
@@ -235,7 +235,7 @@ at the tokens of the text, at the instruction before the text, at the question a
 the text, or at the final position only. As a check, patching a model with its own
 states left every answer unchanged.
 
-At layer 16, the pattern was unambiguous and identical for both families (Figure 3,
+At layer 16, the pattern was unambiguous and identical for both families (Figure 4,
 right). Exchanging the states of the text tokens changed nothing: Apertus after SFT
 remained at chance when it received the base model's text representation (−0.11; SFT
 alone −0.04), and the base model kept its sensitivity when it received the SFT model's
@@ -255,7 +255,7 @@ In summary, post-training did not change what the models represent about a text.
 changed how the question takes up this representation, through a change that originates
 in the early layers and that resides in the processing at the question positions.
 
-> **Figure 3 (placeholder, central figure).** Left: model stitching for Apertus and
+> **Figure 4 (placeholder, central figure).** Left: model stitching for Apertus and
 > OLMo 2 (d′ as a function of the number of layers taken from the other checkpoint, both
 > directions). Right: activation patching at layer 16 (d′ after exchanging states at
 > text, pre-text, question, and final positions).
