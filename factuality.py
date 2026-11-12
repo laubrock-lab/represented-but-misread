@@ -83,12 +83,26 @@ def items(st: ModuleType) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def apply_set_overrides(st: ModuleType) -> None:
+    """A statement set may define its own SYSTEM, RAW, USER prompts and answer LABELS
+    (signal word, noise word); defaults are the true/false prompts above."""
+    global SYSTEM, RAW, USER, ORDERS, CANDIDATES
+    SYSTEM = getattr(st, "SYSTEM", SYSTEM)
+    RAW = getattr(st, "RAW", RAW)
+    USER = getattr(st, "USER", USER)
+    if hasattr(st, "LABELS"):
+        a, b = st.LABELS
+        ORDERS = {"tf": (a, b), "ft": (b, a)}
+        CANDIDATES = {"True": [a, " " + a], "False": [b, " " + b]}
+
+
 def truth_items(corpus: str, limit_pairs: int | None = None) -> pd.DataFrame:
     """'truth:<name>' -> items of truth/<name>_statements.py in the column layout of the
     text corpora (text_id, source_id, is_ai, text), so that stitch.py and
     patch_positions.py can run on true/false judgments (is_ai = is_true = signal)."""
     name = corpus.split(":", 1)[1]
     st = load_statements(config.REPO / "truth" / f"{name}_statements.py")
+    apply_set_overrides(st)
     if limit_pairs:
         st.PAIRS = st.PAIRS[:limit_pairs]
     return items(st).rename(columns={"item_id": "text_id", "pair_id": "source_id",
@@ -314,9 +328,8 @@ def main() -> None:
         ap.error("--adapter needs a --tag without underscores")
 
     st = load_statements(args.statements)
-    global SYSTEM
-    SYSTEM = getattr(st, "SYSTEM", SYSTEM)     # a statement set may define its own system prompt
-    print(f"system prompt (chat format): {SYSTEM!r}")
+    apply_set_overrides(st)
+    print(f"system prompt (chat format): {SYSTEM!r}; answer words: {ORDERS['tf']}")
     out = args.out_dir
     df = items(st)
     if args.limit:
