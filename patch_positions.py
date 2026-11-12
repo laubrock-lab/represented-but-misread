@@ -25,6 +25,8 @@ Usage (cluster)
 ---------------
     python patch_positions.py --corpus textbook --preset apertus15-8b --recipient sft --donor base --layer 8
 Output: outputs/patch/<corpus>/<preset>_<recipient>-from-<donor>_L<k>.csv (one row per text x order x set)
+True/false judgments (prompt and scoring of factuality.py): --corpus truth:<name>
+(--limit = number of pairs); "text" = the statement, output in outputs/patch/truth_<name>/.
 """
 
 from __future__ import annotations
@@ -37,6 +39,7 @@ import pandas as pd
 import torch
 
 import config
+import factuality as F
 from judge_logits import (build_prompt, candidate_ids, load_model, pick_device, score_one,
                           truncate_text)
 from steer_logits import find_decoder_layers
@@ -89,19 +92,27 @@ def main() -> None:
 
     device = pick_device(args.device)
     ids = config.MODEL_PRESETS[args.preset]
-    texts = pd.read_parquet(config.REPO / "data" / f"texts_{args.corpus}.parquet",
-                            columns=["text_id", "source_id", "is_ai", "text"])
-    if args.limit:
-        texts = texts.head(args.limit)
+    truth = args.corpus.startswith("truth:")
+    orders = tuple(F.ORDERS) if truth else ("mk", "km")
+    if truth:     # true/false statements; --limit counts pairs
+        texts = F.truth_items(args.corpus, args.limit)
+    else:
+        texts = pd.read_parquet(config.REPO / "data" / f"texts_{args.corpus}.parquet",
+                                columns=["text_id", "source_id", "is_ai", "text"])
+        if args.limit:
+            texts = texts.head(args.limit)
+
+    def make_prompt(tok, text, order):
+        return F.build_prompt(tok, text, "raw", order) if truth else build_prompt(tok, text, "raw", order, "neutral")
 
     # 1. donor activations at layer k for every prompt position
     tok, donor = load_model(ids[args.donor], device, torch.bfloat16)
     store = {}
     with torch.no_grad():
         for r in texts.itertuples(index=False):
-            text = truncate_text(tok, r.text, args.max_text_tokens)[0]
-            for order in ("mk", "km"):
-                prompt, add = build_prompt(tok, text, "raw", order, "neutral")
+            text = r.text if truth else truncate_text(tok, r.text, args.max_text_tokens)[0]
+            for order in orders:
+                prompt, add = make_prompt(tok, text, order)
                 n, pos = prompt_positions(tok, prompt, add, text)
                 ids_t = tok(prompt, add_special_tokens=add, return_tensors="pt")["input_ids"].to(device)
                 hs = donor(input_ids=ids_t, output_hidden_states=True, use_cache=False).hidden_states
@@ -113,22 +124,23 @@ def main() -> None:
     # 2. recipient with patched positions
     tok, model = load_model(ids[args.recipient], device, torch.bfloat16)
     patcher = Patcher(find_decoder_layers(model)[args.layer - 1])
-    cands, eow = candidate_ids(tok), {}
+    cands, eow = (F.candidate_seqs(tok) if truth else candidate_ids(tok)), {}
     rows = []
     with torch.no_grad():
         for r in texts.itertuples(index=False):
-            for order in ("mk", "km"):
+            for order in orders:
                 prompt, add, pos, act = store[(r.text_id, order)]
                 for s in args.sets:
                     idx = torch.tensor(pos[s], dtype=torch.long)
                     patcher.idx, patcher.val = (idx, act[idx]) if len(idx) else (None, None)
-                    res = score_one(model, tok, prompt, add, None, cands, eow, device, False)
+                    res = (F.score(model, tok, prompt, add, cands, eow, device, False) if truth else
+                           score_one(model, tok, prompt, add, None, cands, eow, device, False))
                     rows.append(dict(text_id=r.text_id, source_id=r.source_id, is_ai=r.is_ai, order=order,
                                      set=s, n_pos=len(idx), dv=res["dv"], p_mass=res["p_mass"]))
     patcher.handle.remove()
-    out_dir = config.OUTPUT_DIR / "patch" / args.corpus
+    out_dir = config.OUTPUT_DIR / "patch" / args.corpus.replace(":", "_")
     out_dir.mkdir(parents=True, exist_ok=True)
-    out = out_dir / f"{args.preset}_{args.recipient}-from-{args.donor}_L{args.layer}{'_smoke' if args.limit else ''}.csv"
+    out = out_dir / f"{args.preset}_{args.recipient}-from-{args.donor}_L{args.layer}{f'_n{args.limit}' if args.limit else ''}.csv"
     df = pd.DataFrame(rows)
     df.to_csv(out, index=False)
 

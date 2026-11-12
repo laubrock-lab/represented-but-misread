@@ -24,6 +24,9 @@ Usage (cluster)
     python stitch.py --corpus textbook --preset apertus15-8b --lower sft --upper base --split 16
 Output: outputs/stitch/<corpus>/<preset>_<lower>-<upper>_L<split>_raw_{mk,km}.csv
         + ppl line in outputs/stitch/<corpus>/perplexity.csv
+True/false judgments (prompt and scoring of factuality.py): --corpus truth:<name> reads
+truth/<name>_statements.py (--limit = number of pairs); output in
+outputs/stitch/truth_<name>/<preset>_<lower>-<upper>_L<split>_raw_{tf,ft}.csv
 """
 
 from __future__ import annotations
@@ -36,6 +39,7 @@ import pandas as pd
 import torch
 
 import config
+import factuality as F
 from judge_logits import load_model, pick_device, run_condition
 from steer_logits import find_decoder_layers
 
@@ -54,10 +58,24 @@ def perplexity(model, tok, texts: list[str], device: str, max_tokens: int = 512)
     return float(np.exp(nll / n))
 
 
+def run_truth(model, tok, items: pd.DataFrame, preset: str, label: str, out_dir, device: str) -> None:
+    cands, eow = F.candidate_seqs(tok), {}
+    for order in F.ORDERS:
+        rows = []
+        for r in items.itertuples(index=False):
+            prompt, add = F.build_prompt(tok, r.text, "raw", order)
+            res = F.score(model, tok, prompt, add, cands, eow, device, False)
+            rows.append(dict(text_id=r.text_id, source_id=r.source_id, is_ai=r.is_ai, order=order,
+                             dv=res["dv"], p_mass=res["p_mass"]))
+        df = pd.DataFrame(rows)
+        df.to_csv(out_dir / f"{preset}_{label}_raw_{order}.csv", index=False)
+        print(f"{label} {order}: {len(df)} statements, p_mass {df.p_mass.mean():.2f}")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--corpus", required=True)
+    ap.add_argument("--corpus", required=True, help="text corpus, or truth:<name> for true/false statements")
     ap.add_argument("--preset", required=True, choices=list(config.MODEL_PRESETS))
     ap.add_argument("--lower", required=True, help="variant providing embedding + layers 1..split")
     ap.add_argument("--upper", required=True, help="variant providing layers split+1..L + head")
@@ -114,10 +132,14 @@ def main() -> None:
     print(f"stitched {args.preset}: {args.lower} (embedding + layers 1..{args.split}) -> "
           f"{args.upper} (layers {args.split + 1}..{L} + head)")
 
-    texts = pd.read_parquet(config.REPO / "data" / f"texts_{args.corpus}.parquet")
-    if args.limit:
-        texts = texts.head(args.limit)
-    out_dir = config.OUTPUT_DIR / "stitch" / args.corpus
+    truth = args.corpus.startswith("truth:")
+    if truth:     # true/false judgments (factuality.py prompt); --limit counts pairs
+        texts = F.truth_items(args.corpus, args.limit)
+    else:
+        texts = pd.read_parquet(config.REPO / "data" / f"texts_{args.corpus}.parquet")
+        if args.limit:
+            texts = texts.head(args.limit)
+    out_dir = config.OUTPUT_DIR / "stitch" / args.corpus.replace(":", "_")
     out_dir.mkdir(parents=True, exist_ok=True)
     label = f"{args.lower}-{args.upper}_L{args.split}" + ("" if args.component == "all" else f"_{args.component}")
     ppl_texts = texts.sample(min(args.n_ppl, len(texts)), random_state=1)["text"].tolist()
@@ -125,6 +147,9 @@ def main() -> None:
     print(f"perplexity on {len(ppl_texts)} texts: {ppl:.2f}")
     with open(out_dir / "perplexity.csv", "a") as f:
         f.write(f"{args.preset},{args.lower},{args.upper},{args.split},{L},{ppl:.4f},{len(ppl_texts)},{args.component}\n")
+    if truth:
+        run_truth(model, tok, texts, args.preset, label, out_dir, device)
+        return
     for order in ("mk", "km"):
         run_condition(model, tok, texts, preset=args.preset, variant=label,
                       model_id=f"{ids[args.lower]}|{ids[args.upper]}@{args.split}", fmt="raw",

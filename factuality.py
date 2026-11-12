@@ -83,6 +83,18 @@ def items(st: ModuleType) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def truth_items(corpus: str, limit_pairs: int | None = None) -> pd.DataFrame:
+    """'truth:<name>' -> items of truth/<name>_statements.py in the column layout of the
+    text corpora (text_id, source_id, is_ai, text), so that stitch.py and
+    patch_positions.py can run on true/false judgments (is_ai = is_true = signal)."""
+    name = corpus.split(":", 1)[1]
+    st = load_statements(config.REPO / "truth" / f"{name}_statements.py")
+    if limit_pairs:
+        st.PAIRS = st.PAIRS[:limit_pairs]
+    return items(st).rename(columns={"item_id": "text_id", "pair_id": "source_id",
+                                     "is_true": "is_ai", "statement": "text"})
+
+
 def build_prompt(tok, s: str, fmt: str, order: str) -> tuple[str, bool]:
     opts = " or ".join(ORDERS[order])
     if fmt == "raw":
