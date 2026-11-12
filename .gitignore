@@ -11,3 +11,4 @@ __pycache__/
 .DS_Store
 # literature PDFs (copyrighted; never commit)
 paper/references/pdf/
+paper/build/
