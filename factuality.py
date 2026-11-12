@@ -62,7 +62,7 @@ SYSTEM = "You answer questions about historical facts."
 USER = ("Is the following statement true or false?\n\n"
         "Statement: {s}\n\n"
         "Answer with exactly one word: {opts}.")
-CONDITIONS = [("base", "raw"), ("instruct", "raw"), ("instruct", "chat")]
+CONDITIONS = [("base", "raw")] + [(v, f) for v in ("sft", "rl", "dpo", "instruct") for f in ("raw", "chat")]
 
 
 def load_statements(path: Path) -> ModuleType:
@@ -286,7 +286,8 @@ def main() -> None:
     ap.add_argument("--statements", type=Path, required=True, help="statement-set file (.py)")
     ap.add_argument("--out-dir", type=Path, required=True)
     ap.add_argument("--presets", nargs="+", default=["gemma3-4b"], choices=list(config.MODEL_PRESETS))
-    ap.add_argument("--variants", nargs="+", default=["base", "instruct"], choices=["base", "instruct"])
+    ap.add_argument("--variants", nargs="+", default=["base", "instruct"],
+                    choices=["base", "sft", "rl", "dpo", "instruct"])
     ap.add_argument("--adapter", type=Path, help="LoRA adapter applied to the instruct weights")
     ap.add_argument("--tag", help="variant label for the adapter condition (no underscores)")
     ap.add_argument("--generate", type=int, default=0,
