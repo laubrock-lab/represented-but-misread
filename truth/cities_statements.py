@@ -15,6 +15,7 @@ _true = _d[_d.label == 1].set_index("city").statement
 _false = _d[_d.label == 0].set_index("city").statement
 _cities = sorted(set(_true.index) & set(_false.index))
 
+SYSTEM = "You evaluate statements."   # neutral, parallel to "Du bewertest Texte." (authorship)
 TOPICS = ["cities"]
 TARGET = "cities"
 MATCHED = "cities"

@@ -7,6 +7,8 @@ and each checkpoint (preset x variant, raw prompt, both answer orders averaged):
               "True" vs "False" (does not saturate), criterion c, p_mass
     probe     logistic probe on the last prompt token at ~67 % depth, out-of-fold
               (GroupKFold by pair), AUC-based d' and d_z
+    transfer  the same probe trained on cities (same checkpoint and layer) and applied to
+              the other sets: harder, and tests a shared truth direction (Marks & Tegmark)
     contrast  stage minus base for answer d_z and probe d_z, paired grouped bootstrap
               over pairs (same items in both conditions), z-test p
 
@@ -64,6 +66,21 @@ def probe_scores(out, preset, variant, items: pd.DataFrame) -> pd.Series | None:
     return pd.Series(s, index=ids, name="probe")
 
 
+def transfer_scores(preset, variant, items: pd.DataFrame, ds: str) -> pd.Series | None:
+    """Probe fitted on all cities statements, applied to the statements of ds."""
+    src = config.OUTPUT_DIR / "truth_cities" / f"{preset}_{variant}_raw_tf_acts.npz"
+    tgt = config.OUTPUT_DIR / f"truth_{ds}" / f"{preset}_{variant}_raw_tf_acts.npz"
+    if ds == "cities" or not (src.exists() and tgt.exists()):
+        return None
+    zs, zt = np.load(src), np.load(tgt)
+    layer = round(.67 * (zs["acts"].shape[1] - 1))
+    ys = np.array([1 if i.endswith("T") else 0 for i in zs["item_id"]])
+    clf = make_pipeline(StandardScaler(), LogisticRegression(C=0.01, max_iter=5000))
+    clf.fit(zs["acts"][:, layer].astype(np.float64), ys)
+    return pd.Series(clf.decision_function(zt["acts"][:, layer].astype(np.float64)),
+                     index=zt["item_id"], name="transfer")
+
+
 def boot_diff(a: pd.DataFrame, b: pd.DataFrame, col: str, n_boot: int, rng) -> tuple[float, float, float]:
     """Paired grouped bootstrap of dz(b) - dz(a); a, b indexed by item_id with pair_id, is_true."""
     m = a[["pair_id", "is_true", col]].join(b[[col]], rsuffix="_b", how="inner")
@@ -102,6 +119,9 @@ def main() -> None:
                 a = a.set_index("item_id")
                 if p is not None:
                     a = a.join(p)
+                t = transfer_scores(preset, v, a, ds)
+                if t is not None:
+                    a = a.join(t)
                 conds[v] = a
                 y, s = a.is_true.to_numpy(), a.dv.to_numpy()
                 r = dict(dataset=ds, preset=preset, variant=v, n=len(a), ans_d=sdt(y, s)["d_auc"],
@@ -109,13 +129,15 @@ def main() -> None:
                          p_mass=a.p_mass.mean())
                 if "probe" in a:
                     r |= dict(probe_d=sdt(y, a.probe.to_numpy())["d_auc"], probe_dz=dz(y, a.probe.to_numpy()))
+                if "transfer" in a:
+                    r |= dict(transfer_d=sdt(y, a.transfer.to_numpy())["d_auc"], transfer_dz=dz(y, a.transfer.to_numpy()))
                 rows.append(r)
             if "base" not in conds:
                 continue
             for v, b in conds.items():
                 if v == "base":
                     continue
-                for col, lab in (("dv", "answer"), ("probe", "probe")):
+                for col, lab in (("dv", "answer"), ("probe", "probe"), ("transfer", "transfer")):
                     if col in b and col in conds["base"]:
                         d, se, p = boot_diff(conds["base"], b, col, args.n_boot, rng)
                         cons.append(dict(dataset=ds, preset=preset, contrast=f"{v} - base", measure=lab,

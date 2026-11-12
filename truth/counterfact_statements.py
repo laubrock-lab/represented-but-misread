@@ -16,6 +16,7 @@ _g = _d[_d.key.isin(_keys)]
 _true = _g[_g.label == 1].drop_duplicates("key").set_index("key").statement
 _false = _g[_g.label == 0].drop_duplicates("key").set_index("key").statement
 
+SYSTEM = "You evaluate statements."   # neutral, parallel to "Du bewertest Texte." (authorship)
 TOPICS = ["counterfact"]
 TARGET = "counterfact"
 MATCHED = "counterfact"

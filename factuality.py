@@ -58,7 +58,7 @@ RAW = ("Is the following statement true or false?\n\n"
        "Statement: {s}\n\n"
        "Answer with one word ({opts}).\n"
        "Answer:")
-SYSTEM = "You answer questions about historical facts."
+SYSTEM = "You answer questions about historical facts."   # default; truth/ sets override
 USER = ("Is the following statement true or false?\n\n"
         "Statement: {s}\n\n"
         "Answer with exactly one word: {opts}.")
@@ -314,6 +314,9 @@ def main() -> None:
         ap.error("--adapter needs a --tag without underscores")
 
     st = load_statements(args.statements)
+    global SYSTEM
+    SYSTEM = getattr(st, "SYSTEM", SYSTEM)     # a statement set may define its own system prompt
+    print(f"system prompt (chat format): {SYSTEM!r}")
     out = args.out_dir
     df = items(st)
     if args.limit:
