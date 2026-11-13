@@ -97,17 +97,17 @@ layer 16, the whole difference between base and SFT model is carried by the ques
 positions. Error bars
 are 95% bootstrap confidence intervals.
 
-**Figure S2 (`figS2_checkpoint_transfer`; draft 13 Nov).** Post-training leaves the
-representation of the text intact and reorganizes the answer position. For each layer, a
-linear probe was trained on one checkpoint and tested on the other (base vs. final
-post-trained model, both directions averaged); the transfer deficit is the loss in d′
-relative to the probe trained on the checkpoint itself. A deficit of 0 means that the
-same direction separates the classes in both checkpoints. Thin lines: model families;
-thick lines: mean. Light grey: mean over the text positions (authorship corpora only);
-dark: last prompt position, at which the answer is produced. At the text positions,
-probes transferred without loss at every depth, also where the probes were well below
-ceiling (chats, d′ ≈ 2). At the answer position, the deficit grew with depth in all
-families and tasks, although probes trained on each checkpoint itself still decoded the
-information. Negated statements: the dip at mid-depth reflects that both checkpoints are
-at ceiling there (AUC = 1). TODO: update when the resubmitted families (chats: Gemma 3
-4B, Qwen3, OLMo 3; news: Gemma 3 4B, Qwen3) are in.
+**Figure S2 (`figS2_checkpoint_transfer`).** Post-training leaves the representation of
+the text intact and reorganizes the answer position. For each layer, a linear probe was
+trained on one checkpoint and tested on the other (base vs. final post-trained model,
+both directions averaged); the transfer deficit is the loss in d′ relative to the probe
+trained on the checkpoint itself. A deficit of 0 means that the same direction separates
+the classes in both checkpoints. Dark lines: OLMo 2 7B (solid) and Apertus 1.5 8B
+(dashed), the two families included in all six sets; thin grey lines: the other
+families; thick light line: mean over all families at the text positions (authorship
+corpora only). At the text positions, probes transferred without loss at every depth,
+also where they were well below ceiling (chats, d′ ≈ 2). At the last prompt position, at
+which the answer is produced, the deficit grew with depth in all families and tasks,
+although probes trained on each checkpoint itself still decoded the information. For the
+negated statements, the deficit drops to zero at mid-depth because both checkpoints are
+at ceiling there (AUC = 1); OLMo 2 shows no deficit in the upper layers for this set.
