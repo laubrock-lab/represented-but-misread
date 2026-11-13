@@ -136,7 +136,7 @@ the last label alternated between example sets.
 
 ## 2.7 Causal interventions
 
-We used three causal interventions, which are illustrated in Figure 1.
+We used three causal interventions, which are illustrated in Figure 2.
 
 *Steering.* To test whether the authorship information causally influences the answer,
 we added a vector to the residual stream at the last prompt position after a given

@@ -46,6 +46,9 @@ abstract: |
 {chr(10).join('  ' + l for l in abstract.splitlines())}
 bibliography: references/references.bib
 nocite: "@*"
+header-includes: |
+  \\usepackage{{caption}}
+  \\captionsetup[figure]{{labelformat=empty}}
 link-citations: true
 ---
 

@@ -6,7 +6,29 @@ Figures: `paper/figures/` (PDF for the manuscript, PNG for review). Code:
 checkpoint, orange = post-trained model / SFT checkpoint, grey = baselines and
 references.
 
-**Figure 1 (methods schematic, `fig0_methods_schematic`).** How the interventions work.
+**Figure 1 (lens model with an internal lens, `fig_lens_two_stage`).** Brunswik's lens
+model, applied to a language model as judge and extended by an internal lens. A state of
+the world (Brunswik's distal criterion; the ground truth, here whether a text was written
+by an AI, whether a statement is true, or whether a review is genuine) is reflected in
+observable cues of the text, some of which are valid and some of which are not (dashed).
+In the first lens (encoding), the model integrates these cues into its internal
+representation; whether the ground truth can be decoded from this representation is
+measured with linear probes, and whether two checkpoints represent it in the same way
+with probe transfer. In the second lens (readout), the question reads the representation
+out into an answer by weighting internal features. Only one of these features was
+measured directly: the class direction, i.e., the direction that separates the two
+classes in the representation; its weight and sign in the answer were measured with
+steering. The other features are schematic. Achievement, i.e., the agreement of the
+answer with the state of the world, requires both lenses. Post-training changes the
+second lens (orange); model stitching and activation patching locate the change in depth
+and in the prompt. Splitting the judge side of the lens model has precedents in
+personality judgment (detection vs. utilization of cues; Funder, 1995) and in
+neuroscience (information encoded in a neural population vs. read out for behavior;
+Panzeri et al., 2017). Note: for the authorship corpora, probes were fitted both on the
+text positions and on the last prompt position; for the truth and review sets, only on
+the last prompt position.
+
+**Figure 2 (methods schematic, `fig0_methods_schematic`).** How the interventions work.
 In panels A, C, and D, the horizontal axis shows the positions of the prompt in reading
 order (the instruction, the text to be judged, the question, and the position at which
 the answer is produced), and the vertical axis shows the layers of the network. (A) Information
@@ -24,7 +46,7 @@ Activation patching replaces the internal states of one model (here SFT) at sele
 positions and one layer with those of the other model (here the base model's states at
 the question positions).
 
-**Figure 2 (`fig1_information_vs_answers`).** The authorship information is available but
+**Figure 3 (`fig1_information_vs_answers`).** The authorship information is available but
 not used. Sensitivity (d′) for separating AI from human texts in the three corpora.
 Upper rows: classifiers on word and character n-grams and on surface statistics,
 probes on the average input embedding and on the internal activations at two thirds of
@@ -34,7 +56,7 @@ range across models. Lower rows: sensitivity of the models' own answers (raw pro
 one small dot per model family, large dot = median. The dashed line marks the maximum
 d′ that can be estimated with the given number of texts.
 
-**Figure 3 (`fig2_answers_and_fewshot`).** Post-training mostly lowers the sensitivity
+**Figure 4 (`fig2_answers_and_fewshot`).** Post-training mostly lowers the sensitivity
 of the answers; labelled examples help almost all models. (A) Sensitivity of the base
 model (blue) and of the final post-trained model with the identical raw prompt (filled
 orange) and with its chat template (open orange), per model family and corpus.
@@ -51,7 +73,7 @@ in the text: significantly so in three of five comparisons, reversed for Qwen3 o
 textbook summaries. On the textbook summaries, only 0, 8, and 16 examples were
 tested (OLMo 2: 0 and 8).
 
-**Figure 4 (`fig3_stitching_patching`).** Post-training changes how the question reads
+**Figure 5 (`fig3_stitching_patching`).** Post-training changes how the question reads
 the text. (A) Model stitching between base and SFT checkpoints (textbook summaries).
 The x-axis gives the number of lower layers taken from the other checkpoint. Blue: base
 layers below, SFT layers above; orange: SFT layers below, base layers above. Dashed and
@@ -63,35 +85,17 @@ inserted into the SFT model; orange: SFT model's states inserted into the base m
 bootstrap confidence intervals. Patching at layer 8 (more mixed; text positions
 contribute somewhat) is shown in Supplementary Figure S1.
 
-Numbering: the schematic is Figure 1 (Method); the data figures are Figures 2–4
-(results.md updated 12 Nov).
+Numbering (13 Nov): Figure 1 = lens model with an internal lens (Introduction); Figure 2 =
+methods schematic (Method); Figures 3–5 = data figures; S1, S2 = supplement.
 
 **Figure S1 (`figS1_patching_layers`).** Activation patching at layers 8 and 16
-(textbook summaries). As Figure 4B, with layer 8 added. At layer 8 the picture is
+(textbook summaries). As Figure 5B, with layer 8 added. At layer 8 the picture is
 mixed: in Apertus, exchanging the states of the text positions still has a partial
 effect; in OLMo 2, even exchanging all positions transfers only part of the difference
-(the change is not yet complete at layer 8; cf. the stitching curve in Figure 4A). At
+(the change is not yet complete at layer 8; cf. the stitching curve in Figure 5A). At
 layer 16, the whole difference between base and SFT model is carried by the question
 positions. Error bars
 are 95% bootstrap confidence intervals.
-
-**Figure (two-stage lens, `fig_lens_two_stage`; draft 13 Nov, placement open: candidate
-for Figure 1A or a separate introductory figure).** Brunswik's lens model, applied to a
-language model as judge and split at its internal representation. A ground truth
-(Brunswik's distal criterion; here: whether a text was written by an AI, whether a
-statement is true, whether a review is genuine) is reflected in observable cues of the text, some of which are valid and some
-of which are not (dashed). In stage 1 (perception), the model encodes these cues in its
-internal representation; whether the ground truth can be decoded from this representation
-is measured with linear probes. In stage 2 (utilization), the question reads this
-representation out into an answer; how the answer uses the information is measured with
-signal detection theory and lens-model statistics. Achievement, i.e., the agreement of
-the answer with the ground truth, requires both stages. Post-training changes stage 2
-(orange). Steering tests whether the represented information causally drives the
-answer; model stitching and activation patching locate the change in depth and in the
-prompt. Note: for the authorship corpora, probes were fitted both on the text positions
-and on the last prompt position; for the truth and review sets, only on the last prompt
-position, i.e., after the question -- information decodable there but not reflected in
-the answer is a failure of the final readout.
 
 **Figure S2 (`figS2_checkpoint_transfer`; draft 13 Nov).** Post-training leaves the
 representation of the text intact and reorganizes the answer position. For each layer, a

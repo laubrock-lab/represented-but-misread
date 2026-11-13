@@ -62,7 +62,14 @@ validity of the cues that a stimulus offers and the way in which a judge utilize
 valid cues or from valid cues that are not used, or used in the wrong way. For human
 judges, the utilization of cues can only be inferred from their judgments. For language
 models, it can be examined directly, because their internal representations are
-accessible.
+accessible. The judgment of a language model can then be described by two lenses in
+series (Figure 1): In a first lens, the cues of the text are encoded in the model's
+internal representation; in a second lens, the question reads this representation out
+into an answer. Splitting the judge side of the lens model in this way has precedents in
+research on personality judgment, which distinguishes the detection of cues from their
+utilization (Funder, 1995), and in neuroscience, which distinguishes the information that
+a neural population encodes from the information that is read out for behavior (Panzeri
+et al., 2017).
 
 This possibility has been used to show that language models often represent more than
 they say. Simple linear classifiers ("probes") trained on a model's internal activations
