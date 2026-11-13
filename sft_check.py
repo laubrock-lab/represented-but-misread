@@ -125,8 +125,8 @@ def _text(c) -> str:
         return ""
     if isinstance(c, str):
         return c
-    if isinstance(c, dict):
-        return _text(c.get("text") or c.get("content") or c.get("parts") or "")
+    if isinstance(c, dict):     # Apertus: {"text", "parts": [...], "blocks": [{"type": "response", ...}]}
+        return "\n".join(t for t in (_text(c.get(k)) for k in ("text", "content", "parts", "blocks")) if t)
     if isinstance(c, (list, tuple)):
         return "\n".join(_text(x) for x in c)
     return str(c)
@@ -215,13 +215,14 @@ def main() -> None:
     ap.add_argument("--search", action="store_true")
     ap.add_argument("--census", action="store_true", help="full streaming pass with regex counts")
     ap.add_argument("--limit", type=int, help="census: stop after N rows (testing)")
+    ap.add_argument("--mixtures", nargs="+", default=list(MIXTURES), choices=list(MIXTURES))
     ap.add_argument("--n-offsets", type=int, default=400)
     ap.add_argument("--block", type=int, default=5)
     ap.add_argument("--max-hits", type=int, default=500)
     args = ap.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
     counts = []
-    for name, ds in MIXTURES.items():
+    for name, ds in ((k, MIXTURES[k]) for k in args.mixtures):
         if args.sample:
             sample(name, ds, args.n_offsets, args.block)
         if args.search:
