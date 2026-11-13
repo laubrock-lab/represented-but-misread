@@ -47,7 +47,7 @@ p <- ggplot() +
                colour = INK, linewidth = 0.4) +
   scale_linetype_manual(values = c(`TRUE` = "solid", `FALSE` = "22"), guide = "none") +
   # nodes
-  box(crit, 1.38, 1.3, "white", INK, "Criterion\n(AI or human?\ntrue or false?\ngenuine or fake?)", size = 2.2) +
+  box(crit, 1.38, 1.3, "white", INK, "Ground truth\n(AI or human?\ntrue or false?\ngenuine or fake?)", size = 2.2) +
   geom_label(data = cues, aes(x = x, y = y, label = lab), size = 2.3, colour = DARK, fill = "white",
              linewidth = 0.3, label.r = unit(0.08, "lines"), label.padding = unit(0.18, "lines")) +
   box(rep_xy, 1.45, 1.25, "white", INK, "Internal\nrepresentation\nof the text", size = 2.35) +
@@ -64,7 +64,7 @@ p <- ggplot() +
            linetype = "dashed") +
   annotate("segment", x = c(crit[1], ans_xy[1]), xend = c(crit[1], ans_xy[1]), y = 6.2,
            yend = c(crit[2] + 0.68, ans_xy[2] + 0.48), colour = INK, linewidth = 0.35, linetype = "dashed") +
-  annotate("label", x = 5.35, y = 6.2, label = "achievement: does the answer track the criterion?",
+  annotate("label", x = 5.35, y = 6.2, label = "achievement: does the answer track the ground truth?",
            size = 2.3, colour = INK, fill = "white", linewidth = 0) +
   # legend for invalid cues
   annotate("segment", x = 2.35, xend = 2.75, y = 0.55, yend = 0.55, colour = INK, linewidth = 0.4, linetype = "22") +
