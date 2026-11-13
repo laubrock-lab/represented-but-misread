@@ -89,6 +89,8 @@ p <- ggplot() +
   theme_void(base_size = 8.5) + theme(plot.margin = margin(6, 6, 6, 6))
 
 dir.create(OUT, showWarnings = FALSE, recursive = TRUE)
-ggsave(file.path(OUT, "fig_lens_two_stage.pdf"), p, width = 6.6, height = 3.7, device = cairo_pdf)
+ggsave(file.path(OUT, "fig_lens_two_stage.pdf"), p, width = 6.6, height = 3.7, device = pdf)   # base pdf device: Helvetica core font, correct metrics in every viewer
+embedFonts(file.path(OUT, "fig_lens_two_stage.pdf"), outfile = file.path(OUT, "fig_lens_two_stage.pdf"),
+           options = "-dPDFSETTINGS=/prepress -dEmbedAllFonts=true")   # arXiv/journals: embed all fonts (needs ghostscript)
 ggsave(file.path(OUT, "fig_lens_two_stage.png"), p, width = 6.6, height = 3.7, dpi = 200, bg = "white")
 cat("written:", file.path(OUT, "fig_lens_two_stage.{pdf,png}"), "\n")

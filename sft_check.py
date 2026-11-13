@@ -38,6 +38,7 @@ QUERIES = {
     "truth": ["true or false", "true/false", "is this statement true", "fact-check",
               "is the following statement true"],
 }
+PARQUET_SPLIT = {"tulu3_olmo2": "train", "apertus15": "partial-train"}
 OUT = config.OUTPUT_DIR / "sft_check"
 
 
@@ -119,6 +120,19 @@ PATTERNS = {
 NEG = re.compile(r"\b(?:not|never|no longer|isn't|aren't|wasn't|weren't|doesn't|don't|didn't)\b", re.I)
 
 
+def _text(c) -> str:
+    """Plain text of a message content: str, list of parts ({'type': 'text', 'text': ...}), or dict."""
+    if c is None:
+        return ""
+    if isinstance(c, str):
+        return c
+    if isinstance(c, dict):
+        return _text(c.get("text") or c.get("content") or c.get("parts") or "")
+    if isinstance(c, (list, tuple)):
+        return "\n".join(_text(x) for x in c)
+    return str(c)
+
+
 def turns(row: dict) -> tuple[str, str]:
     """(all user/system text, all assistant text) for the common chat schemas."""
     msgs = row.get("messages") or row.get("conversations") or row.get("conversation")
@@ -127,7 +141,7 @@ def turns(row: dict) -> tuple[str, str]:
         for m in msgs:
             role = (m.get("role") or m.get("from") or "").lower()
             txt = m.get("content") if m.get("content") is not None else m.get("value", "")
-            txt = txt if isinstance(txt, str) else json.dumps(txt, ensure_ascii=False)
+            txt = _text(txt)
             (a if role in ("assistant", "gpt", "model", "bot") else u).append(txt)
         return "\n".join(u), "\n".join(a)
     strs = {k: v for k, v in row.items() if isinstance(v, str)}
@@ -137,10 +151,14 @@ def turns(row: dict) -> tuple[str, str]:
 
 def census(name: str, ds: str, max_store: int = 400, limit: int | None = None) -> dict:
     from datasets import load_dataset
+    # dataset-server parquet conversion: complete for Tulu 3; for the Apertus mix the first
+    # ~10 % ("partial-train") of the deterministically shuffled rows = a random sample
+    split_dir = PARQUET_SPLIT[name]
+    files = f"hf://datasets/{ds}@refs%2Fconvert%2Fparquet/default/{split_dir}/*.parquet"
     counts = {k: 0 for k in PATTERNS} | {"truefalse_task_negated": 0, "rows": 0}
     stored = {k: 0 for k in PATTERNS}
     with open(OUT / f"{name}_census_hits.jsonl", "w") as f:
-        for i, row in enumerate(load_dataset(ds, split="train", streaming=True)):
+        for i, row in enumerate(load_dataset("parquet", data_files=files, split="train", streaming=True)):
             if limit and i >= limit:
                 break
             user, asst = turns(row)
@@ -158,7 +176,8 @@ def census(name: str, ds: str, max_store: int = 400, limit: int | None = None) -
                 if stored[k] < max_store:
                     stored[k] += 1
                     s = max(0, m.start() - 400)
-                    f.write(json.dumps(dict(category=k, idx=i, id=row.get("id"), source=row.get("source"),
+                    f.write(json.dumps(dict(category=k, idx=i, id=row.get("id") or row.get("conversation_id"),
+                                            source=row.get("source") or row.get("dataset_source"),
                                             negated=neg, user=user[s: m.end() + 600],
                                             assistant=asst[:800]), ensure_ascii=False) + "\n")
             if i % 100000 == 0:
