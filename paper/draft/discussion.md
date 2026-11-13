@@ -146,7 +146,14 @@ the intended effects of post-training, such as instruction following, is an open
 question, and the approach is related to combining fine-tuned weights by interpolation
 or averaging (Wortsman et al., 2022a, 2022b). Second, knowing where a side effect arises
 makes it possible to protect the affected components during fine-tuning or to correct
-them with small, targeted interventions instead of broader training. Third, and in our
+them with small, targeted interventions instead of broader training. That such
+interventions are practical has been shown, albeit with the opposite intention, for the
+refusal behavior that post-training installs: Refusal is mediated by a single direction
+in the residual stream, and removing this direction abolishes it (Arditi et al., 2024),
+and tools that optimize such edits automatically remove refusals while changing the
+model's other outputs only minimally (Weidmann, 2025). Note, however, that the same ease
+of editing that makes targeted corrections possible also shows how fragile safety-related
+post-training can be. Third, and in our
 view most important, post-training can change how a question is read while the
 knowledge that the answer would require remains in the model. The answer then no longer
 reflects what the model represents. This is a concrete and measurable instance of a

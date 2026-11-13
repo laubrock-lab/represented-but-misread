@@ -1,7 +1,8 @@
 """Assemble the paper drafts into one Markdown file for pandoc (reading copy, not the
 submission version).
 
-Order: title (option 1 of abstract.md), abstract, introduction, methods, results,
+Order: title (option 1 of abstract.md), abstract, introduction, terminology tables
+(rosetta.md), methods, results,
 discussion, figures (images + captions from figures.md), references (ALL entries of
 references/references.bib -- the drafts use plain-text citations, so the list is not
 filtered to the cited works).
@@ -27,13 +28,16 @@ abstract = abstract_md.split("## Abstract", 1)[1].strip()
 
 figs = []
 for para in section("figures.md").split("\n\n"):
-    m = re.match(r"\*\*(Figure (?:S?\d+)) \((?:[^`]*`)?(fig\w+)`?\)\.\*\*\s*(.*)", para.strip(), flags=re.S)
+    # "**Figure 2 (`stem`).**", "**Figure S2 (`stem`; draft ...).**", "**Figure (two-stage lens, `stem`; ...).**"
+    m = re.match(r"\*\*(Figure(?: S?\d+)?) \(([^`]*)`(fig\w+)`[^)]*\)\.\*\*\s*(.*)", para.strip(), flags=re.S)
     if m:
-        label, stem, caption = m.groups()
+        label, pre, stem, caption = m.groups()
+        if label == "Figure":                       # unnumbered draft figure: name it by its description
+            label = f"Figure ({pre.strip(' ,')})"
         caption = " ".join(caption.split())
         figs.append(f"![**{label}.** {caption}](figures/{stem}.pdf){{width=100%}}\n\n\\clearpage\n")
 
-body = "\n\n".join(section(f) for f in ("introduction.md", "methods.md", "results.md", "discussion.md"))
+body = "\n\n".join(section(f) for f in ("introduction.md", "rosetta.md", "methods.md", "results.md", "discussion.md"))
 header = f"""---
 title: "{title}"
 subtitle: "Reading copy, assembled {date.today():%d %b %Y} -- draft, do not distribute"
