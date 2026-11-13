@@ -92,11 +92,12 @@ def main() -> None:
     ap.add_argument("--sets", nargs="+", default=SETS)
     ap.add_argument("--layer-step", type=int, default=1)
     ap.add_argument("--out", default="checkpoint_transfer.csv", help="file name in outputs/")
+    ap.add_argument("--presets", nargs="+", help="restrict to these model families")
     args = ap.parse_args()
     rows = []
     for name in args.sets:
         conds = conditions(config.OUTPUT_DIR / name)
-        for preset in sorted({p for p, _ in conds}):
+        for preset in sorted({p for p, _ in conds if not args.presets or p in args.presets}):
             if (preset, "base") not in conds:
                 continue
             items_a, acts_a = load(conds[(preset, "base")])
