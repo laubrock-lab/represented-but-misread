@@ -92,3 +92,18 @@ prompt. Note: for the authorship corpora, probes were fitted both on the text po
 and on the last prompt position; for the truth and review sets, only on the last prompt
 position, i.e., after the question -- information decodable there but not reflected in
 the answer is a failure of the final readout.
+
+**Figure S2 (`figS2_checkpoint_transfer`; draft 13 Nov).** Post-training leaves the
+representation of the text intact and reorganizes the answer position. For each layer, a
+linear probe was trained on one checkpoint and tested on the other (base vs. final
+post-trained model, both directions averaged); the transfer deficit is the loss in d′
+relative to the probe trained on the checkpoint itself. A deficit of 0 means that the
+same direction separates the classes in both checkpoints. Thin lines: model families;
+thick lines: mean. Light grey: mean over the text positions (authorship corpora only);
+dark: last prompt position, at which the answer is produced. At the text positions,
+probes transferred without loss at every depth, also where the probes were well below
+ceiling (chats, d′ ≈ 2). At the answer position, the deficit grew with depth in all
+families and tasks, although probes trained on each checkpoint itself still decoded the
+information. Negated statements: the dip at mid-depth reflects that both checkpoints are
+at ceiling there (AUC = 1). TODO: update when the resubmitted families (chats: Gemma 3
+4B, Qwen3, OLMo 3; news: Gemma 3 4B, Qwen3) are in.
