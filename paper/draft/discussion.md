@@ -103,39 +103,52 @@ answers do not use them.
 
 Why should training that makes a model more helpful and more agreeable to humans make it
 worse at telling human from AI text? Our data do not answer this question, but they
-constrain the possible answers. A first observation is that plain AI texts, generated
-without any instruction to sound human, were judged as more human than AI texts that
-had been optimized to resemble human writing. On the short chats, for example, the
-post-trained Gemma 3 12B separated human texts from plain AI texts with an AUC of .18
-but from optimized AI texts with an AUC of .26, and the post-trained Qwen3 with AUCs of
-.20 and .36. This tendency was already present in the base models and became stronger
-after post-training (Gemma 3 12B: .39 before and .18 after post-training). The purest
-assistant style thus appeared most human to the models. We see three explanations, which
-are not mutually exclusive.
+constrain the possible answers. A first observation concerns the two kinds of AI text in
+the chat corpus. Plain AI messages, generated without any instruction to sound human,
+were judged as more human than optimized messages, which had been matched to the style
+of the respective student and then revised according to the students' feedback on what
+still sounded AI-like. This feedback mostly asked for less polished text: for less
+elevated word choice, a more informal tone, shorter messages, a less tidy structure, and
+less perfect spelling and punctuation. On the short chats, for example, the post-trained
+Gemma 3 12B separated human texts from plain AI texts with an AUC of .18 but from
+optimized AI texts with an AUC of .26, and the post-trained Qwen3 with AUCs of .20 and
+.36; this tendency was already present in the base models and became stronger after
+post-training (Gemma 3 12B: .39 before and .18 after post-training). Note, however, that
+this ordering follows from any reversed readout: Because the optimized messages had been
+moved toward the style of the human messages, a model that reads authorship with the
+wrong sign must judge them as intermediate. The observation therefore shows that the
+reversal is graded rather than categorical, but it does not by itself distinguish between
+explanations. (TODO: result for the style-matched messages without feedback revision,
+which separate the contributions of style matching and feedback.)
 
-First, the reversal might reflect familiarity. During supervised fine-tuning, a model
-learns to produce a particular assistant style, which then becomes its most typical and
-most fluent kind of text. If the post-trained construal of the question maps "natural,
-like the text I would write" onto "human", texts in the model's own register would be
-judged human. Note that token-level predictability did not account for the reversal:
-For Gemma 3 4B, controlling for the model's own surprisal of each text left the
-reversal unchanged on the short chats and even enlarged it on the newspaper segments
+What the observation does show is that the models' judgments ran against the heuristics
+of human readers. The students took polish as a sign of AI authorship, and removing it
+made the messages sound more human to them; to the models, the same revision made the
+messages more AI-like. We see two explanations, which are not mutually exclusive. First,
+the reversal might reflect familiarity. During supervised fine-tuning, a model learns to
+produce a particular assistant style, which then becomes its most typical and most fluent
+kind of text. If the post-trained construal of the question maps "natural, like the text
+I would write" onto "human", polished text in the model's own register would be judged
+human, and less polished text, which is typical of human messages, would be judged
+AI-like. Note that token-level predictability did not account for the reversal: For
+Gemma 3 4B, controlling for the model's own surprisal of each text left the reversal
+unchanged on the short chats and even enlarged it on the newspaper segments
 (supplementary analysis). The relevant familiarity would therefore have to concern
-register and style rather than the predictability of single words. Second, the
-model might inherit the stereotype of its raters. Preference data reward polished,
-warm, and helpful text, and the people or models who provide these ratings cannot
-themselves tell AI from human text and hold invalid heuristics about it. Optimizing for
-what raters prefer could thus tie "human-like" to the features of polished assistant
-text, so that post-training acts as an implicit optimization against the detection of
-its own output. Third, post-training might narrow the model's concept of AI text to
-explicit assistant markers, such as disclaimers or bulleted lists, so that texts without
-such markers default to "human". These explanations make different predictions. The
-first predicts the strongest reversal for AI text whose style is closest to the model's
-own fine-tuning data, the second predicts that the reversal grows with the amount of
-human preference optimization, and the third predicts that AI texts with explicit
-assistant markers are recognized while texts without them are not. All three are
-compatible with a changed construal of the question; they differ in why the construal
-changed.
+register and style rather than the predictability of single words. Second, and more
+speculatively, post-training might tie good writing to human writing. Preference data
+reward polished, warm, and helpful text; a model that learns that such text is what
+humans want, without distinguishing what humans want from what humans write, would take
+polish as a sign of human authorship. In contrast to the intuition that post-training
+imports the stereotypes of human raters, this account predicts that the model inverts
+them, which is what we observed. Note, however, that in the two models with stage-wise
+checkpoints, the change arose during supervised fine-tuning rather than during preference
+optimization, which favors the first explanation, although demonstration data are curated
+for human preferences as well. A third possibility, that post-training narrows the
+model's concept of AI text to explicit assistant markers, is not supported by our data:
+Removing such markers made the messages more, not less, AI-like to the models. A
+limitation of these observations is that style matching and feedback revision were
+applied together, so that their contributions cannot be separated in the optimized
+messages.
 
 ## Implications
 
