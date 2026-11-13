@@ -13,7 +13,8 @@ and each checkpoint (preset x variant, raw prompt, both answer orders averaged):
               over pairs or hotels (same items in both conditions), z-test p
 
 Usage:  python truth_stages.py [--datasets cities neg_cities counterfact] [--n-boot 1000]
-Output: outputs/truth_<dataset>/stages.csv, outputs/truth_stages_contrasts.csv
+Output: outputs/truth_<dataset>/stages.csv, item_scores.csv (per item: dv, probe, transfer),
+        outputs/truth_stages_contrasts.csv
 """
 
 from __future__ import annotations
@@ -107,7 +108,7 @@ def main() -> None:
     ap.add_argument("--n-boot", type=int, default=1000)
     args = ap.parse_args()
     rng = np.random.default_rng(1)
-    rows, cons = [], []
+    rows, cons, scores = [], [], []
     for ds in args.datasets:
         out = config.OUTPUT_DIR / f"truth_{ds}"
         if not out.exists():
@@ -126,6 +127,7 @@ def main() -> None:
                 if t is not None:
                     a = a.join(t)
                 conds[v] = a
+                scores.append(a.reset_index().assign(dataset=ds, preset=preset, variant=v))
                 y, s = a.is_true.to_numpy(), a.dv.to_numpy()
                 r = dict(dataset=ds, preset=preset, variant=v, n=len(a), ans_d=sdt(y, s)["d_auc"],
                          ans_dz=dz(y, s), ans_c=sdt(y, s)["c0"], share_true=(s > 0).mean(),
@@ -145,6 +147,9 @@ def main() -> None:
                         d, se, p = boot_diff(conds["base"], b, col, args.n_boot, rng)
                         cons.append(dict(dataset=ds, preset=preset, contrast=f"{v} - base", measure=lab,
                                          diff_dz=d, se=se, lo=d - 1.96 * se, hi=d + 1.96 * se, p=p))
+        sc = [x for x in scores if x["dataset"].iloc[0] == ds]
+        if sc:      # per-item scores (answer dv, probe, transfer) for the lens-model analyses
+            pd.concat(sc).to_csv(out / "item_scores.csv", index=False)
         res = pd.DataFrame([r for r in rows if r["dataset"] == ds])
         if len(res):
             res.to_csv(out / "stages.csv", index=False)
