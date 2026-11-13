@@ -38,7 +38,6 @@ QUERIES = {
     "truth": ["true or false", "true/false", "is this statement true", "fact-check",
               "is the following statement true"],
 }
-PARQUET_SPLIT = {"tulu3_olmo2": "train", "apertus15": "partial-train"}
 OUT = config.OUTPUT_DIR / "sft_check"
 
 
@@ -149,39 +148,63 @@ def turns(row: dict) -> tuple[str, str]:
     return "\n".join(strs.values()), a
 
 
+PARQUET_FILES = {"tulu3_olmo2": [f"default/train/{i:04d}.parquet" for i in range(6)],
+                 "apertus15": [f"default/partial-train/{i:04d}.parquet" for i in range(10)]}
+
+
 def census(name: str, ds: str, max_store: int = 400, limit: int | None = None) -> dict:
-    from datasets import load_dataset
-    # dataset-server parquet conversion: complete for Tulu 3; for the Apertus mix the first
-    # ~10 % ("partial-train") of the deterministically shuffled rows = a random sample
-    split_dir = PARQUET_SPLIT[name]
-    files = f"hf://datasets/{ds}@refs%2Fconvert%2Fparquet/default/{split_dir}/*.parquet"
+    """Full pass over the dataset-server parquet conversion, one file at a time: download
+    via the resolve URL (CDN, not the rate-limited API), count, delete. For Tulu 3 the
+    conversion is complete (census); for the Apertus mix it is the first ~10 % of the
+    deterministically shuffled rows (a simple random sample, n = 373,520)."""
+    import pyarrow.parquet as pq
+    from huggingface_hub import get_token
     counts = {k: 0 for k in PATTERNS} | {"truefalse_task_negated": 0, "rows": 0}
     stored = {k: 0 for k in PATTERNS}
+    domains: dict = {}
+    tmp = OUT / "tmp.parquet"
+    headers = {"Authorization": f"Bearer {get_token()}"} if get_token() else {}
+    i = 0
     with open(OUT / f"{name}_census_hits.jsonl", "w") as f:
-        for i, row in enumerate(load_dataset("parquet", data_files=files, split="train", streaming=True)):
+        for rel in PARQUET_FILES[name]:
+            url = f"https://huggingface.co/datasets/{ds}/resolve/refs%2Fconvert%2Fparquet/{rel}"
+            with requests.get(url, headers=headers, stream=True, timeout=120) as r:
+                r.raise_for_status()
+                with open(tmp, "wb") as out:
+                    for chunk in r.iter_content(1 << 22):
+                        out.write(chunk)
+            for batch in pq.ParquetFile(tmp).iter_batches(batch_size=2000):
+                for row in batch.to_pylist():
+                    if limit and i >= limit:
+                        break
+                    dom = row.get("domain") or row.get("source") or "?"
+                    domains[dom] = domains.get(dom, 0) + 1
+                    user, asst = turns(row)
+                    counts["rows"] += 1
+                    for k, pat in PATTERNS.items():
+                        m = pat.search(user)
+                        if not m:
+                            continue
+                        counts[k] += 1
+                        neg = False
+                        if k == "truefalse_task":
+                            window = user[max(0, m.start() - 300): m.end() + 300]
+                            neg = bool(NEG.search(window))
+                            counts["truefalse_task_negated"] += neg
+                        if stored[k] < max_store:
+                            stored[k] += 1
+                            s0 = max(0, m.start() - 400)
+                            f.write(json.dumps(dict(category=k, idx=i, id=row.get("id") or row.get("conversation_id"),
+                                                    source=row.get("source") or row.get("dataset_source"),
+                                                    domain=row.get("domain"), negated=neg,
+                                                    user=user[s0: m.end() + 600], assistant=asst[:800]),
+                                               ensure_ascii=False) + "\n")
+                    i += 1
+            tmp.unlink()
+            print(f"{name}: {rel} done, {i} rows, {counts}", flush=True)
             if limit and i >= limit:
                 break
-            user, asst = turns(row)
-            counts["rows"] += 1
-            for k, pat in PATTERNS.items():
-                m = pat.search(user)
-                if not m:
-                    continue
-                counts[k] += 1
-                neg = False
-                if k == "truefalse_task":
-                    window = user[max(0, m.start() - 300): m.end() + 300]
-                    neg = bool(NEG.search(window))
-                    counts["truefalse_task_negated"] += neg
-                if stored[k] < max_store:
-                    stored[k] += 1
-                    s = max(0, m.start() - 400)
-                    f.write(json.dumps(dict(category=k, idx=i, id=row.get("id") or row.get("conversation_id"),
-                                            source=row.get("source") or row.get("dataset_source"),
-                                            negated=neg, user=user[s: m.end() + 600],
-                                            assistant=asst[:800]), ensure_ascii=False) + "\n")
-            if i % 100000 == 0:
-                print(f"{name}: {i} rows {counts}", flush=True)
+    pd.Series(domains).sort_values(ascending=False).to_csv(OUT / f"{name}_domains.csv", header=["rows"])
     print(f"{name}: done {counts}", flush=True)
     return dict(mixture=name, **counts)
 
