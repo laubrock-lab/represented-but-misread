@@ -20,13 +20,14 @@ representation is read out into an answer? The superficial alignment hypothesis
 suggests the latter, but direct causal tests are scarce. We used the judgment whether a
 text was written by a human or by an AI as a test case, because the correct answer is
 known, the relevant information is contained in the input, and its availability can be
-established independently of the model. Across eight families of open-weight language
-models and three corpora of German texts, including unpublished newspaper articles, the
+established independently of the model. Across six open-weight base models and their
+post-trained versions and three corpora of German texts, including chat messages written
+for this study, the
 information that distinguishes AI from human texts was readily available: Linear probes
 on the models' activations and simple word-frequency classifiers separated the two
 classes well. The models' own answers, analyzed with signal detection theory, used this
 information poorly and often with the wrong sign, and post-training lowered their
-sensitivity on average (Δd′ = −0.33). In two model families with checkpoints after each
+sensitivity on average (Δd′ = −0.33). In two models with checkpoints after each
 stage of post-training, the decrease arose during supervised fine-tuning. Three causal
 methods converged on where it takes effect. Shifting the internal state toward "AI" along the
 direction that separates AI from human texts moved the answers of post-trained models

@@ -12,7 +12,7 @@ otherwise, sensitivity is expressed as d′ estimated from the area under the RO
 with 95% confidence intervals from a grouped bootstrap; positive values indicate that AI
 texts are judged as more AI-like than human texts, negative values indicate the reverse.
 
-## 3.1 The authorship information is available, and it is ordinary
+## 3.1 The authorship information is available
 
 Is the information that separates AI from human texts available to the models at all?
 We first answered this question with linear probes, i.e., simple classifiers that are
@@ -27,7 +27,7 @@ rules out that the probes merely memorized the training texts.
 However, this information is not specific to the internal machinery of language models.
 Classifiers trained on simple word frequencies reached the same or higher sensitivity
 than the probes (short chats: d′ = 1.73 [1.44, 2.06]; newspaper segments and textbook
-summaries: AUC ≥ .99), and a probe on the average input embedding of the text, i.e.,
+summaries: AUC ≥ .99[^auc]), and a probe on the average input embedding of the text, i.e.,
 before any processing by the network, performed about as well as probes on deep layers
 (short chats: d′ = 1.48). Holding out whole authors instead of single originals did not
 change this picture (word frequencies: d′ = 1.79). A detector that was trained by
@@ -38,6 +38,11 @@ the cues that distinguish AI from human texts are present and readily accessible
 in the texts themselves and in the models' representations; they consist largely of
 ordinary lexical and stylistic regularities. In terms of Brunswik's lens model, the
 environment offers valid cues.
+
+[^auc]: When nearly all pairs of texts are ordered correctly, the AUC-based d′ approaches
+a maximum that depends on the number of texts (d′ = 3.73 for the textbook summaries and
+3.14 for the newspaper segments); for such near-perfect classifiers, we therefore report
+the AUC.
 
 > **Figure 3 (placeholder).** Sensitivity of probes and baselines (word and character
 > n-grams, surface statistics, average input embedding, EditLens) compared with the
@@ -52,14 +57,17 @@ final post-trained models. Many cells are close to chance, and a considerable nu
 clearly below it: Qwen3-8B after post-training judged the newspaper segments with
 d′ = −1.01 (raw prompt) and −1.30 (chat prompt), and Gemma 3 12B judged the short chats
 with d′ = −0.81 and −1.09. A negative d′ cannot result from a response bias alone; it
-means that the models systematically took AI texts for human texts and vice versa.
+means that the models systematically took AI texts for human texts and vice versa. In
+terms of signal detection theory, the evidence on which the answer was based pointed in
+the wrong direction: Properties typical of human texts pushed the answer toward "AI",
+and properties typical of AI texts toward "human".
 
 > **Table 1.** Sensitivity (d′) of the models' answers. Base models were queried with a
 > plain completion prompt ("raw"); post-trained models with the same prompt and with
 > their chat template ("chat"). Conditions in which a model placed less than 30% of its
 > probability on the two answer words are omitted (—).
 >
-> | Model family | Corpus | Base (raw) | Final (raw) | Final (chat) |
+> | Base model | Corpus | Base (raw) | Final (raw) | Final (chat) |
 > |---|---|---|---|---|
 > | Gemma 3 4B | Chats | −0.21 | −0.72 | −0.66 |
 > | | News | +0.48 | −0.34 | −0.28 |
@@ -90,9 +98,9 @@ prompt format, we compared each final model with its base model on the identical
 prompt. Of these 18 comparisons, 14 showed a decrease. A random-effects summary across
 all 18 comparisons yielded a mean change of Δd′ = −0.33 [−0.50, −0.17] (z = −3.95,
 p < .001), with considerable heterogeneity between cells (I² = 82%). Because the same
-model families contribute to several corpora, we repeated the summary after averaging
-within each family; the result was the same (−0.34 [−0.49, −0.18], p < .001), and all
-six families showed a decrease on average. Per corpus, the decrease was reliable for the
+base models contribute to several corpora, we repeated the summary after averaging
+within each base model; the result was the same (−0.34 [−0.49, −0.18], p < .001), and all
+six base models showed a decrease on average. Per corpus, the decrease was reliable for the
 newspaper segments (−0.42 [−0.67, −0.16], p = .002) and the textbook summaries (−0.41
 [−0.70, −0.11], p = .007), but not for the short chats (−0.19 [−0.45, 0.07], p = .15).
 
@@ -112,10 +120,10 @@ tests post hoc as the comparisons that address our hypothesis; Holm correction a
 all 111 contrasts we computed, including comparisons between adjacent post-training
 stages and across prompt formats, left five of the six decreases significant. Hence,
 post-training lowered the sensitivity of the answers on average, but neither uniformly
-nor in a single direction across model families and text types.
+nor in a single direction across models and text types.
 
 For OLMo 2 and Apertus 1.5, the developers released checkpoints after each stage of
-post-training, which allowed us to ask when the change occurs. In both families it
+post-training, which allowed us to ask when the change occurs. In both models it
 occurred at the first, supervised stage (supervised fine-tuning, SFT), in which the
 model learns to imitate example answers. For OLMo 2 on the textbook summaries, d′ fell
 from −0.12 (base) to −0.50 after SFT and then remained stable (−0.46 after preference
@@ -126,25 +134,18 @@ was already complete after imitation learning.
 
 Could the post-trained models simply hold a wrong belief about what AI texts look like,
 a belief that a few correctly labeled examples would correct? We tested this by placing
-2, 8, or 16 labeled examples from other sources before each text (four example sets
-with balanced answer order). Examples improved the judgments of almost all models. With
-16 examples on the short chats, d′ rose from −0.21 to +0.66 for the base model of Gemma
-3 4B, from −0.68 to +0.21 for Qwen3, and from −0.07 to +0.57 for OLMo 2, whereas the
-post-trained models of Gemma 3 4B and Qwen3 remained below chance (−0.72 to −0.31 and
-−0.80 to −0.17, raw prompt). Whether base models profit more from examples than
-post-trained models is, however, a question about the difference between the two gains,
-which we tested with a paired grouped bootstrap. Base models gained significantly more in
-three of five comparisons (Gemma 3 4B, short chats: difference +0.46 [0.12, 0.85],
-p = .012; OLMo 2, short chats: +0.61 [0.29, 0.90], p = .001; Gemma 3 4B, textbook
-summaries: +0.47 [0.17, 0.75], p = .002), but not for Qwen3 on the short chats (+0.26
-[−0.05, 0.58], p = .11), and for Qwen3 on the textbook summaries the post-trained model
-gained more (−0.27 [−0.52, −0.03], p = .026), its base model being already above chance
-without examples. Thus, labeled examples reduce the deficit of the post-trained models
-but do not consistently remove it, and the evidence that post-training makes the
-judgments less responsive to examples is mixed. A simple false belief that examples
-override can therefore neither be ruled out nor be taken as the full explanation.
+2, 8, or 16 labeled examples from other sources before each text. Examples improved the
+judgments of almost all models. With 16 examples on the short chats, d′ rose from −0.21
+to +0.66 for the base model of Gemma 3 4B, from −0.68 to +0.21 for Qwen3, and from
+−0.07 to +0.57 for OLMo 2, whereas the post-trained models of Gemma 3 4B and Qwen3
+remained below chance (−0.72 to −0.31 and −0.80 to −0.17, raw prompt). In three of five
+comparisons, the base models also gained significantly more from the examples than their
+post-trained versions (supplementary analysis). A mistaken belief about what
+distinguishes AI from human texts, which examples can partly correct, is therefore likely
+to be part of the explanation, but it does not account for the persisting deficit of the
+post-trained models.
 
-> **Figure 4 (placeholder).** Summary across all cells (model family × corpus × prompt
+> **Figure 4 (placeholder).** Summary across all cells (base model × corpus × prompt
 > format): probe sensitivity, base-model answer, and post-trained answer; few-shot
 > curves as an inset.
 
@@ -159,18 +160,22 @@ amounted to six within-class standard deviations, and we compared it with two ki
 control directions: random directions drawn from the same high-variance subspace as the
 authorship direction, and differences between random halves of the texts within each
 class. As a positive control, we also shifted along the direction that the model's own
-answers follow.
+answers follow (the decision direction; Section 2.7).
 
 In Gemma 3 4B after post-training, shifting a text toward "AI" made the model answer
 "human" more often, and this effect clearly exceeded the control directions from the
 middle of the network onward. On the newspaper segments, the shift changed the answer by
 −3.26 nats at layer 22 and by −6.09 nats at layer 28, compared with control effects of
 −0.57 ± 1.14 and +1.22 ± 1.12 (mean ± SD across random directions); on the short chats,
-the effect was −5.48 nats at layer 17 (controls −0.25 ± 0.15). The positive control
-behaved as expected, moving the answer toward "AI" (+11.46 and +7.98 nats at the same
-layers). Only at the earliest layer tested (layer 11) could the authorship effect not
+the effect was −5.48 nats at layer 17 (controls −0.25 ± 0.15). The positive control,
+i.e., the decision direction, behaved as expected, moving the answer toward "AI" (+11.46
+and +7.98 nats at the same layers). Only at the earliest layer tested (layer 11) could the authorship effect not
 be distinguished from the controls. Gemma 3 12B showed the same reversal on the short
-chats (layer 31: −17.36 nats; random directions −0.63 ± 1.31; positive control +14.48).
+chats (layer 31: −17.36 nats; random directions −0.63 ± 1.31; positive control +14.48),
+and so did Qwen3 on both corpora (newspaper segments, layers 24 and 30: −1.27 and −2.59
+nats; short chats: −3.40 and −5.88 nats), with random directions within ±0.33 nats and
+positive controls of +2.02 to +6.50 nats; for Qwen3, only isotropic random directions
+were used as controls.
 Note that the reversal was carried by the part of the authorship direction that points
 against the model's decision direction: after this part had been removed, the remaining
 authorship component moved the answer in the correct direction (newspaper segments,
@@ -191,7 +196,7 @@ use (Apertus) or into a reversed use (OLMo 3).
 ## 3.4 The change originates in the early layers
 
 Where in the network does post-training make the difference? Because the base and the
-post-trained checkpoints of a family share the same architecture and start from the same
+post-trained checkpoints of a model share the same architecture and start from the same
 weights, we could combine them: the lower layers from one checkpoint and the upper layers
 from the other, passing the internal state at the junction on unchanged ("model
 stitching"). This test requires no probe and no statistic derived from the answers; it
@@ -204,7 +209,7 @@ text (perplexity 6.0–6.7 for Apertus, 8.2–9.4 for OLMo 2), and stitching at 
 bottom or the very top reproduced the respective parent model.
 
 If post-training changed only the final readout stage, the upper layers should decide
-the outcome. The opposite was the case (Figure 5, left). When the first 8 of 32 layers of
+the outcome. The opposite was the case (Figure 5A). When the first 8 of 32 layers of
 Apertus came from the base model and all layers above from the SFT model, the combined
 model discriminated at least as well as the base model (d′ = +0.59 [0.41, 0.80]; base
 +0.43). Conversely, the first 8 layers of the SFT model sufficed to abolish the base
@@ -232,11 +237,9 @@ follow it, i.e., the question "Was this text written by a human or generated by 
 and the answer cue. We therefore exchanged the internal states between base and SFT
 checkpoints selectively at different positions of the prompt ("activation patching"):
 at the tokens of the text, at the instruction before the text, at the question after
-the text, or at the final position only. As a check, patching a model with its own
-states left every answer unchanged.
+the text, or at the final position only.
 
-At layer 16, the pattern was unambiguous and identical for both families (Figure 5,
-right). Exchanging the states of the text tokens changed nothing: Apertus after SFT
+At layer 16, the pattern was unambiguous and identical for both models (Figure 5B). Exchanging the states of the text tokens changed nothing: Apertus after SFT
 remained at chance when it received the base model's text representation (−0.11; SFT
 alone −0.04), and the base model kept its sensitivity when it received the SFT model's
 text representation (+0.43; base alone +0.43). Exchanging only the states of the
@@ -255,7 +258,7 @@ In summary, post-training did not change what the models represent about a text.
 changed how the question takes up this representation, through a change that originates
 in the early layers and that resides in the processing at the question positions.
 
-> **Figure 5 (placeholder, central figure).** Left: model stitching for Apertus and
+> **Figure 5 (placeholder, central figure).** (A) Model stitching for Apertus and
 > OLMo 2 (d′ as a function of the number of layers taken from the other checkpoint, both
-> directions). Right: activation patching at layer 16 (d′ after exchanging states at
+> directions). (B) Activation patching at layer 16 (d′ after exchanging states at
 > text, pre-text, question, and final positions).

@@ -38,7 +38,10 @@ the positions in between, i.e., the question (dark tiles). (B) Steering, sketche
 version of the high-dimensional representation space: human texts (open circles) and AI
 texts (triangles) differ along an AI–human direction (arrow between the class means).
 Steering moves the state of one text along this direction (diamonds) and measures how
-the model's answer changes; the dashed line marks where the answer switches. If the
+the model's answer changes; the dashed line marks where the answer switches. The two
+need not be orthogonal: the angle between the AI–human direction and the model's
+decision boundary determines how strongly a shift along the direction changes the
+answer. If the
 model read the direction correctly, a shift toward the AI texts would move the answer
 toward "KI". (C) Model stitching combines the lower layers of one checkpoint (here the
 base model, blue) with the upper layers of another (here the SFT model, orange). (D)
@@ -53,13 +56,13 @@ probes on the average input embedding and on the internal activations at two thi
 the network depth, and an externally trained detector (EditLens). Lines show 95%
 bootstrap confidence intervals, except for the two probe rows, where they show the
 range across models. Lower rows: sensitivity of the models' own answers (raw prompt),
-one small dot per model family, large dot = median. The dashed line marks the maximum
+one small dot per model, large dot = median. The dashed line marks the maximum
 d′ that can be estimated with the given number of texts.
 
 **Figure 4 (`fig2_answers_and_fewshot`).** Post-training mostly lowers the sensitivity
 of the answers; labelled examples help almost all models. (A) Sensitivity of the base
 model (blue) and of the final post-trained model with the identical raw prompt (filled
-orange) and with its chat template (open orange), per model family and corpus.
+orange) and with its chat template (open orange), per model and corpus.
 Asterisks mark differences between the base and the final model on the identical raw
 prompt that survive Holm correction within the family of 18 final-vs-base comparisons;
 all of them are decreases. The increases of OLMo 2 on the short chats and of OLMo 3
@@ -69,9 +72,10 @@ false-discovery-rate control (the latter in a condition with low answer probabil
 labelled examples placed before each text (raw prompt; base vs. final post-trained
 model). Vertical lines show the range across four example sets. Whether base models
 profit more than post-trained models (difference of gains, 0 vs. 16 examples) is tested
-in the text: significantly so in three of five comparisons, reversed for Qwen3 on the
-textbook summaries. On the textbook summaries, only 0, 8, and 16 examples were
-tested (OLMo 2: 0 and 8).
+in the supplement: significantly so in three of five comparisons, reversed for Qwen3 on
+the textbook summaries. On the textbook summaries, only 0, 8, and 16 examples were
+tested; for OLMo 2 only 0 and 8, because 16 textbook summaries exceed its context window
+of 4,096 tokens.
 
 **Figure 5 (`fig3_stitching_patching`).** Post-training changes how the question reads
 the text. (A) Model stitching between base and SFT checkpoints (textbook summaries).
@@ -103,11 +107,12 @@ trained on one checkpoint and tested on the other (base vs. final post-trained m
 both directions averaged); the transfer deficit is the loss in d′ relative to the probe
 trained on the checkpoint itself. A deficit of 0 means that the same direction separates
 the classes in both checkpoints. Dark lines: OLMo 2 7B (solid) and Apertus 1.5 8B
-(dashed), the two families included in all six sets; thin grey lines: the other
-families; thick light line: mean over all families at the text positions (authorship
+(dashed), the two models included in all six sets; thin grey lines: the other
+models (OLMo 3 Think and Instruct, which share a base model, counted separately); thick
+light line: mean over all models at the text positions (authorship
 corpora only). At the text positions, probes transferred without loss at every depth,
 also where they were well below ceiling (chats, d′ ≈ 2). At the last prompt position, at
-which the answer is produced, the deficit grew with depth in all families and tasks,
+which the answer is produced, the deficit grew with depth in all models and tasks,
 although probes trained on each checkpoint itself still decoded the information. For the
 negated statements, the deficit drops to zero at mid-depth because both checkpoints are
 at ceiling there (AUC = 1); OLMo 2 shows no deficit in the upper layers for this set.

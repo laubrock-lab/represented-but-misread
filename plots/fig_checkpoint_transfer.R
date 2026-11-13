@@ -23,11 +23,11 @@ d <- bind_rows(lapply(Sys.glob("outputs/checkpoint_transfer_*.csv"), read_csv, s
   mutate(deficit = ((within_base - base_to_post) + (within_post - post_to_base)) / 2)
 nfam <- d |> distinct(set, preset) |> count(set, name = "k")
 d <- d |> left_join(nfam, by = "set") |>
-  mutate(panel = factor(paste0(SETS[set], " (", k, " families)"),
+  mutate(panel = factor(paste0(SETS[set], " (", k, " models)"),
                         levels = paste0(SETS[nfam$set[match(names(SETS), nfam$set)]], " (",
-                                        nfam$k[match(names(SETS), nfam$set)], " families)")),
-         family = ifelse(preset %in% names(FOCUS), FOCUS[preset], "other families"),
-         family = factor(family, levels = c(FOCUS, "other families")))
+                                        nfam$k[match(names(SETS), nfam$set)], " models)")),
+         family = ifelse(preset %in% names(FOCUS), FOCUS[preset], "other models"),
+         family = factor(family, levels = c(FOCUS, "other models")))
 
 ans <- d |> filter(site == "last")
 txt <- d |> filter(site == "textmean") |> mutate(depth_bin = round(depth * 10) / 10) |>
@@ -36,17 +36,17 @@ txt <- d |> filter(site == "textmean") |> mutate(depth_bin = round(depth * 10) /
 
 p <- ggplot() +
   geom_hline(yintercept = 0, colour = GREY, linewidth = 0.3) +
-  geom_line(data = filter(ans, family == "other families"),
+  geom_line(data = filter(ans, family == "other models"),
             aes(depth, deficit, group = preset, colour = family, linetype = family, linewidth = family)) +
   geom_line(data = txt, aes(depth_bin, deficit, colour = family, linetype = family, linewidth = family)) +
-  geom_line(data = filter(ans, family != "other families"),
+  geom_line(data = filter(ans, family != "other models"),
             aes(depth, deficit, group = preset, colour = family, linetype = family, linewidth = family)) +
   facet_wrap(~panel, nrow = 2) +
-  scale_colour_manual(NULL, values = c(`OLMo 2 7B` = INK, `Apertus 1.5 8B` = INK, `other families` = GREY,
+  scale_colour_manual(NULL, values = c(`OLMo 2 7B` = INK, `Apertus 1.5 8B` = INK, `other models` = GREY,
                                        `text positions (mean)` = LIGHT)) +
-  scale_linetype_manual(NULL, values = c(`OLMo 2 7B` = "solid", `Apertus 1.5 8B` = "42", `other families` = "solid",
+  scale_linetype_manual(NULL, values = c(`OLMo 2 7B` = "solid", `Apertus 1.5 8B` = "42", `other models` = "solid",
                                          `text positions (mean)` = "solid")) +
-  scale_linewidth_manual(NULL, values = c(`OLMo 2 7B` = 0.75, `Apertus 1.5 8B` = 0.75, `other families` = 0.35,
+  scale_linewidth_manual(NULL, values = c(`OLMo 2 7B` = 0.75, `Apertus 1.5 8B` = 0.75, `other models` = 0.35,
                                           `text positions (mean)` = 1.4)) +
   scale_x_continuous("relative depth (layer / number of layers)", breaks = c(0, .5, 1), labels = c("0", ".5", "1")) +
   scale_y_continuous(expression(paste("transfer deficit (", italic(d), "')"))) +

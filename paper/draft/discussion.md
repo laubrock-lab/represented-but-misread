@@ -3,12 +3,12 @@
 
 In the present study we used authorship judgments as a test case for the question of
 whether post-training changes what a language model represents or how it reads this
-representation out. Across eight families of open-weight models and three corpora of German texts,
+representation out. Across six open-weight base models and three corpora of German texts,
 the information that distinguishes AI from human texts was readily available, both in
 the texts themselves and in the models' internal representations, but the models'
 answers did not use it, and often used it with the wrong sign. Post-training lowered
 the sensitivity of the answers on average (Δd′ = −0.33), with considerable variation
-between model families and text types, and in the two families with stage-wise
+between models and text types, and in the two models with stage-wise
 checkpoints the change occurred during supervised fine-tuning. Three causal methods
 converged on where this change takes effect. Steering showed that the direction that
 separates AI from human texts drives the answer in the wrong direction after
@@ -81,8 +81,8 @@ information from the text reaches it only through the positions in between, i.e.
 question. At each layer, these positions retrieve information from the text through
 attention and transform it through the feed-forward blocks. Post-training could
 intervene at either step, by changing what is retrieved or by changing what is made of
-it, and the stitching results suggest that both are involved. A psychological
-description of such a change is a different construal of the question. A model after
+it, and the stitching results suggest that both are involved. Speculatively, a
+psychological description of such a change is a different construal of the question. A model after
 post-training may understand "written by a human" differently than its base model did,
 much as a task set determines which features of a stimulus an observer selects and how
 they are mapped onto a response. In accounts of biased competition, a task set acts
@@ -92,7 +92,8 @@ the early layers, where the question begins to select information from the text,
 was fully located in the question positions by the middle of the network.
 
 The parallel to human judges is equally instructive. Human readers fail to recognize AI
-text because they rely on cues that are plausible but invalid (Jakesch et al., 2023),
+text because they rely on cues that are plausible but invalid (Jakesch et al., 2023;
+Rosin & Laubrock, in prep.),
 which in terms of the lens model is a failure of cue utilization rather than of cue
 availability (Brunswik, 1956; Karelaia & Hogarth, 2008). The models in our study fail in
 a similar way: Valid cues are present in the texts and in the representations, and the
@@ -156,8 +157,15 @@ of editing that makes targeted corrections possible also shows how fragile safet
 post-training can be. Third, and in our
 view most important, post-training can change how a question is read while the
 knowledge that the answer would require remains in the model. The answer then no longer
-reflects what the model represents. This is a concrete and measurable instance of a
-model that knows something but says something else, and it suggests that comparing the
+reflects what the model represents. In the terms of memory research, the information is
+available but not accessible (Tulving & Pearlstone, 1966); in the terms of the second
+lens in Figure 1, the readout weights the internal cues as if their validity were
+different from what it is, and post-training can make this misweighting worse. Whether
+language models can access their own internal states at all is the question of
+introspection, for which they show some, but limited and unreliable, abilities (Kadavath
+et al., 2022; Binder et al., 2024; Lindsey, 2025; Gurnee et al., 2026). Our case is a
+concrete and measurable instance of a model that represents something but says something
+else, and it suggests that comparing the
 representation at the question positions with the answer might be a useful tool for
 auditing models, in the spirit of distinguishing the presence of a feature from the
 behavior it supports (Templeton et al., 2024) and of examining which representations a
@@ -173,12 +181,12 @@ parameters, and the reversal might be weaker or absent in larger models. The
 information that the models failed to use was largely lexical and stylistic, as shown by
 simple n-gram classifiers, so our results concern the readout of ordinary cues rather
 than of any deep representation of authorship. The stitching and patching analyses were
-restricted to two model families with stage-wise checkpoints, to one corpus, and to the
-plain prompt format, because base models cannot be queried with a chat template. Model
-families also differ in their post-training recipes, including distillation from larger
+restricted to two models with stage-wise checkpoints, to one corpus, and to the
+plain prompt format, because base models cannot be queried with a chat template. Models
+from different developers also differ in their post-training recipes, including distillation from larger
 models, the emphasis on reasoning, and the share of human preference data, and our
 design cannot separate these factors; they are a plausible source of the heterogeneity
-between families and text types. The few-shot results were mixed, and they neither rule
+between models and text types. The few-shot results were mixed, and they neither rule
 out nor confirm that a correctable belief contributes to the failure. Finally, we defined
 the family of hypothesis tests for the post-training contrasts after inspecting the full
 set of comparisons; we therefore report the result under a stricter correction across
