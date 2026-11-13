@@ -74,3 +74,21 @@ effect; in OLMo 2, even exchanging all positions transfers only part of the diff
 layer 16, the whole difference between base and SFT model is carried by the question
 positions. Error bars
 are 95% bootstrap confidence intervals.
+
+**Figure (two-stage lens, `fig_lens_two_stage`; draft 13 Nov, placement open: candidate
+for Figure 1A or a separate introductory figure).** Brunswik's lens model, applied to a
+language model as judge and split at its internal representation. A criterion (here:
+whether a text was written by an AI, whether a statement is true, whether a review is
+genuine) is reflected in observable cues of the text, some of which are valid and some
+of which are not (dashed). In stage 1 (perception), the model encodes these cues in its
+internal representation; whether the criterion can be decoded from this representation
+is measured with linear probes. In stage 2 (utilization), the question reads this
+representation out into an answer; how the answer uses the information is measured with
+signal detection theory and lens-model statistics. Achievement, i.e., the agreement of
+the answer with the criterion, requires both stages. Post-training changes stage 2
+(orange). Steering tests whether the represented information causally drives the
+answer; model stitching and activation patching locate the change in depth and in the
+prompt. Note: for the authorship corpora, probes were fitted both on the text positions
+and on the last prompt position; for the truth and review sets, only on the last prompt
+position, i.e., after the question -- information decodable there but not reflected in
+the answer is a failure of the final readout.
