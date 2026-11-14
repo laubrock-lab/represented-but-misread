@@ -318,8 +318,8 @@ itself had little or no effect.
 *Deceptive reviews.* All models judged the reviews close to chance (d′ = 0.06–0.50),
 although probes separated truthful from deceptive reviews well (d′ = 2.5–2.9), at least
 as well as a classifier on word frequencies (d′ = 2.44). Post-training changed the probes
-little (Δd_z between −0.31 and +0.06), but it changed the answers in a direction that
-depended on the model: Gemma 3 4B lost sensitivity (Δd_z = −0.40), Qwen3 gained
+little (Δd~z~ between −0.31 and +0.06), but it changed the answers in a direction that
+depended on the model: Gemma 3 4B lost sensitivity (Δd~z~ = −0.40), Qwen3 gained
 (+0.42), and OLMo 2 and Apertus gained slightly (+0.08 to +0.18). After post-training,
 all models showed a strong bias toward "Truthful" (83–92% of the answers of the final
 models). The judgments
