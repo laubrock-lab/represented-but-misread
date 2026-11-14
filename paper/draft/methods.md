@@ -240,9 +240,15 @@ activations at the last prompt position at two thirds of the network depth, eval
 out of fold. For the negated statements, we additionally applied a probe trained on the
 simple geographic statements of the same checkpoint (transfer probe), which tests whether
 one truth direction also covers negated statements (Marks & Tegmark, 2024). Model
-stitching and activation patching were carried out as for authorship, on 300 pairs of
-negated statements (OLMo 2 and Apertus, base vs. SFT) and on the reviews (Gemma 3 4B and
-Qwen3 8B, base vs. final model; 800 pairs for stitching, 400 for patching).
+stitching and activation patching were carried out as for authorship, for both further
+judgments, but only where there was a change to locate: in models whose answers changed
+substantially with post-training and whose base models answered in the requested format.
+For the negated statements, these were OLMo 2 and Apertus (base vs. SFT, 300 pairs); the
+Gemma 3 base models rarely gave one of the two answers, and the Qwen3 base model already
+judged the negated statements perfectly. For the reviews, these were Gemma 3 4B, which
+lost sensitivity, and Qwen3 8B, which gained (base vs. final model; 800 pairs for
+stitching, 400 for patching); in OLMo 2 and Apertus, the changes were too small. For the
+statements on diverse facts, post-training changed the answers too little in any model.
 
 *Probe transfer between checkpoints.* To test whether post-training changes the geometry
 of the representation, we trained a probe at each layer on the activations of one
