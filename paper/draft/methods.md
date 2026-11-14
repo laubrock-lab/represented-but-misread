@@ -242,9 +242,10 @@ simple geographic statements of the same checkpoint (transfer probe), which test
 one truth direction also covers negated statements (Marks & Tegmark, 2024). Model
 stitching and activation patching were carried out as for authorship, for both further
 judgments, but only where there was a change to locate: in models whose answers changed
-substantially with post-training and whose base models answered in the requested format.
-For the negated statements, these were OLMo 2 and Apertus (base vs. SFT, 300 pairs); the
-Gemma 3 base models rarely gave one of the two answers, and the Qwen3 base model already
+substantially with post-training and whose base models placed at least 30% of their
+probability on the two answer words, the criterion used for authorship (Table 1). For the
+negated statements, these were OLMo 2 and Apertus (base vs. SFT, 300 pairs); the Gemma 3
+base models fell below this criterion (18% and 25%), and the Qwen3 base model already
 judged the negated statements perfectly. For the reviews, these were Gemma 3 4B, which
 lost sensitivity, and Qwen3 8B, which gained (base vs. final model; 800 pairs for
 stitching, 400 for patching); in OLMo 2 and Apertus, the changes were too small. For the
