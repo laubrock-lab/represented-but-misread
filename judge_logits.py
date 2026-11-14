@@ -387,7 +387,11 @@ def main() -> None:
     ap.add_argument("--fewshot-seeds", type=int, nargs="+", default=[0])
     ap.add_argument("--fewshot-max-tokens", type=int, default=200,
                     help="truncate each demonstration to this many tokens")
+    ap.add_argument("--adapter", type=Path, help="LoRA adapter dir, merged into the --variants model")
+    ap.add_argument("--tag", help="variant label used in output names for --adapter runs (no underscores)")
     args = ap.parse_args()
+    if args.adapter and (not args.tag or "_" in args.tag or len(args.variants) != 1):
+        raise SystemExit("--adapter needs exactly one --variants entry and a --tag without underscores")
     if args.fewshot and args.out_dir is None:
         raise SystemExit("--fewshot needs an explicit --out-dir (keep few-shot runs separate)")
 
@@ -410,6 +414,7 @@ def main() -> None:
     print(f"{len(texts)} texts ({texts['is_ai'].sum()} AI) | device {device} | {args.dtype}")
 
     for variant in args.variants:
+        label = args.tag or variant          # output label (adapter runs: the tag)
         seeds = args.fewshot_seeds if args.fewshot else [0]
         conditions = [(f, o, p, po, sd) for p in args.priors
                       for po in (args.prior_orders if p != "none" else ["ai"])
@@ -417,7 +422,7 @@ def main() -> None:
                       if not (f == "chat" and variant == "base")]
         todo = []
         for fmt, order, prior, po, sd in conditions:
-            stem = condition_stem(args.preset, variant, fmt, order, args.system, prior, po)
+            stem = condition_stem(args.preset, label, fmt, order, args.system, prior, po)
             stem += f"_fs{args.fewshot}s{sd}" if args.fewshot else ""
             if (out_dir / f"{stem}.csv").exists() and not args.overwrite:
                 print(f"skip {stem} (exists; --overwrite to redo)")
@@ -426,9 +431,14 @@ def main() -> None:
         if not todo:
             continue
         tok, model = load_model(ids[variant], device, dtype)
+        model_id = ids[variant]
+        if args.adapter:
+            from peft import PeftModel
+            model = PeftModel.from_pretrained(model, str(args.adapter)).merge_and_unload().eval()
+            model_id = f"{ids[variant]}+{args.adapter}"
         for fmt, order, prior, po, sd in todo:
-            run_condition(model, tok, texts, preset=args.preset, variant=variant,
-                          model_id=ids[variant], fmt=fmt, order=order, system=args.system,
+            run_condition(model, tok, texts, preset=args.preset, variant=label,
+                          model_id=model_id, fmt=fmt, order=order, system=args.system,
                           max_text_tokens=args.max_text_tokens, device=device,
                           want_acts=order in (args.acts_orders or []), out_dir=out_dir,
                           prior=prior, prior_order=po, fewshot=args.fewshot, fewshot_seed=sd,
