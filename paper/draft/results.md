@@ -156,7 +156,7 @@ messages in this corpus were richer in adverbs and verbs, lexically more diverse
 contained longer sentences than the human messages (r = .16 to .23 with authorship),
 whereas the human messages contained more adjectives, proper nouns, and long words. The
 post-trained models of Gemma 3 12B, Qwen3, and Apertus took long words, adjectives, nouns,
-and low readability as signs of AI authorship (e.g., Gemma 3 12B, long words: r = −.04
+and low readability as signs of AI authorship (e.g., Gemma 3 12B, mean word length: r = −.04
 before and +.24 after post-training; adjectives: −.06 and +.27) and adverbs and lexical
 diversity as signs of human authorship. OLMo 2, whose answers on the chats slightly
 improved with post-training, showed the opposite weighting after SFT (G = +.39). The
