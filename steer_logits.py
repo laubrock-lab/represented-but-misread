@@ -38,6 +38,10 @@ Usage
     python steer_logits.py outputs/journalism_seg --preset gemma3-4b --variant instruct
     python steer_logits.py outputs/chat_tw25 --preset gemma3-4b --variant instruct --layer 16
     python steer_logits.py outputs/journalism_seg --preset gemma3-4b --limit 6   # smoke test
+True/false judgments (factuality.py outputs; prompt, answer words and scoring of the
+statement set, e.g. "Truthful"/"Deceptive" for opspam): an out_dir named truth_<set>
+switches to truth mode; orders tf/ft; --layer defaults to ~67 % depth.
+    python steer_logits.py outputs/truth_neg_cities --preset olmo2-7b --variant base --controls decision random
 """
 
 from __future__ import annotations
@@ -256,25 +260,42 @@ def main() -> None:
     ap.add_argument("--seed", type=int, default=1)
     args = ap.parse_args()
 
-    stem = condition_stem(args.preset, args.variant, args.fmt, "mk", args.system)
-    acts = np.load(args.out_dir / f"{stem}_acts.npz")
-    layer = args.layer if args.layer is not None else best_layer(args.out_dir, stem)
+    truth = args.out_dir.name.startswith("truth_")
+    if truth:      # true/false judgments: factuality.py layout and prompts
+        import factuality as F
+        items = F.truth_items("truth:" + args.out_dir.name.removeprefix("truth_"))   # sets prompts/labels
+        if args.orders == ["mk", "km"]:
+            args.orders = list(F.ORDERS)
+        stem = f"{args.preset}_{args.variant}_raw_tf"
+        acts = np.load(args.out_dir / f"{stem}_acts.npz")
+        A = acts["acts"]
+        layer = args.layer if args.layer is not None else round(.67 * (A.shape[1] - 1))
+        meta = pd.DataFrame(dict(text_id=acts["item_id"].astype(str))).merge(
+            items.assign(prompt_type=""), on="text_id", how="left", validate="1:1")
+        X = A[:, layer, :].astype(np.float64)
+    else:
+        stem = condition_stem(args.preset, args.variant, args.fmt, "mk", args.system)
+        acts = np.load(args.out_dir / f"{stem}_acts.npz")
+        layer = args.layer if args.layer is not None else best_layer(args.out_dir, stem)
+        meta = pd.DataFrame(dict(text_id=acts["text_id"], source_id=acts["source_id"],
+                                 is_ai=acts["is_ai"]))
+        texts_path = args.texts or config.DATA_DIR / f"texts_{args.out_dir.name}.parquet"
+        texts = pd.read_parquet(texts_path, columns=["text_id", "prompt_type", "text"])
+        meta = meta.merge(texts, on="text_id", how="left", validate="1:1")
+        X = acts["acts_last"][:, layer, :].astype(np.float64)
     if layer < 1:
         raise SystemExit("--layer must be >= 1 (layer 0 = embeddings, not a decoder output).")
-    meta = pd.DataFrame(dict(text_id=acts["text_id"], source_id=acts["source_id"],
-                             is_ai=acts["is_ai"]))
-    texts_path = args.texts or config.DATA_DIR / f"texts_{args.out_dir.name}.parquet"
-    texts = pd.read_parquet(texts_path, columns=["text_id", "prompt_type", "text"])
-    meta = meta.merge(texts, on="text_id", how="left", validate="1:1")
     if meta["text"].isna().any():
         raise SystemExit("Some activation texts are missing from the parquet file.")
-
-    X = acts["acts_last"][:, layer, :].astype(np.float64)
     y, groups = meta["is_ai"].to_numpy(), meta["source_id"].to_numpy()
     score = None
     if {"decision", "classorth"} & set(args.controls):   # model's own unsteered dv, order-averaged
-        js = [pd.read_csv(args.out_dir / f"{condition_stem(args.preset, args.variant, args.fmt, o, args.system)}.csv")
-              for o in ("mk", "km")]
+        if truth:
+            js = [pd.read_csv(args.out_dir / f"{args.preset}_{args.variant}_raw_{o}.csv").rename(
+                  columns={"item_id": "text_id"}) for o in ("tf", "ft")]
+        else:
+            js = [pd.read_csv(args.out_dir / f"{condition_stem(args.preset, args.variant, args.fmt, o, args.system)}.csv")
+                  for o in ("mk", "km")]
         dv = pd.concat(js).groupby("text_id")["dv"].mean()
         score = meta["text_id"].map(dv).to_numpy(float)
         if np.isnan(score).any():
@@ -303,7 +324,7 @@ def main() -> None:
     layers = find_decoder_layers(model)
     verify_alignment(model, tok, layers, layer, device)
     steer = Steerer(layers[layer - 1])   # hidden_states[L] = output of layer L-1 = input of layer L
-    cands, eow = candidate_ids(tok), {}
+    cands, eow = (F.candidate_seqs(tok) if truth else candidate_ids(tok)), {}
     print(f"{stem}: layer {layer}, positions {args.positions}, {len(meta)} texts, "
           f"{len(settings)} settings x {len(args.orders)} orders; "
           f"step unit ({args.unit}) {np.mean([d['delta'] for d in dirs['class']]):.1f}; "
@@ -314,8 +335,11 @@ def main() -> None:
     rows, t0 = [], time.time()
     for order in args.orders:
         for i, r in enumerate(tqdm(meta.itertuples(index=False), total=len(meta), desc=order)):
-            text, _, _ = truncate_text(tok, r.text, args.max_text_tokens)
-            prompt, add_special = build_prompt(tok, text, args.fmt, order, args.system)
+            if truth:
+                prompt, add_special = F.build_prompt(tok, r.text, "raw", order)
+            else:
+                text, _, _ = truncate_text(tok, r.text, args.max_text_tokens)
+                prompt, add_special = build_prompt(tok, text, args.fmt, order, args.system)
             n_prompt = len(tok(prompt, add_special_tokens=add_special)["input_ids"])
             steer.pos = slice(n_prompt - 1, n_prompt) if args.positions == "last" \
                 else slice(0, n_prompt)
@@ -323,7 +347,8 @@ def main() -> None:
                 d = dirs[direction][i]
                 steer.u, steer.delta, steer.mid = d["u"], d["delta"], d["mid"]
                 steer.mode, steer.alpha = mode, float(a)
-                res = score_one(model, tok, prompt, add_special, None, cands, eow, device, False)
+                res = (F.score(model, tok, prompt, add_special, cands, eow, device, False) if truth else
+                       score_one(model, tok, prompt, add_special, None, cands, eow, device, False))
                 rows.append(dict(text_id=r.text_id, source_id=r.source_id, is_ai=r.is_ai,
                                  prompt_type=r.prompt_type, order=order, direction=direction,
                                  mode=mode, alpha=a, dv=res["dv"], p_mass=res["p_mass"]))
