@@ -154,7 +154,9 @@ opposite to their validity (matching index G for Gemma 3 4B: −.39; Gemma 3 12B
 Apertus after SFT: −.55; Qwen3: −.58; base models between −.52 and −.04). The AI
 messages in this corpus were richer in adverbs and verbs, lexically more diverse, and
 contained longer sentences than the human messages (r = .16 to .23 with authorship),
-whereas the human messages contained more adjectives, proper nouns, and long words. The
+whereas the human messages contained more adjectives, proper nouns, and long words. Read out by probes, in contrast, the internal representations weighted the same
+properties in line with their validity in every checkpoint (G = .75–.83), and
+post-training did not change this. The
 post-trained models of Gemma 3 12B, Qwen3, and Apertus took long words, adjectives, nouns,
 and low readability as signs of AI authorship (e.g., Gemma 3 12B, mean word length: r = −.04
 before and +.24 after post-training; adjectives: −.06 and +.27) and adverbs and lexical
@@ -336,6 +338,18 @@ question positions repaired the base model completely (OLMo 2: 0.63 → 3.26; Ap
 model (3.20 → 1.07; 4.15 → −1.09), whereas exchanging the states of the statement
 itself had little or no effect.
 
+Steering confirmed that post-training changed how the answer uses the represented truth
+direction, in the direction opposite to authorship. Shifting the internal state at the
+answer position along the direction that separates true from false negated statements
+(six standard deviations, layer 21; Section 2.7) moved the answer of the Apertus base
+model toward "False" (−0.40 nats; control directions at most ±0.22), i.e., the base model
+used the direction with the wrong sign, which explains its sensitivity below chance.
+After SFT, the same shift moved the answer toward "True" (+1.06 nats; controls at most
+±0.29). In OLMo 2, the base model did not use the direction beyond the controls (+0.28;
+controls up to ±0.35), whereas the SFT model used it strongly (+3.10; controls up to
+±1.12). Supervised fine-tuning thus turned a reversed use (Apertus) or no use (OLMo 2)
+into a correct use, the mirror image of what it did for authorship.
+
 *Deceptive reviews.* All models judged the reviews close to chance (d′ = 0.06–0.50),
 although probes separated truthful from deceptive reviews well (d′ = 2.5–2.9), at least
 as well as a classifier on word frequencies (d′ = 2.44). Post-training changed the probes
@@ -361,7 +375,13 @@ this matching that post-training changed: from .83 to .26 in Gemma 3 4B, and fro
 a cue without validity (r = .03 with the ground truth), and ignored first-person pronouns,
 the most valid single cue (r = −.33). Stitching and patching located the change for the
 reviews, too, at the question positions by the middle of the network (supplementary
-analysis), although the effects were smaller than for the other two judgments.
+analysis), although the effects were smaller than for the other two judgments. Steering
+explained the gain of Qwen3 causally: Its base model did not use the direction that
+separates truthful from deceptive reviews (−0.02 nats; controls up to ±0.48), whereas
+the post-trained model did (+1.48; controls up to ±0.43). For Gemma 3 4B, steering did
+not reveal the source of the loss: Relative to the positive control, the post-trained
+model used the direction about as much as its base model (22% vs. 25% of the effect of
+the decision direction).
 
 *Representation and readout across checkpoints.* If post-training leaves the
 representation intact and changes how it is read out, a probe trained on the base model

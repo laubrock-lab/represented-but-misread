@@ -224,9 +224,9 @@ simple n-gram classifiers, so our results concern the readout of ordinary cues r
 than of any deep representation of authorship. The stitching and patching analyses were
 restricted to two models per judgment, to one corpus for authorship, and to the plain
 prompt format, because base models cannot be queried with a chat template. The two
-further judgments were studied with two to four models, the truth judgments without
-steering (TODO: update when the steering results are in), and the effects of
-post-training on the reviews were small. Models
+further judgments were studied with two to five models, steering for them with two
+models each and on 300 items, and the effects of post-training on the reviews were
+small; for Gemma 3 4B, steering did not reveal the source of the loss. Models
 from different developers also differ in their post-training recipes, including distillation from larger
 models, the emphasis on reasoning, and the share of human preference data, and our
 design cannot separate these factors; they are a plausible source of the heterogeneity
