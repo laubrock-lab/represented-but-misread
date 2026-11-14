@@ -14,9 +14,13 @@ converged on where this change takes effect. Steering showed that the direction 
 separates AI from human texts drives the answer in the wrong direction after
 post-training. Model stitching showed that the damaging change originates in the early
 layers. Activation patching showed that it does not reside in the representation of the
-text but in the processing at the positions of the question that follow the text. In
-short, post-training did not change what the models represent about a text; it changed
-how the question they are asked reads this representation out.
+text but in the processing at the positions of the question that follow the text. The
+same pattern held for two further judgments with public data: For negated statements and
+for deceptive hotel reviews, the information was represented, post-training changed the
+readout rather than the representation, and the change resided at the question positions.
+Its direction, however, differed between the judgments, and so did its depth. In short,
+post-training did not change what the models represent; it changed how the question they
+are asked reads this representation out, in a direction that depended on the judgment.
 
 ## Relation to previous work
 
@@ -61,8 +65,9 @@ diffing and cache patching, in which much of what fine-tuning adds was concentra
 chat-template and system-prompt tokens (Leong et al., 2025; Loos & Eberle, 2026; Minder
 et al., 2026). Because our prompts used no chat template, our results suggest that the
 relevant positions are those at which the task is posed, whether in template tokens or
-in a question phrased in natural language. In contrast, the early origin of the change
-departs from the common picture that fine-tuning mainly alters the upper layers
+in a question phrased in natural language. In contrast, the origin of the change in the
+early layers for authorship, and in the middle layers for negated statements, departs
+from the common picture that fine-tuning mainly alters the upper layers
 (Merchant et al., 2020; Zhao et al., 2026; Zhou, 2026b). It is compatible, however, with
 evidence that changes in the late layers can depend on altered earlier computation
 (Zhou, 2026a), that post-training retunes routing mechanisms formed in pretraining
@@ -72,6 +77,39 @@ at layer ℓ is equivalent to exchanging the full residual stream at all positio
 that layer, so that our stitching and patching results are two views of one family of
 interventions rather than independent tests; their convergence with steering, which
 does not exchange states between checkpoints, is the stronger argument.
+
+## The direction of the change depends on the training signal
+
+Post-training impaired the readout of authorship, repaired the readout of negated
+statements, and made the readout of the reviews converge across models. A common
+account of these outcomes follows from the second lens in Figure 1. Post-training does
+not add information to the representation; it installs a way of reading the
+representation out. Whether this improves or impairs a judgment then depends on whether
+the training signal specifies a valid way of reading the question. For truth judgments,
+it does: The supervised fine-tuning data of both models contained thousands of
+statements to be judged as true or false, and the models learned to take the logic of
+the statement into account, including its negation. For authorship and deception, it
+does not: The data contained no such judgments, and the readout drifted toward what
+post-training made salient. For the reviews, this was a shared heuristic of all models,
+namely that long and detailed reviews are genuine, a cue without validity. For authorship, it was a reversed use of the
+information, possibly familiarity with the model's own style (see below). In terms of
+the lens model, post-training changes the weights of the second lens, and these weights
+are valid only to the extent that the training data contain valid examples.
+
+This account explains why the sign of the change differed between judgments, and, for
+the reviews, between models: Because post-training made the models' judgments converge,
+the change was negative for a model whose base version had read the reviews comparatively
+well (Gemma 3 4B) and positive for a model whose base version had not (Qwen3). It also
+qualifies the superficial alignment hypothesis in a second respect. A change that leaves
+the representation intact is superficial with respect to what the model knows, but not
+with respect to its consequences, which can make a judgment considerably better or worse.
+Note, however, that the account is partly inferred from the outcomes themselves. The
+inspection of the training data provides independent support for the difference between
+truth judgments on the one hand and authorship and deception on the other, but it cannot
+show which training examples produced the change, and the two mixtures differed in the
+kind of their truth judgments (factual claims vs. mathematical statements with explicit
+reasoning) as well as in other respects. A causal test would require fine-tuning a base
+model with and without valid examples of a judgment.
 
 ## The question reads the text
 
@@ -187,8 +225,11 @@ parameters, and the reversal might be weaker or absent in larger models. The
 information that the models failed to use was largely lexical and stylistic, as shown by
 simple n-gram classifiers, so our results concern the readout of ordinary cues rather
 than of any deep representation of authorship. The stitching and patching analyses were
-restricted to two models with stage-wise checkpoints, to one corpus, and to the
-plain prompt format, because base models cannot be queried with a chat template. Models
+restricted to two models per judgment, to one corpus for authorship, and to the plain
+prompt format, because base models cannot be queried with a chat template. The two
+further judgments were studied with two to four models, the truth judgments without
+steering (TODO: update when the steering results are in), and the effects of
+post-training on the reviews were small. Models
 from different developers also differ in their post-training recipes, including distillation from larger
 models, the emphasis on reasoning, and the share of human preference data, and our
 design cannot separate these factors; they are a plausible source of the heterogeneity
@@ -202,7 +243,11 @@ all contrasts as well, which left five of six decreases significant.
 
 Language models that write like humans fail to recognize their own kind of text, not
 because they lack the information but because post-training changes how they read it
-out. To know what a model knows, it is therefore not enough to look at its answers; one
-has to look at how the question is read. Future studies with larger models, controlled
-post-training, and other judgments may show how general this mechanism is and whether
-it can be prevented without giving up the benefits of post-training.
+out. The same holds, with a different sign, for judgments that post-training improves:
+In all three judgments we studied, post-training left the representation intact and
+changed how the question reads it, at the positions of the question and from the early
+or middle layers on. To know what a model knows, it is therefore not enough to look at
+its answers; one has to look at how the question is read. Future studies with larger
+models and with controlled post-training, in which the training data for a judgment are
+varied directly, may show how general this mechanism is and whether its side effects can
+be prevented without giving up the benefits of post-training.
