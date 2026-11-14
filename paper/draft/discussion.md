@@ -159,7 +159,11 @@ Thus, the properties that the students regarded as telltale signs of AI authorsh
 not influence the models' judgments at all, in line with the observation that the models
 used text properties differently from human readers (Section ... TODO lens analysis).
 Whatever drives the reversed judgments lies in the style of the authors rather than in
-the polish of the text. We see two explanations, which are not mutually exclusive. First,
+the polish of the text. (NOTE 14 Nov, to discuss with Jochen before revising: the cue-level lens analysis of the
+chats, outputs/chat_cues, argues against the familiarity account below and for a
+stereotype "AI text = formal, nominal, hard to read" that post-training installs in
+Gemma 3 12B, Qwen3 and Apertus; see PLAN.md.) We see two explanations, which are not
+mutually exclusive. First,
 the reversal might reflect familiarity. During supervised fine-tuning, a model learns to
 produce a particular assistant style, which then becomes its most typical and most fluent
 kind of text. If the post-trained construal of the question maps "natural, like the text
