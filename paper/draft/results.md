@@ -321,7 +321,8 @@ as well as a classifier on word frequencies (d′ = 2.44). Post-training changed
 little (Δd_z between −0.31 and +0.06), but it changed the answers in a direction that
 depended on the model: Gemma 3 4B lost sensitivity (Δd_z = −0.40), Qwen3 gained
 (+0.42), and OLMo 2 and Apertus gained slightly (+0.08 to +0.18). After post-training,
-all models showed a strong bias toward "Truthful" (75–94% of the answers). The judgments
+all models showed a strong bias toward "Truthful" (83–92% of the answers of the final
+models). The judgments
 of different models also became more similar: The mean correlation between the
 item-level judgments of the four models rose from .32 (range .19–.46) for the base
 models to .53 (.50–.59) for the final models with the plain prompt and .59 (.50–.65)
@@ -348,8 +349,9 @@ where the answer is formed. This was the case for all models and judgments (Figu
 At the text positions of the authorship corpora, probes transferred between the base and
 the final checkpoints without loss at every depth (transfer deficit ≤ 0.08 d′, also for
 the short chats, where the probes were far from ceiling). At the last prompt position,
-the deficit grew with depth, reaching 0.7 to 1.9 d′ in the upper third of the network for
-authorship and 0.5 to 1.1 d′ for the other judgments, although probes trained on each
+the deficit grew with depth, reaching on average 0.7 to 1.9 d′ in the upper third of the network for
+the authorship corpora and 0.5 to 1.1 d′ for the other judgments (with one exception: for
+OLMo 2 on the negated statements, the upper layers showed no deficit), although probes trained on each
 checkpoint itself continued to decode the information.
 
 *What do the training data teach?* The direction of the change differed between the
