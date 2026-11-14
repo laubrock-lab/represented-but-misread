@@ -92,7 +92,7 @@ the statement into account, including its negation. For authorship and deception
 does not: The data contained no such judgments, and the readout drifted toward what
 post-training made salient. For the reviews, this was a shared heuristic of all models,
 namely that long and detailed reviews are genuine, a cue without validity. For authorship, it was a reversed use of the
-information, possibly familiarity with the model's own style (see below). In terms of
+information, most plausibly an outdated stereotype of AI text (see below). In terms of
 the lens model, post-training changes the weights of the second lens, and these weights
 are valid only to the extent that the training data contain valid examples.
 
@@ -103,13 +103,20 @@ well (Gemma 3 4B) and positive for a model whose base version had not (Qwen3). I
 qualifies the superficial alignment hypothesis in a second respect. A change that leaves
 the representation intact is superficial with respect to what the model knows, but not
 with respect to its consequences, which can make a judgment considerably better or worse.
-Note, however, that the account is partly inferred from the outcomes themselves. The
-inspection of the training data provides independent support for the difference between
-truth judgments on the one hand and authorship and deception on the other, but it cannot
-show which training examples produced the change, and the two mixtures differed in the
-kind of their truth judgments (factual claims vs. mathematical statements with explicit
-reasoning) as well as in other respects. A causal test would require fine-tuning a base
-model with and without valid examples of a judgment.
+Note, however, that this account runs the risk of circularity: If the presence of a
+valid training signal were inferred only from the improvement of a judgment, the account
+would explain every outcome and predict none. The inspection of the training data
+provides an independent measurement, and it agrees with the account: The data contained
+thousands of truth judgments but no authorship or deception judgments. This comparison,
+however, is correlational and rests on two data mixtures. It cannot show which examples
+produced the repair of the negated statements (the truth judgments themselves, or, for
+instance, the many mathematical and reasoning tasks that teach a model to read a question
+precisely), and the two mixtures differed in size, languages, the share of mathematical
+tasks, and the kind of their truth judgments. A causal test would be a training study
+with a control condition: Fine-tuning the same base model on otherwise identical data
+with and without valid examples of a judgment, or with examples that embody a stereotype,
+should change the readout in the predicted direction while leaving the representation
+intact.
 
 ## The question reads the text
 
