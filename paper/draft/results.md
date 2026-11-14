@@ -262,3 +262,110 @@ in the early layers and that resides in the processing at the question positions
 > OLMo 2 (d′ as a function of the number of layers taken from the other checkpoint, both
 > directions). (B) Activation patching at layer 16 (d′ after exchanging states at
 > text, pre-text, question, and final positions).
+
+## 3.6 Beyond authorship: truth judgments and deceptive reviews
+
+Is the dissociation between representation and answer, and its modification by
+post-training, specific to authorship? We repeated the central analyses for two further
+judgments with known ground truth and publicly available data (Section 2.8): judgments of
+whether a statement is true, and judgments of whether a hotel review is genuine. Table 3
+summarizes the results.
+
+> **Table 3.** Sensitivity (d′) of probes and answers for three judgments, plain prompt.
+> Answers are given for the base model, after supervised fine-tuning (SFT), and for the
+> final model; for Gemma 3 and Qwen3, no intermediate checkpoints are available (—).
+> d′ = 4.54 is the maximum for 748 pairs (AUC = 1).
+>
+> | Judgment | Model | Probe, base → final | Answer, base → SFT → final |
+> |---|---|---|---|
+> | Authorship (textbook) | OLMo 2 7B | ≥ 2.4 (Section 3.1) | −0.12 → −0.50 → −0.44 |
+> | | Apertus 1.5 8B | ≥ 2.4 (Section 3.1) | +0.43 → −0.04 → −0.04 |
+> | Negated statements | OLMo 2 7B | 4.54 → 4.54 | 0.80 → 3.36 → 3.10 |
+> | | Apertus 1.5 8B | 4.54 → 4.54 | −0.88 → 4.54 → 4.54 |
+> | Facts (counterfact) | OLMo 2 7B | 2.15 → 2.05 | 1.79 → 1.77 → 1.84 |
+> | | Apertus 1.5 8B | 1.95 → 2.09 | 1.41 → 1.64 → 1.68 |
+> | Deceptive reviews | OLMo 2 7B | 2.93 → 2.79 | 0.16 → 0.20 → 0.17 |
+> | | Apertus 1.5 8B | 2.62 → 2.49 | 0.14 → 0.32 → 0.23 |
+> | | Gemma 3 4B | 2.82 → 2.51 | 0.45 → — → 0.08 |
+> | | Qwen3 8B | 2.56 → 2.59 | 0.06 → — → 0.50 |
+
+*Truth judgments.* For simple geographic statements, all checkpoints judged at ceiling,
+so that this set served only as a check. For the negated statements, however, the base
+models showed the same dissociation as for authorship, in a sharper form: Probes decoded
+the truth of every statement (AUC = 1), but the answers of the OLMo 2 base model used
+this information only weakly (d′ = 0.80), and those of the Apertus base model used it
+with the wrong sign (d′ = −0.88). Both base models answered "False" almost always
+(criterion c = 2.6 and 3.0). Supervised fine-tuning repaired the readout (OLMo 2:
+d′ = 3.36; Apertus: 4.54), whereas the probes remained at ceiling. A probe trained on the
+simple statements of the same checkpoint revealed what the base models' answers followed:
+Applied to the negated statements, it separated them with the wrong sign (OLMo 2:
+d′ = −1.28; Apertus: −1.43), i.e., the general truth direction of the base models
+encoded whether city and country belong together and ignored the negation. After SFT, the
+same probe separated the negated statements in the correct direction (+0.69; +3.05). For
+the statements on diverse facts, post-training changed the answers only slightly.
+
+Where does the repair arise? Model stitching located it in the middle of the network
+rather than in the early layers. In OLMo 2, the first 8 base layers combined with all
+upper SFT layers still judged at the level of the SFT model (d′ = 3.76; base 0.63, SFT
+3.20 in this subset of 300 pairs), whereas the first 16 base layers abolished the
+repair (0.38); in Apertus, the repair arose mainly in layers 9 to 12. Activation patching
+at layer 16 showed the same locus as for authorship: The SFT model's states at the
+question positions repaired the base model completely (OLMo 2: 0.63 → 3.26; Apertus:
+−0.87 → 4.15), and the base model's question states abolished the repair in the SFT
+model (3.20 → 1.07; 4.15 → −1.09), whereas exchanging the states of the statement
+itself had little or no effect.
+
+*Deceptive reviews.* All models judged the reviews close to chance (d′ = 0.06–0.50),
+although probes separated truthful from deceptive reviews well (d′ = 2.5–2.9), at least
+as well as a classifier on word frequencies (d′ = 2.44). Post-training changed the probes
+little (Δd_z between −0.31 and +0.06), but it changed the answers in a direction that
+depended on the model: Gemma 3 4B lost sensitivity (Δd_z = −0.40), Qwen3 gained
+(+0.42), and OLMo 2 and Apertus gained slightly (+0.08 to +0.18). After post-training,
+all models showed a strong bias toward "Truthful" (75–94% of the answers). The judgments
+of different models also became more similar: The mean correlation between the
+item-level judgments of the four models rose from .32 (range .19–.46) for the base
+models to .53 (.50–.59) for the final models with the plain prompt and .59 (.50–.65)
+with their chat templates. The direction of the change thus depended on where the base
+model started: Post-training replaced the base models' individual ways of reading the
+reviews by a shared one.
+
+A lens-model decomposition made this explicit. Fifteen interpretable cues predicted the
+ground truth moderately well (R_e = .56; cross-validated .55). Read out by probes, the
+internal representation weighted these cues almost exactly as the environment did, in
+all 13 checkpoints (matching index G = .97–.99) and unchanged by post-training. The
+answers, in contrast, were poorly matched to the environment (G = .15–.83), and it was
+this matching that post-training changed: from .83 to .26 in Gemma 3 4B, and from .17 to
+.53 in Qwen3. After post-training, all models treated long, detailed reviews as truthful,
+a cue without validity (r = .03 with the ground truth), and ignored first-person pronouns,
+the most valid single cue (r = −.33). Stitching and patching located the change for the
+reviews, too, at the question positions by the middle of the network (supplementary
+analysis), although the effects were smaller than for the other two judgments.
+
+*Representation and readout across checkpoints.* If post-training leaves the
+representation intact and changes how it is read out, a probe trained on the base model
+should work on the post-trained model at the text positions, but less so at the position
+where the answer is formed. This was the case for all models and judgments (Figure S2).
+At the text positions of the authorship corpora, probes transferred between the base and
+the final checkpoints without loss at every depth (transfer deficit ≤ 0.08 d′, also for
+the short chats, where the probes were far from ceiling). At the last prompt position,
+the deficit grew with depth, reaching 0.7 to 1.9 d′ in the upper third of the network for
+authorship and 0.5 to 1.1 d′ for the other judgments, although probes trained on each
+checkpoint itself continued to decode the information.
+
+*What do the training data teach?* The direction of the change differed between the
+judgments: Post-training impaired the readout of authorship, repaired that of negated
+statements, and made that of the reviews converge. To examine whether this corresponds to
+the supervised fine-tuning data, we searched the SFT mixtures of OLMo 2 and Apertus. Both
+contained thousands of requests to judge statements as true or false (Tülu 3: 2,685;
+Apertus, extrapolated: about 2,300), largely factual claims in Tülu 3 and mathematical
+statements with explicit reasoning, often including negations, in Apertus. In contrast,
+neither mixture contained a single request to judge whether a text had been written by a
+human or by an AI, and the matches for fake or deceptive reviews were sentiment tasks or
+summaries of research papers. Thus, post-training improved the one judgment for which the
+training data specify how to read the question, and impaired or merely reshaped the
+judgments for which they do not.
+
+In summary, the pattern found for authorship generalized: In all three judgments, the
+information was represented, the answers used it poorly before or after post-training,
+post-training changed the readout rather than the representation, and the change resided
+at the question positions. Its direction, however, depended on the judgment.
