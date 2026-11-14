@@ -278,8 +278,8 @@ summarizes the results.
 >
 > | Judgment | Model | Probe, base → final | Answer, base → SFT → final |
 > |---|---|---|---|
-> | Authorship (textbook) | OLMo 2 7B | ≥ 2.4 (Section 3.1) | −0.12 → −0.50 → −0.44 |
-> | | Apertus 1.5 8B | ≥ 2.4 (Section 3.1) | +0.43 → −0.04 → −0.04 |
+> | Authorship (textbook) | OLMo 2 7B | 2.4–3.7 (Section 3.1) | −0.12 → −0.50 → −0.44 |
+> | | Apertus 1.5 8B | 2.4–3.7 (Section 3.1) | +0.43 → −0.04 → −0.04 |
 > | Negated statements | OLMo 2 7B | 4.54 → 4.54 | 0.80 → 3.36 → 3.10 |
 > | | Apertus 1.5 8B | 4.54 → 4.54 | −0.88 → 4.54 → 4.54 |
 > | Facts (counterfact) | OLMo 2 7B | 2.15 → 2.05 | 1.79 → 1.77 → 1.84 |
@@ -331,7 +331,7 @@ model started: Post-training replaced the base models' individual ways of readin
 reviews by a shared one.
 
 A lens-model decomposition made this explicit. Fifteen interpretable cues predicted the
-ground truth moderately well (R_e = .56; cross-validated .55). Read out by probes, the
+ground truth moderately well (R~e~ = .56; cross-validated .55). Read out by probes, the
 internal representation weighted these cues almost exactly as the environment did, in
 all 13 checkpoints (matching index G = .97–.99) and unchanged by post-training. The
 answers, in contrast, were poorly matched to the environment (G = .15–.83), and it was

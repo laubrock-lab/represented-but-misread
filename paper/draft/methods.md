@@ -249,10 +249,10 @@ and the length of the review and of its words and sentences; all variables were 
 within the positive and the negative reviews. For each judge, i.e., the answers of a
 checkpoint or the probe scores of its representation, we computed the components of the
 lens model equation (Tucker, 1964; Karelaia & Hogarth, 2008) from linear regressions of
-the ground truth and of the judgments on the cues: the environmental predictability R_e,
-the consistency of the judge R_s, the matching index G (the correlation of the two
-predictions), the unmodeled agreement C, and the achievement r_a, which decomposes as
-r_a = G R_e R_s + C √(1 − R_e²) √(1 − R_s²). We also report the cosine similarity of the
+the ground truth and of the judgments on the cues: the environmental predictability R~e~,
+the consistency of the judge R~s~, the matching index G (the correlation of the two
+predictions), the unmodeled agreement C, and the achievement r~a~, which decomposes as
+r~a~ = G R~e~ R~s~ + C √(1 − R_e²) √(1 − R_s²). We also report the cosine similarity of the
 two weight vectors.
 
 *Supervised fine-tuning data.* To examine whether the supervised fine-tuning data contain
