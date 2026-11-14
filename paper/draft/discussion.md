@@ -140,50 +140,43 @@ answers do not use them.
 ## Why would human-oriented post-training impair the detection of AI text?
 
 Why should training that makes a model more helpful and more agreeable to humans make it
-worse at telling human from AI text? Our data do not answer this question, but they
-constrain the possible answers. A first observation concerns the kinds of AI text in the
-chat corpus. Besides plain AI messages, generated without any instruction to sound human,
-the corpus contains messages that had been matched to the style of the respective student
-and then revised according to the students' feedback on what still sounded AI-like. This
-feedback mostly asked for less polished text: for less elevated word choice, a more
-informal tone, shorter messages, a less tidy structure, and less perfect spelling and
-punctuation. For several models, the plain messages were judged as more human than the
-optimized ones (post-trained Gemma 3 12B: AUC .18 vs. .26; post-trained Qwen3: .20 vs.
-.36). Because the original pipeline had also produced style-matched messages without the
-feedback revision, we could separate the two steps. The feedback revision made no
-difference to any model (change in AUC between −.03 and +.04 in all 18 model
-conditions), whereas style matching changed the judgments, in different directions for
-different models: Style-matched messages appeared more AI-like than plain ones to Gemma 3
-12B, Qwen3, and Apertus (+.07 to +.16), and more human-like to OLMo 2 (−.08 to −.12).
-Thus, the properties that the students regarded as telltale signs of AI authorship did
-not influence the models' judgments at all, in line with the observation that the models
-used text properties differently from human readers (Section ... TODO lens analysis).
-Whatever drives the reversed judgments lies in the style of the authors rather than in
-the polish of the text. (NOTE 14 Nov, to discuss with Jochen before revising: the cue-level lens analysis of the
-chats, outputs/chat_cues, argues against the familiarity account below and for a
-stereotype "AI text = formal, nominal, hard to read" that post-training installs in
-Gemma 3 12B, Qwen3 and Apertus; see PLAN.md.) We see two explanations, which are not
-mutually exclusive. First,
-the reversal might reflect familiarity. During supervised fine-tuning, a model learns to
-produce a particular assistant style, which then becomes its most typical and most fluent
-kind of text. If the post-trained construal of the question maps "natural, like the text
-I would write" onto "human", text in the model's own register would be judged human, and
-text in an individual human style would be judged AI-like. Note that token-level predictability did not account for the reversal: For
-Gemma 3 4B, controlling for the model's own surprisal of each text left the reversal
-unchanged on the short chats and even enlarged it on the newspaper segments
-(supplementary analysis). The relevant familiarity would therefore have to concern
-register and style rather than the predictability of single words. Second, and more
-speculatively, post-training might tie good writing to human writing. Preference data
-reward polished, warm, and helpful text; a model that learns that such text is what
-humans want, without distinguishing what humans want from what humans write, would take
-polish as a sign of human authorship. Note, however, that in the two models with stage-wise
-checkpoints, the change arose during supervised fine-tuning rather than during preference
-optimization, which favors the first explanation, although demonstration data are curated
-for human preferences as well. A third possibility, that post-training narrows the
-model's concept of AI text to explicit assistant markers, is not supported by our data:
-Removing such markers did not change the models' judgments. Which properties of the
-authors' style drive the reversed judgments remains open; a cue-level analysis is in
-preparation (TODO).
+worse at telling human from AI text? Our data do not answer this question conclusively,
+but they constrain the possible answers. The lens analysis of the chat messages showed
+what the post-trained models took as signs of AI authorship: long words, adjectives,
+nouns, and text that is hard to read, i.e., a formal and nominal style. In our corpus,
+this was the wrong way round. The AI messages, written by current models instructed to
+sound like a private group chat, were more verbal and lexically more diverse than the
+students' messages, and the post-trained models took exactly these properties as signs
+of human authorship. The base models hardly used these properties; post-training
+installed the weighting, and in the two models with stage-wise checkpoints it did so
+during supervised fine-tuning.
+
+A plausible explanation is an outdated stereotype of AI text. The picture of AI writing
+as formal, elaborate, and impersonal fits the output of earlier assistant models and is
+widespread in texts about AI, which may well be among the data that shape a model's
+concept of its own kind of text during post-training. Current models that are asked to
+imitate a group chat no longer fit this picture, so that a model that relies on it
+judges informal AI text as human. If this explanation is correct, the error is a moving
+target: As human and AI raters become more familiar with generated text, and as
+generated text changes with each generation of models, the stereotype that post-training
+installs may change as well, and the direction of the error with it. Two alternatives
+are less consistent with our data. Familiarity with the model's own style would predict
+that text in a formal assistant register is judged human, which is the opposite of what
+we observed, and token-level predictability did not account for the reversal (for Gemma
+3 4B, controlling for the model's own surprisal of each text left the reversal unchanged
+on the short chats and even enlarged it on the newspaper segments; supplementary
+analysis). The idea that post-training narrows the concept of AI text to explicit
+assistant markers is not supported either: Removing the markers that the students had
+identified did not change the models' judgments.
+
+OLMo 2 does not fit this picture. After supervised fine-tuning, it weighted the same
+properties in the opposite direction and judged the chats slightly better than its base
+model, whereas its judgments of the other two corpora became worse. We can only
+speculate about the reason; its fine-tuning data contain a large number of real user
+messages from chat logs, which might have shaped a more accurate picture of informal
+human writing. Note also that the lens analysis is correlational and that many of the
+text properties are correlated with each other; it shows which properties the answers
+follow, not which ones cause them.
 
 ## Implications
 

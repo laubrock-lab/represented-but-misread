@@ -145,6 +145,27 @@ distinguishes AI from human texts, which examples can partly correct, is therefo
 to be part of the explanation, but it does not account for the persisting deficit of the
 post-trained models.
 
+Which properties of the texts did the answers follow? For the short chats, we described
+each message by 34 text properties (e.g., word and sentence length, lexical diversity,
+part-of-speech shares, readability, punctuation, and features that the students had named
+as typical of AI text) and decomposed the judgments with the lens model (Section 2.8).
+The answers of most post-trained models weighted these properties in the direction
+opposite to their validity (matching index G for Gemma 3 4B: −.39; Gemma 3 12B: −.49;
+Apertus after SFT: −.55; Qwen3: −.58; base models between −.52 and −.04). The AI
+messages in this corpus were richer in adverbs and verbs, lexically more diverse, and
+contained longer sentences than the human messages (r = .16 to .23 with authorship),
+whereas the human messages contained more adjectives, proper nouns, and long words. The
+post-trained models of Gemma 3 12B, Qwen3, and Apertus took long words, adjectives, nouns,
+and low readability as signs of AI authorship (e.g., Gemma 3 12B, long words: r = −.04
+before and +.24 after post-training; adjectives: −.06 and +.27) and adverbs and lexical
+diversity as signs of human authorship. OLMo 2, whose answers on the chats slightly
+improved with post-training, showed the opposite weighting after SFT (G = +.39). The
+properties that the students had named as typical of AI text (e.g., dashes, perfect
+capitalization) were barely valid in the truncated messages and barely used by the
+models. In line with this, a control set of style-matched messages that had not been
+revised according to the students' feedback was judged like the revised messages
+(change in AUC between −.03 and +.04 for every model).
+
 > **Figure 4 (placeholder).** Summary across all cells (base model × corpus × prompt
 > format): probe sensitivity, base-model answer, and post-trained answer; few-shot
 > curves as an inset.
