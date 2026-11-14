@@ -18,9 +18,13 @@ and GPT-5.4), with a plain instruction ("naive") and with an optimized instructi
 messages of the same student as style examples (leaving out the message to be matched),
 and the resulting messages were further revised on the basis of the students' feedback
 on what still sounded AI-like (e.g., dashes, "if this, then that" constructions)
-(TODO: generation prompts in the lab course repository; consent). Because AI and human messages differed considerably in
-length, we truncated every message to its first 25 words and discarded shorter
+(TODO: generation prompts in the lab course repository; consent). Because AI and human
+messages differed considerably in length, we truncated every message to its first 25 words and discarded shorter
 messages. The resulting corpus comprised 300 texts (61 human, 239 AI) from 61 groups.
+Because the generation pipeline had also stored the style-matched messages before the
+feedback revision, we additionally scored these 122 messages (same generators and
+truncation) as a control that separates the effect of style matching from that of the
+revision.
 
 *Newspaper segments.* Articles written by a local journalist for a local newspaper,
 which to our knowledge were not available in digital form and are therefore unlikely to
@@ -189,7 +193,78 @@ residual stream replaced by the donor's at a selected set of positions: the toke
 text, the instruction before the text, the question and answer cue after the text, the
 final position only, or all positions.
 
-## 2.8 Implementation
+## 2.8 Two further judgments
+
+To test whether the results generalize beyond authorship, we applied the same analyses
+to two further judgments on publicly available data, for which the correct answer is
+known as well.
+
+*Truth judgments.* We used three statement sets from Marks and Tegmark (2024), each
+consisting of 748 matched pairs of a true and a false statement that differ in a single
+fact: simple geographic statements ("The city of Bokaro is in India."), the same
+statements negated ("The city of Bokaro is not in China."), and statements on diverse
+facts (counterfact; one true and one false statement with the same subject and relation,
+748 pairs drawn with a fixed seed). The models were asked "Is the following statement
+true or false?" and answered with "True" or "False"; dv was the log-odds of the two
+answers, computed and averaged over both answer orders as for authorship. In the chat
+format, the system prompt was "You evaluate statements." The pair formed the unit of
+resampling and cross-validation.
+
+*Deceptive reviews.* The Deceptive Opinion Spam Corpus (Ott et al., 2011, 2013) contains
+1,600 reviews of 20 hotels in Chicago, half of them written by guests (truthful) and half
+by crowd workers who had never stayed at the hotel (deceptive), each in a positive and a
+negative version. Human readers judge these reviews close to chance, whereas classifiers
+on word frequencies separate them well (Ott et al., 2011). The prompt defined both
+classes ("A truthful review was written by a real guest about an actual stay; a
+deceptive review was written by someone who has never stayed at the hotel."), and the
+models answered with "Truthful" or "Deceptive"; the system prompt in the chat format was
+"You evaluate hotel reviews." The hotel formed the unit of resampling and
+cross-validation.
+
+For both judgments, we used the two model lines with checkpoints after every stage of
+post-training (OLMo 2 and Apertus 1.5); for the reviews, we added Gemma 3 4B and Qwen3 8B
+(base and final model). Probes were logistic regressions (L2 penalty, C = 0.01) on the
+activations at the last prompt position at two thirds of the network depth, evaluated
+out of fold. For the negated statements, we additionally applied a probe trained on the
+simple geographic statements of the same checkpoint (transfer probe), which tests whether
+one truth direction also covers negated statements (Marks & Tegmark, 2024). Model
+stitching and activation patching were carried out as for authorship, on 300 pairs of
+negated statements (OLMo 2 and Apertus, base vs. SFT) and on the reviews (Gemma 3 4B and
+Qwen3 8B, base vs. final model; 800 pairs for stitching, 400 for patching).
+
+*Probe transfer between checkpoints.* To test whether post-training changes the geometry
+of the representation, we trained a probe at each layer on the activations of one
+checkpoint and tested it on those of the other (base vs. final model, both directions;
+grouped five-fold cross-validation over the same items). Each checkpoint was standardized
+with the statistics of its own training folds, so that the test concerns the direction
+that separates the classes. The transfer deficit is the loss in d′ relative to the probe
+trained and tested on the same checkpoint, averaged over both directions. For the
+authorship corpora, the analysis was carried out both for the last prompt position and
+for the mean over the text positions.
+
+*Lens model decomposition.* For the reviews, we described each review by 15 interpretable
+cues motivated by Ott et al. (2011), such as the rates of first-person pronouns, of
+references to family and to the hotel or city, of spatial details and of emotion words,
+and the length of the review and of its words and sentences; all variables were centered
+within the positive and the negative reviews. For each judge, i.e., the answers of a
+checkpoint or the probe scores of its representation, we computed the components of the
+lens model equation (Tucker, 1964; Karelaia & Hogarth, 2008) from linear regressions of
+the ground truth and of the judgments on the cues: the environmental predictability R_e,
+the consistency of the judge R_s, the matching index G (the correlation of the two
+predictions), the unmodeled agreement C, and the achievement r_a, which decomposes as
+r_a = G R_e R_s + C √(1 − R_e²) √(1 − R_s²). We also report the cosine similarity of the
+two weight vectors.
+
+*Supervised fine-tuning data.* To examine whether the supervised fine-tuning data contain
+valid examples of the three judgments, we searched the SFT mixtures of OLMo 2 (Tülu 3;
+Lambert et al., 2024; all 939,344 conversations) and of Apertus 1.5 (the first 373,520
+of 3,707,851 conversations, which had been shuffled before publication and thus form a
+random sample) with regular expressions for requests to judge the authorship of a text,
+to judge the authenticity of reviews or statements, and to judge statements as true or
+false. Matching conversations were inspected to determine whether they were actual
+judgment tasks.
+
+## 2.9 Implementation
 
 All models were run in bfloat16 precision with the Hugging Face `transformers` library
 (version 5.22.2; for Apertus, the developers' fork of version 5.18) and PyTorch 2.6, on
@@ -198,16 +273,17 @@ local workstation. Gradients for the supplementary readout analysis were compute
 gradient checkpointing, which leaves them unchanged. All analysis code is available in
 the project repository (TODO: URL once public).
 
-## 2.9 Data and code availability
+## 2.10 Data and code availability
 
 The newspaper texts are unpublished and confidential, the human chat messages were
 written by participants who have not consented to publication (TODO: update after
 consent requests), and the human textbook summaries are protected by copyright.
-Therefore, the texts cannot be shared. All code, the per-text model outputs without
-text content, and all derived results are available in the project repository
-(TODO: URL).
+Therefore, these texts cannot be shared. The two further judgments (Section 2.8) use
+publicly available data (Marks & Tegmark, 2024; Ott et al., 2011, 2013), so that these
+analyses can be reproduced in full. All code, the per-text model outputs without text
+content, and all derived results are available in the project repository (TODO: URL).
 
-## 2.10 Use of AI tools
+## 2.11 Use of AI tools
 
 The analyses for this study were implemented and run with the assistance of AI coding
 agents (Claude Code with Claude Opus; additional analyses with GLM and DeepSeek models;
