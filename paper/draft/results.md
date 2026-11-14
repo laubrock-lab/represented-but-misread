@@ -305,12 +305,21 @@ summarizes the results.
 > | | Apertus 1.5 8B | 2.4–3.7 (Section 3.1) | +0.43 → −0.04 → −0.04 |
 > | Negated statements | OLMo 2 7B | 4.54 → 4.54 | 0.80 → 3.36 → 3.10 |
 > | | Apertus 1.5 8B | 4.54 → 4.54 | −0.88 → 4.54 → 4.54 |
+> | | Gemma 3 4B | 4.54 → 4.34 | 0.06ᵃ → — → 3.46 |
+> | | Gemma 3 12B | 4.54 → 4.54 | 1.97ᵃ → — → 4.54 |
+> | | Qwen3 8B | 4.54 → 4.54 | 4.54 → — → 4.54 |
 > | Facts (counterfact) | OLMo 2 7B | 2.15 → 2.05 | 1.79 → 1.77 → 1.84 |
 > | | Apertus 1.5 8B | 1.95 → 2.09 | 1.41 → 1.64 → 1.68 |
+> | | Gemma 3 4B | 1.82 → 1.93 | 0.81ᵃ → — → 1.46 |
+> | | Gemma 3 12B | 2.24 → 2.26 | 1.64ᵃ → — → 1.97 |
+> | | Qwen3 8B | 2.28 → 2.15 | 1.94 → — → 1.77 |
 > | Deceptive reviews | OLMo 2 7B | 2.93 → 2.79 | 0.16 → 0.20 → 0.17 |
 > | | Apertus 1.5 8B | 2.62 → 2.49 | 0.14 → 0.32 → 0.23 |
 > | | Gemma 3 4B | 2.82 → 2.51 | 0.45 → — → 0.08 |
 > | | Qwen3 8B | 2.56 → 2.59 | 0.06 → — → 0.50 |
+>
+> ᵃ The Gemma 3 base models placed only 18–32% of their probability on the two answer
+> words; interpret with caution.
 
 *Truth judgments.* For simple geographic statements, all checkpoints judged at ceiling,
 so that this set served only as a check. For the negated statements, however, the base
@@ -319,7 +328,11 @@ the truth of every statement (AUC = 1), but the answers of the OLMo 2 base model
 this information only weakly (d′ = 0.80), and those of the Apertus base model used it
 with the wrong sign (d′ = −0.88). Both base models answered "False" almost always
 (criterion c = 2.6 and 3.0). Supervised fine-tuning repaired the readout (OLMo 2:
-d′ = 3.36; Apertus: 4.54), whereas the probes remained at ceiling. A probe trained on the
+d′ = 3.36; Apertus: 4.54), whereas the probes remained at ceiling. The Gemma 3 models
+showed the same pattern between their base and final versions (Gemma 3 4B: 0.06 → 3.46;
+Gemma 3 12B: 1.97 → 4.54), although their base models rarely answered with the two
+answer words, whereas the base model of Qwen3 already judged the negated statements
+perfectly. A probe trained on the
 simple statements of the same checkpoint revealed what the base models' answers followed:
 Applied to the negated statements, it separated them with the wrong sign (OLMo 2:
 d′ = −1.28; Apertus: −1.43), i.e., the general truth direction of the base models

@@ -233,8 +233,9 @@ models answered with "Truthful" or "Deceptive"; the system prompt in the chat fo
 cross-validation.
 
 For both judgments, we used the two model lines with checkpoints after every stage of
-post-training (OLMo 2 and Apertus 1.5); for the reviews, we added Gemma 3 4B and Qwen3 8B
-(base and final model). Probes were logistic regressions (L2 penalty, C = 0.01) on the
+post-training (OLMo 2 and Apertus 1.5); for the truth judgments, we added Gemma 3 4B,
+Gemma 3 12B and Qwen3 8B, and for the reviews Gemma 3 4B and Qwen3 8B (base and final
+model in each case). Probes were logistic regressions (L2 penalty, C = 0.01) on the
 activations at the last prompt position at two thirds of the network depth, evaluated
 out of fold. For the negated statements, we additionally applied a probe trained on the
 simple geographic statements of the same checkpoint (transfer probe), which tests whether
