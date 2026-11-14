@@ -294,29 +294,33 @@ judgments with known ground truth and publicly available data (Section 2.8): jud
 whether a statement is true, and judgments of whether a hotel review is genuine. Table 3
 summarizes the results.
 
-> **Table 3.** Sensitivity (d′) of probes and answers for three judgments, plain prompt.
-> Answers are given for the base model, after supervised fine-tuning (SFT), and for the
-> final model; for Gemma 3 and Qwen3, no intermediate checkpoints are available (—).
-> d′ = 4.54 is the maximum for 748 pairs (AUC = 1).
+> **Table 3.** Sensitivity (d′) of the probes (last prompt position, two thirds of the
+> network depth) and of the answers (plain prompt) for three kinds of judgment:
+> authorship (was the text written by a human or by an AI? textbook summaries, repeated
+> from Sections 3.1 and 3.2 for comparison), truth (is the statement true or false? either
+> statements on diverse facts from the counterfact set or negated geographic statements),
+> and authenticity (is the hotel review truthful or deceptive?). SFT: after supervised
+> fine-tuning (answer); —: no intermediate checkpoint released. The maximum d′ (AUC = 1) is 3.73 for
+> the 119 textbook pairs and 4.54 for the 748 statement pairs.
 >
-> | Judgment | Model | Probe, base → final | Answer, base → SFT → final |
-> |---|---|---|---|
-> | Authorship (textbook) | OLMo 2 7B | 2.4–3.7 (Section 3.1) | −0.12 → −0.50 → −0.44 |
-> | | Apertus 1.5 8B | 2.4–3.7 (Section 3.1) | +0.43 → −0.04 → −0.04 |
-> | Negated statements | OLMo 2 7B | 4.54 → 4.54 | 0.80 → 3.36 → 3.10 |
-> | | Apertus 1.5 8B | 4.54 → 4.54 | −0.88 → 4.54 → 4.54 |
-> | | Gemma 3 4B | 4.54 → 4.34 | 0.06ᵃ → — → 3.46 |
-> | | Gemma 3 12B | 4.54 → 4.54 | 1.97ᵃ → — → 4.54 |
-> | | Qwen3 8B | 4.54 → 4.54 | 4.54 → — → 4.54 |
-> | Facts (counterfact) | OLMo 2 7B | 2.15 → 2.05 | 1.79 → 1.77 → 1.84 |
-> | | Apertus 1.5 8B | 1.95 → 2.09 | 1.41 → 1.64 → 1.68 |
-> | | Gemma 3 4B | 1.82 → 1.93 | 0.81ᵃ → — → 1.46 |
-> | | Gemma 3 12B | 2.24 → 2.26 | 1.64ᵃ → — → 1.97 |
-> | | Qwen3 8B | 2.28 → 2.15 | 1.94 → — → 1.77 |
-> | Deceptive reviews | OLMo 2 7B | 2.93 → 2.79 | 0.16 → 0.20 → 0.17 |
-> | | Apertus 1.5 8B | 2.62 → 2.49 | 0.14 → 0.32 → 0.23 |
-> | | Gemma 3 4B | 2.82 → 2.51 | 0.45 → — → 0.08 |
-> | | Qwen3 8B | 2.56 → 2.59 | 0.06 → — → 0.50 |
+> | Judgment | Model | Probe base | Probe final | Answer base | SFT | Final |
+> |:---|:---|---:|---:|---:|---:|---:|
+> | Authorship | OLMo 2 7B | 3.73 | 3.57 | −0.12 | −0.50 | −0.44 |
+> | (textbook summaries) | Apertus 1.5 8B | 3.73 | 3.73 | 0.43 | −0.04 | −0.04 |
+> | Truth | OLMo 2 7B | 2.15 | 2.05 | 1.79 | 1.77 | 1.84 |
+> | (diverse facts) | Apertus 1.5 8B | 1.95 | 2.09 | 1.41 | 1.64 | 1.68 |
+> | | Gemma 3 4B | 1.82 | 1.93 | 0.81ᵃ | — | 1.46 |
+> | | Gemma 3 12B | 2.24 | 2.26 | 1.64ᵃ | — | 1.97 |
+> | | Qwen3 8B | 2.28 | 2.15 | 1.94 | — | 1.77 |
+> | Truth | OLMo 2 7B | 4.54 | 4.54 | 0.80 | 3.36 | 3.10 |
+> | (negated statements) | Apertus 1.5 8B | 4.54 | 4.54 | −0.88 | 4.54 | 4.54 |
+> | | Gemma 3 4B | 4.54 | 4.34 | 0.06ᵃ | — | 3.46 |
+> | | Gemma 3 12B | 4.54 | 4.54 | 1.97ᵃ | — | 4.54 |
+> | | Qwen3 8B | 4.54 | 4.54 | 4.54 | — | 4.54 |
+> | Authenticity | OLMo 2 7B | 2.93 | 2.79 | 0.16 | 0.20 | 0.17 |
+> | (hotel reviews) | Apertus 1.5 8B | 2.62 | 2.49 | 0.14 | 0.32 | 0.23 |
+> | | Gemma 3 4B | 2.82 | 2.51 | 0.45 | — | 0.08 |
+> | | Qwen3 8B | 2.56 | 2.59 | 0.06 | — | 0.50 |
 >
 > ᵃ The Gemma 3 base models placed only 18–32% of their probability on the two answer
 > words; interpret with caution.
