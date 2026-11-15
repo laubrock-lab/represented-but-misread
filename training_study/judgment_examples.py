@@ -14,6 +14,9 @@ z(share of capitalized, non-sentence-initial words, i.e. mostly nouns).
 Prompt: the raw authorship prompt of judge_logits.py (neutral, random answer order); the
 target is the answer word with a leading space, as in the few-shot format.
 
+If MULTITuDE is used as a second training source (replication), cite Macko et al. (2023),
+EMNLP 2023, arXiv:2310.13606 (references.bib: macko2023multitude) -- a condition of access.
+
 Also writes the held-out items as an evaluation corpus in the usual layout:
 data/texts_gnad_heldout.parquet (text_id, source_id, is_ai, prompt_type, text).
 """
