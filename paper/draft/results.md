@@ -5,7 +5,7 @@ We report results for three corpora of German texts that each pair human-written
 with AI-generated counterparts: short chat messages truncated to 25 words (300 texts
 from 61 human originals), segments of local newspaper articles (103 segments from 14
 articles), and textbook summaries (238 texts, 119 matched human–AI pairs;
-TODO: credit as Rosin & Laubrock, in prep., pending Niklas Rosin's consent). In all
+TODO: credit as Rosin & Laubrock, in preparation, pending Niklas Rosin's consent). In all
 analyses, texts derived from the same human original form one group, so that a model,
 a probe, or a bootstrap resample never profits from recognizing a topic. Unless stated
 otherwise, sensitivity is expressed as d′ estimated from the area under the ROC curve,
@@ -506,4 +506,4 @@ experimentally, by training data whose cues were valid for one genre and mislead
 another.
 
 Because training with valid labels inverted the judgments of the chats, we verified
-the labels of this corpus. All 61 human messages are verbatim the students' original submissions, all 239 AI messages trace to the generation pipeline (none resembles a student message, maximum similarity .16), and independent judges recognized the chats in the labeled direction (human participants: AUC = .82; Claude Opus: .69–.90). Whether individual students used AI tools to write their messages cannot be determined from the records.
+the labels of this corpus. All 61 human messages are verbatim the students' original submissions, all 239 AI messages trace to the generation pipeline (none resembles a student message, maximum similarity .16), and independent judges recognized the chats in the labeled direction (human participants in a separate experiment: AUC = .82, Rosin & Laubrock, in preparation; Claude Opus: .69–.90). Whether individual students used AI tools to write their messages cannot be determined from the records.

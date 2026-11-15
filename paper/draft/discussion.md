@@ -153,7 +153,7 @@ was fully located in the question positions by the middle of the network.
 
 The parallel to human judges is equally instructive. Human readers fail to recognize AI
 text because they rely on cues that are plausible but invalid (Jakesch et al., 2023;
-Rosin & Laubrock, in prep.),
+Rosin & Laubrock, in preparation),
 which in terms of the lens model is a failure of cue utilization rather than of cue
 availability (Brunswik, 1956; Karelaia & Hogarth, 2008). The models in our study fail in
 a similar way: Valid cues are present in the texts and in the representations, and the
