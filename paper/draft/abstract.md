@@ -23,20 +23,20 @@ representation is read out into an answer? We used judgments with known ground t
 test cases, primarily whether a text was written by a human or by an AI. Across six
 open-weight base models and their post-trained versions and three corpora of German
 texts, linear probes and simple word-frequency classifiers separated AI from human texts
-well, but the models' own answers, analyzed with signal detection theory, used this
-information poorly and often with the wrong sign. Post-training lowered their
-sensitivity on average (Δd′ = −0.33), mostly during supervised fine-tuning. Steering
-showed that post-trained models use the represented authorship direction in reverse.
-Combining layers of base and fine-tuned checkpoints (model stitching) and exchanging
-their internal states at selected prompt positions (activation patching) located the
-change at the positions of the question rather than of the text, originating in early
-layers. The pattern generalized to two judgments with public data. For negated
-statements, several base models represented truth perfectly but answered poorly, and
-post-training repaired their readout; for deceptive reviews, all models answered near
-chance despite accurate probes, and post-training made most models' readouts converge. Probes
-transferred between base and post-trained checkpoints at the text positions but not at
-the answer position. In a training study, adding 2,000 correctly or stereotypically
-labeled examples to otherwise identical fine-tuning data shifted the readout in the
-implied direction, leaving the representation intact. Post-training thus leaves the representation intact and changes how
-the question reads it, in a direction that depends on whether the training data specify a
-valid readout.
+well, but the models' answers, analyzed with signal detection theory, used this
+information poorly and often ordered the texts inversely. Post-training lowered their
+sensitivity on average (Δd′ = −0.33), mostly during supervised fine-tuning, and in
+several models steering showed that the represented authorship direction pushed the
+answer the wrong way. Combining layers of base and fine-tuned checkpoints (model
+stitching) implicated the early layers, and exchanging internal states at selected
+prompt positions (activation patching) located the change at the positions of the
+question rather than of the text. The pattern generalized to two judgments with public
+data. For negated statements, several base models represented truth perfectly but
+answered poorly, and post-training repaired their readout; for deceptive reviews, all
+models answered near chance despite accurate probes. Probes transferred between base and
+post-trained checkpoints at the text positions, but only partially at the answer
+position. In a training study, adding 2,000 correctly or stereotypically labeled
+examples to otherwise identical fine-tuning data shifted the readout in the implied
+direction, with little change at the text positions. Post-training thus mainly changes
+how the question reads the text, in a direction that depends on whether the training
+data specify a valid readout.

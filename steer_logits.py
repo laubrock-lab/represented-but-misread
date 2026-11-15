@@ -47,6 +47,7 @@ switches to truth mode; orders tf/ft; --layer defaults to ~67 % depth.
 from __future__ import annotations
 
 import argparse
+import copy
 import time
 from pathlib import Path
 
@@ -56,7 +57,7 @@ import torch
 from sklearn.model_selection import GroupKFold
 
 import config
-from judge_logits import (build_prompt, candidate_ids, condition_stem, load_model,
+from judge_logits import (build_prompt, candidate_ids, condition_stem, end_of_word_mask, load_model,
                           pick_device, score_one, truncate_text)
 from sdt_summary import grouped_bootstrap, sdt
 
@@ -92,9 +93,16 @@ class Steerer:
         self.mid = 0.0                         # class midpoint along u
         self.mode, self.alpha = "add", 0.0
         self.pos: slice | None = None
+        self.batch_vec: torch.Tensor | None = None   # [S, d] per-row additive shifts (batched mode)
         self.handle = layer_module.register_forward_hook(self._hook)
 
     def _hook(self, module, inputs, output):
+        if self.batch_vec is not None and self.pos is not None:
+            h = output[0] if isinstance(output, tuple) else output
+            h = h.clone()
+            h[:, self.pos, :] = (h[:, self.pos, :].float()
+                                 + self.batch_vec.to(h.device)[:, None, :]).to(h.dtype)
+            return (h,) + tuple(output[1:]) if isinstance(output, tuple) else h
         if self.u is None or self.pos is None:
             return output
         if self.mode == "add" and self.alpha == 0.0:
@@ -115,6 +123,48 @@ class Steerer:
 
     def remove(self):
         self.handle.remove()
+
+
+@torch.no_grad()
+def score_batched(model, tok, steer: Steerer, prompt: str, add_special: bool, cands: dict,
+                  eow: dict, device: str, vecs: torch.Tensor, pos_label: str, neg_label: str,
+                  base_cache=None):
+    """Additive steering at the last prompt token for S settings at once.
+
+    The prompt prefix (all tokens but the last) is unaffected by steering at the last
+    position, so its KV cache is computed once (unsteered) and shared; each setting
+    then costs only the last prompt token plus the answer tokens. Returns dv [S] and
+    p_mass [S], defined exactly as in judge_logits.score_one / factuality.score.
+    """
+    ids = tok(prompt, add_special_tokens=add_special, return_tensors="pt")["input_ids"].to(device)
+    if base_cache is None:
+        steer.batch_vec, steer.pos = None, None
+        base_cache = model(input_ids=ids[:, :-1], use_cache=True).past_key_values
+    S = vecs.shape[0]
+    lp_word, lp_pre = {}, {}
+    for label, seqs in cands.items():
+        word, pre = [], []
+        for seq in seqs:
+            cache = copy.deepcopy(base_cache)
+            cache.batch_repeat_interleave(S)
+            x = torch.cat([ids[:, -1:], torch.tensor([seq], device=device)], dim=1).expand(S, -1)
+            steer.batch_vec, steer.pos = vecs, slice(0, 1)    # position 0 = last prompt token
+            try:
+                o = model(input_ids=x, past_key_values=cache, use_cache=True)
+            finally:
+                steer.batch_vec, steer.pos = None, None
+            lps = torch.log_softmax(o.logits.float(), dim=-1)          # [S, 1+len, V]
+            if "mask" not in eow:
+                eow["mask"] = end_of_word_mask(tok, lps.shape[-1]).to(lps.device)
+            lp_seq = sum(lps[:, i, t] for i, t in enumerate(seq))       # [S]
+            pre.append(lp_seq)
+            word.append(lp_seq + torch.logsumexp(lps[:, -1][:, eow["mask"]], dim=-1))
+            del o, lps, cache
+        lp_word[label] = torch.logsumexp(torch.stack(word), dim=0)
+        lp_pre[label] = torch.logsumexp(torch.stack(pre), dim=0)
+    dv = (lp_word[pos_label] - lp_word[neg_label]).cpu().numpy()
+    pm = (lp_pre[pos_label].exp() + lp_pre[neg_label].exp()).cpu().numpy()
+    return dv, pm, base_cache
 
 
 @torch.no_grad()
@@ -141,9 +191,33 @@ def verify_alignment(model, tok, layers, layer: int, device: str) -> None:
 # Cross-fitted directions
 # ---------------------------------------------------------------------------
 
+def fixed_control(X: np.ndarray, y: np.ndarray, control: str, rng) -> tuple:
+    """One control direction for ALL texts (label-free or label-blind nulls need no
+    cross-fitting; drawing them anew per fold would average several directions per
+    control and make the null distribution too narrow)."""
+    mu1, mu0 = X[y == 1].mean(0), X[y == 0].mean(0)
+    if control == "random":
+        r = rng.standard_normal(X.shape[1])
+        return r / np.linalg.norm(r), mu1, mu0
+    if control == "pcrandom":
+        Xc = X - np.where((y == 1)[:, None], mu1, mu0)
+        _, _, Vt = np.linalg.svd(Xc - Xc.mean(0), full_matrices=False)
+        k = min(20, Vt.shape[0])
+        r = rng.standard_normal(k) @ Vt[:k]
+        return r / np.linalg.norm(r), mu1, mu0
+    if control == "split":
+        half = np.zeros(len(y), bool)
+        for c in (0, 1):
+            idx = np.where(y == c)[0]
+            half[rng.permutation(idx)[: len(idx) // 2]] = True
+        a, b = X[half].mean(0), X[~half].mean(0)
+        return (a - b) / np.linalg.norm(a - b), a, b
+    raise ValueError(control)
+
+
 def crossfit_directions(X: np.ndarray, y: np.ndarray, groups: np.ndarray, n_splits: int,
                         control: str, seed: int, score: np.ndarray | None = None,
-                        unit: str = "sd") -> list[dict]:
+                        unit: str = "sd", fixed: bool = False) -> list[dict]:
     """Per text: unit direction u, step size delta and midpoint along u,
     estimated without the text's own source.
 
@@ -166,6 +240,7 @@ def crossfit_directions(X: np.ndarray, y: np.ndarray, groups: np.ndarray, n_spli
     """
     rng = np.random.default_rng(seed)
     out: list[dict | None] = [None] * len(y)
+    fixed_dir = fixed_control(X, y, control, rng) if fixed and control in ("random", "pcrandom", "split") else None
     for tr, te in GroupKFold(n_splits=min(n_splits, len(np.unique(groups)))).split(X, y, groups):
         mu1, mu0 = X[tr][y[tr] == 1].mean(0), X[tr][y[tr] == 0].mean(0)
         diff = mu1 - mu0
@@ -174,7 +249,9 @@ def crossfit_directions(X: np.ndarray, y: np.ndarray, groups: np.ndarray, n_spli
         p = X[tr] @ u_class
         sd = float(np.sqrt((p[y[tr] == 1].var() + p[y[tr] == 0].var()) / 2))
         delta = sd if unit == "sd" else dist               # common step size
-        if control == "random":
+        if fixed_dir is not None:
+            u, a, b = fixed_dir
+        elif control == "random":
             r = rng.standard_normal(X.shape[1])
             u, a, b = r / np.linalg.norm(r), mu1, mu0
         elif control == "pcrandom":
@@ -243,6 +320,13 @@ def main() -> None:
                     choices=["random", "decision", "pcrandom", "split", "classorth"],
                     help="random = null control; decision = positive control (direction the "
                          "model's own dv follows, same site and step size)")
+    ap.add_argument("--fixed-controls", action="store_true",
+                    help="one direction per control replicate for all texts (not redrawn per fold)")
+    ap.add_argument("--control-add", type=float, nargs="*",
+                    help="alphas for the null controls (default: same as --add)")
+    ap.add_argument("--batched", action="store_true",
+                    help="KV-cached, batched scoring of all additive settings (last position only)")
+    ap.add_argument("--batch-size", type=int, default=48)
     ap.add_argument("--n-random", type=int, default=1,
                     help="number of independent random directions (null distribution)")
     ap.add_argument("--suffix", default="", help="extra output suffix (e.g. _mnull), avoids overwriting")
@@ -307,17 +391,22 @@ def main() -> None:
                  if c in ("random", "pcrandom", "split") else [c])
         for r, name in enumerate(names):
             dirs[name] = crossfit_directions(X, y, groups, args.n_splits, c, args.seed + 1000 * r,
-                                             score, unit=args.unit)
+                                             score, unit=args.unit, fixed=args.fixed_controls)
             print(f"  {name} direction: mean cosine with class direction "
                   f"{np.mean([d['cos_class'] for d in dirs[name]]):+.2f}")
     if args.limit:
         meta = meta.head(args.limit)
 
     use = [d for d in dirs if not (args.only_controls and d == "class")]
-    settings = [(d, "add", a) for d in use for a in args.add if d == "class" or a != 0] + \
+    nulls = lambda d: d.startswith(("random", "pcrandom", "split"))
+    settings = [(d, "add", a) for d in use
+                for a in (args.control_add if (args.control_add is not None and nulls(d)) else args.add)
+                if d == "class" or a != 0] + \
                [(d, "scale", k) for d in use for k in args.scale if k != 1]
     if args.only_controls:           # unsteered reference, needed for the decomposition
         settings = [("class", "add", 0.0)] + settings
+    if args.batched and (args.positions != "last" or any(m != "add" for _, m, _ in settings)):
+        raise SystemExit("--batched supports additive steering at the last position only (use --scale with no values).")
     device = pick_device(args.device)
     model_id = config.MODEL_PRESETS[args.preset][args.variant]
     tok, model = load_model(model_id, device, getattr(torch, args.dtype))
@@ -343,6 +432,20 @@ def main() -> None:
             n_prompt = len(tok(prompt, add_special_tokens=add_special)["input_ids"])
             steer.pos = slice(n_prompt - 1, n_prompt) if args.positions == "last" \
                 else slice(0, n_prompt)
+            if args.batched:
+                cache = None
+                for j in range(0, len(settings), args.batch_size):
+                    chunk = settings[j:j + args.batch_size]
+                    vecs = torch.stack([float(a) * dirs[dn][i]["delta"] * dirs[dn][i]["u"]
+                                        for dn, _, a in chunk]).to(device)
+                    dv, pm, cache = score_batched(model, tok, steer, prompt, add_special, cands, eow,
+                                                  device, vecs, *(("True", "False") if truth else ("KI", "Mensch")),
+                                                  base_cache=cache)
+                    for (direction, mode, a), v, m in zip(chunk, dv, pm):
+                        rows.append(dict(text_id=r.text_id, source_id=r.source_id, is_ai=r.is_ai,
+                                         prompt_type=r.prompt_type, order=order, direction=direction,
+                                         mode=mode, alpha=a, dv=float(v), p_mass=float(m)))
+                continue
             for direction, mode, a in settings:
                 d = dirs[direction][i]
                 steer.u, steer.delta, steer.mid = d["u"], d["delta"], d["mid"]
@@ -359,6 +462,7 @@ def main() -> None:
     sfx = f"_L{layer}" + ("_sd" if args.unit == "sd" else "") + \
           ("_prompt" if args.positions == "prompt" else "") + \
           ("_ctrl-" + "-".join(args.controls) if args.only_controls else "") + \
+          ("_fixed" if args.fixed_controls else "") + \
           ("_smoke" if args.limit else "") + args.suffix
     df.to_csv(args.out_dir / f"steer_{stem}{sfx}.csv", index=False)
 

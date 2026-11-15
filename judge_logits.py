@@ -389,7 +389,10 @@ def main() -> None:
                     help="truncate each demonstration to this many tokens")
     ap.add_argument("--adapter", type=Path, help="LoRA adapter dir, merged into the --variants model")
     ap.add_argument("--tag", help="variant label used in output names for --adapter runs (no underscores)")
+    ap.add_argument("--prompt-variant", default="default", choices=list(config.RAW_VARIANTS),
+                    help="raw template variant (robustness check); use with a separate --out-dir")
     args = ap.parse_args()
+    config.set_prompt_variant(args.prompt_variant)
     if args.adapter and (not args.tag or "_" in args.tag or len(args.variants) != 1):
         raise SystemExit("--adapter needs exactly one --variants entry and a --tag without underscores")
     if args.fewshot and args.out_dir is None:

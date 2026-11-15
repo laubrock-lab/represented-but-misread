@@ -101,8 +101,8 @@ layer 16, the whole difference between base and SFT model is carried by the ques
 positions. Error bars
 are 95% bootstrap confidence intervals.
 
-**Figure S2 (`figS2_checkpoint_transfer`).** Post-training leaves the representation of
-the text intact and reorganizes the answer position. For each layer, a linear probe was
+**Figure S2 (`figS2_checkpoint_transfer`).** Post-training changes the text positions
+little and reorganizes the answer position. For each layer, a linear probe was
 trained on one checkpoint and tested on the other (base vs. final post-trained model,
 both directions averaged); the transfer deficit is the loss in d′ relative to the probe
 trained on the checkpoint itself. A deficit of 0 means that the same direction separates

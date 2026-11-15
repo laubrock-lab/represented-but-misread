@@ -118,6 +118,37 @@ PATTERNS = {
 }
 NEG = re.compile(r"\b(?:not|never|no longer|isn't|aren't|wasn't|weren't|doesn't|don't|didn't)\b", re.I)
 
+# German counterparts (response to review, 16 Nov 2026: English-only patterns are weak evidence
+# of absence for a German task and a multilingual mixture). Counted under separate keys.
+AI_REF_DE = r"(?:KI|künstlichen? Intelligenz|Maschine|Sprachmodell|Chatbot|ChatGPT|GPT-?\d?|Computer)"
+PATTERNS |= {
+    "de_authorship_mention": re.compile(
+        rf"\b(?:von|durch) (?:einer?|einem|dem|der) (?:{AI_REF_DE}|Menschen?|Person) (?:geschrieben|verfasst|generiert|erstellt|erzeugt)"
+        r"|\bKI[- ]generiert\w*|\bmaschinell (?:erstellt|erzeugt|generiert|verfasst)\w*|\bvon Menschen (?:geschrieben|verfasst)\w*"
+        r"|\bKI[- ]?(?:Text)?[- ]?(?:Erkennung|Detektor|Detektion)", re.I),
+    "de_authorship_task": re.compile(
+        rf"\b(?:wurde|ist|wurden|sind) (?:dieser|diese|der folgende|die folgende|der|die) (?:Text|Aufsatz|Artikel|Absatz|Beitrag|Nachricht|Antwort|Rezension|Gedicht|Geschichte)\w* "
+        rf"(?:von|durch) (?:einer?|einem) (?:{AI_REF_DE}|Menschen?|Person)"
+        r"|\b(?:Mensch|KI) oder (?:KI|Mensch|Maschine)\b"
+        r"|\b(?:entscheide|bestimme|erkenne|beurteile|klassifiziere|prüfe)\w*\b[^.?!\n]{0,80}\b(?:KI|maschinell)[- ]?(?:generiert|erstellt|geschrieben|verfasst)", re.I),
+    "de_deception": re.compile(
+        r"\b(?:gefälscht|fake)\w* (?:Bewertung|Rezension|Kundenbewertung|Review)\w*|\becht oder (?:gefälscht|fake)\b"
+        r"|\b(?:gefälscht|fake) oder echt\b|\bTäuschung\w* (?:erkenn|entdeck)\w*|\b(?:lügt|lügen) (?:er|sie|die Person)\b", re.I),
+    "de_truefalse_task": re.compile(
+        r"\bwahr oder falsch\b|\brichtig oder falsch\b|\bstimmt (?:das|diese Aussage)\b"
+        r"|\b(?:ist|sind) (?:diese|die folgende|die folgenden)\w* (?:Aussage|Behauptung|Satz|Sätze)\w* (?:wahr|richtig|korrekt|zutreffend)", re.I),
+}
+NEG_DE = re.compile(r"\b(?:nicht|kein\w*|nie|niemals|nirgends)\b", re.I)
+DE_WORDS = re.compile(r"\b(?:und|nicht|ist|das|die|der|ein|eine|ich|mit|für|auf|sich|auch|wird|sind)\b")
+EN_WORDS = re.compile(r"\b(?:the|and|is|not|of|to|in|that|with|for|this|you|are|be)\b")
+
+
+def is_german(text: str) -> bool:
+    """Rough language tag: more German than English function words (at least 5)."""
+    t = text[:3000]
+    de = len(DE_WORDS.findall(t))
+    return de >= 5 and de > len(EN_WORDS.findall(t))
+
 
 def _text(c) -> str:
     """Plain text of a message content: str, list of parts ({'type': 'text', 'text': ...}), or dict."""
@@ -152,20 +183,21 @@ PARQUET_FILES = {"tulu3_olmo2": [f"default/train/{i:04d}.parquet" for i in range
                  "apertus15": [f"default/partial-train/{i:04d}.parquet" for i in range(10)]}
 
 
-def census(name: str, ds: str, max_store: int = 400, limit: int | None = None) -> dict:
+def census(name: str, ds: str, max_store: int = 400, limit: int | None = None, suffix: str = "") -> dict:
     """Full pass over the dataset-server parquet conversion, one file at a time: download
     via the resolve URL (CDN, not the rate-limited API), count, delete. For Tulu 3 the
     conversion is complete (census); for the Apertus mix it is the first ~10 % of the
     deterministically shuffled rows (a simple random sample, n = 373,520)."""
     import pyarrow.parquet as pq
     from huggingface_hub import get_token
-    counts = {k: 0 for k in PATTERNS} | {"truefalse_task_negated": 0, "rows": 0}
+    counts = {k: 0 for k in PATTERNS} | {"truefalse_task_negated": 0, "de_truefalse_task_negated": 0,
+                                         "rows": 0, "rows_german": 0}
     stored = {k: 0 for k in PATTERNS}
     domains: dict = {}
     tmp = OUT / "tmp.parquet"
     headers = {"Authorization": f"Bearer {get_token()}"} if get_token() else {}
     i = 0
-    with open(OUT / f"{name}_census_hits.jsonl", "w") as f:
+    with open(OUT / f"{name}_census{suffix}_hits.jsonl", "w") as f:
         for rel in PARQUET_FILES[name]:
             url = f"https://huggingface.co/datasets/{ds}/resolve/refs%2Fconvert%2Fparquet/{rel}"
             with requests.get(url, headers=headers, stream=True, timeout=120) as r:
@@ -181,16 +213,17 @@ def census(name: str, ds: str, max_store: int = 400, limit: int | None = None) -
                     domains[dom] = domains.get(dom, 0) + 1
                     user, asst = turns(row)
                     counts["rows"] += 1
+                    counts["rows_german"] += is_german(user)
                     for k, pat in PATTERNS.items():
                         m = pat.search(user)
                         if not m:
                             continue
                         counts[k] += 1
                         neg = False
-                        if k == "truefalse_task":
+                        if k in ("truefalse_task", "de_truefalse_task"):
                             window = user[max(0, m.start() - 300): m.end() + 300]
-                            neg = bool(NEG.search(window))
-                            counts["truefalse_task_negated"] += neg
+                            neg = bool((NEG if k == "truefalse_task" else NEG_DE).search(window))
+                            counts[f"{k}_negated"] += neg
                         if stored[k] < max_store:
                             stored[k] += 1
                             s0 = max(0, m.start() - 400)
@@ -204,7 +237,7 @@ def census(name: str, ds: str, max_store: int = 400, limit: int | None = None) -
             print(f"{name}: {rel} done, {i} rows, {counts}", flush=True)
             if limit and i >= limit:
                 break
-    pd.Series(domains).sort_values(ascending=False).to_csv(OUT / f"{name}_domains.csv", header=["rows"])
+    pd.Series(domains).sort_values(ascending=False).to_csv(OUT / f"{name}{suffix}_domains.csv", header=["rows"])
     print(f"{name}: done {counts}", flush=True)
     return dict(mixture=name, **counts)
 
@@ -219,6 +252,7 @@ def main() -> None:
     ap.add_argument("--n-offsets", type=int, default=400)
     ap.add_argument("--block", type=int, default=5)
     ap.add_argument("--max-hits", type=int, default=500)
+    ap.add_argument("--suffix", default="", help="census: output name suffix (e.g. _de), keeps earlier files")
     args = ap.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
     counts = []
@@ -228,8 +262,8 @@ def main() -> None:
         if args.search:
             counts += search(name, ds, args.max_hits)
         if args.census:
-            row = census(name, ds, limit=args.limit)
-            pd.DataFrame([row]).to_csv(OUT / f"{name}_census_counts.csv", index=False)
+            row = census(name, ds, limit=args.limit, suffix=args.suffix)
+            pd.DataFrame([row]).to_csv(OUT / f"{name}_census{args.suffix}_counts.csv", index=False)
     if counts:
         pd.DataFrame(counts).to_csv(OUT / "search_counts.csv", index=False)
 

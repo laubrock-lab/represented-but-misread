@@ -6,35 +6,42 @@ whether post-training changes what a language model represents or how it reads t
 representation out. Across six open-weight base models and three corpora of German texts,
 the information that distinguishes AI from human texts was readily available, both in
 the texts themselves and in the models' internal representations, but the models'
-answers did not use it, and often used it with the wrong sign. Post-training lowered
+answers did not use it, and often ordered the texts inversely. Post-training lowered
 the sensitivity of the answers on average (Δd′ = −0.33), with considerable variation
 between models and text types, and in the two models with stage-wise
 checkpoints the change occurred during supervised fine-tuning. Three causal methods
-converged on where this change takes effect. Steering showed that the direction that
-separates AI from human texts drives the answer in the wrong direction after
-post-training. Model stitching showed that the damaging change originates in the early
-layers. Activation patching showed that it does not reside in the representation of the
-text but in the processing at the positions of the question that follow the text. The
+bore on where this change takes effect. Steering showed that, in several post-trained
+models, the direction that separates AI from human texts pushed the answer the wrong
+way. Model stitching implicated the weights of the early layers, with the caveat that
+stitched hybrids produce effects of their own. Activation patching showed that, by the
+middle of the network, the change does not reside in the representation of the text but
+in the processing at the positions of the question that follow the text. The
 same pattern held for two further judgments with public data: For negated statements and
 for deceptive hotel reviews, the information was represented, post-training changed the
-readout rather than the representation, and the change resided at the question positions.
-Its direction, however, differed between the judgments, and so did its depth. In short,
-post-training did not change what the models represent; it changed how the question they
-are asked reads this representation out, in a direction that depended on the judgment.
+readout far more than the representation of the text, and the change resided at the
+question positions. Its direction, however, differed between the judgments, and so did
+its depth. In short, post-training changed little in how the models represent the text;
+it changed how the question they are asked reads this representation out, in a direction
+that depended on the judgment.
 
 ## Relation to previous work
 
 Our findings are consistent with the growing evidence that language models represent
 more than they say (Burns et al., 2024; Liu et al., 2023; Orgad et al., 2025), including
 for authorship (Zhou et al., 2026; Ackerman & Panickssery, 2025). They add three points.
-First, the dissociation is not only a gap but frequently a reversal. A miscalibrated
+First, the dissociation is not only a gap but frequently an inverse ordering. A miscalibrated
 decision threshold, which has been proposed as the main source of probe–answer gaps
 (Villuri et al., 2026), shifts the criterion in terms of signal detection theory; it
 can lower accuracy but cannot produce sensitivity below chance. Reversed readouts of a
 discriminative direction have been described for steering vectors (Torop et al., 2026);
-here, the reversal occurred in the models' unmodified answers and was confirmed against
-strict control directions and a positive control. Second, the reversal is linked to
-post-training. Interestingly, in the closest related study, post-training had the
+here, the inverse ordering occurred in the graded preferences behind the models'
+unmodified answers, and steering showed in several models that the represented direction
+pushed the answer the wrong way. Note, however, that the cues themselves were specific
+to the corpus: A probe trained on the newspaper segments separated the chats with the
+wrong sign (Section 3.1). A judgment below chance therefore need not reflect an inverted
+reading of a single authorship representation; it can also reflect a fixed policy whose
+cues are valid for one kind of text and invalid for another. Second, the decline is
+linked to post-training. Interestingly, in the closest related study, post-training had the
 opposite effect: It created rather than abolished the ability of a model to recognize
 its own texts (Ackerman & Panickssery, 2025). Recognizing one's own output and judging
 whether an arbitrary text was written by an AI are different tasks, and it is
@@ -48,12 +55,16 @@ Waldis et al., 2026), and it has been qualified by the observation that post-tra
 gains continue to grow with the amount of fine-tuning data (Raghavendra et al., 2024;
 see also Vergara-Browne et al., 2026). To our knowledge, it has not yet been tested with
 causal interventions across checkpoints. Our
-stitching and patching results provide causal evidence for it in one respect: The
-representation of the text was interchangeable between base and post-trained
-checkpoints, so post-training did not change what the models encode about a text. In
-another respect, our results qualify it. The change was not superficial in the sense of
-affecting only the final stages of processing or the output format; it originated in
-the early layers and altered how the question takes up the text, and it had substantive
+patching results provide causal evidence for it in one respect: The representation of
+the text was interchangeable between base and post-trained checkpoints as far as the
+judgment is concerned, and probes transferred between them at the text positions
+wherever this test was not limited by ceiling effects. Note, however, that the
+information available at the answer position declined after post-training in some
+models (Gemma 3, OLMo 3 Think), so that the hypothesis holds for the representation of
+the text rather than for the model as a whole. In another respect, our results qualify
+it. The change was not superficial in the sense of affecting only the final stages of
+processing or the output format; it involved weights in the early layers and altered
+how the question takes up the text, and it had substantive
 consequences for the quality of the judgment. This is consistent with the observation
 that a property tracked across the stages of post-training is shaped mainly during
 supervised fine-tuning (Heidari et al., 2026).
@@ -65,14 +76,17 @@ diffing and cache patching, in which much of what fine-tuning adds was concentra
 chat-template and system-prompt tokens (Leong et al., 2025; Loos & Eberle, 2026; Minder
 et al., 2026). Because our prompts used no chat template, our results suggest that the
 relevant positions are those at which the task is posed, whether in template tokens or
-in a question phrased in natural language. In contrast, the origin of the change in the
-early layers for authorship, and in the middle layers for negated statements, departs
-from the common picture that fine-tuning mainly alters the upper layers
+in a question phrased in natural language. In contrast, the stitching results, which
+implicated the early layers for authorship and the middle layers for negated statements,
+depart from the common picture that fine-tuning mainly alters the upper layers
 (Merchant et al., 2020; Zhao et al., 2026; Zhou, 2026b). It is compatible, however, with
 evidence that changes in the late layers can depend on altered earlier computation
 (Zhou, 2026a), that post-training retunes routing mechanisms formed in pretraining
 (Gupta et al., 2026), and that task representations formed early select later
-processing pathways (Bigoulaeva et al., 2026). Note that stitching without an adapter
+processing pathways (Bigoulaeva et al., 2026). This conclusion is tempered by the
+observation that stitched hybrids can judge worse or better than both parents (Section
+3.4), so that stitching shows where the weights that carry the difference reside rather
+than where the difference is computed. Note also that stitching without an adapter
 at layer ℓ is equivalent to exchanging the full residual stream at all positions at
 that layer, so that our stitching and patching results are two views of one family of
 interventions rather than independent tests; their convergence with steering, which
@@ -92,8 +106,9 @@ statements to be judged as true or false, and the models learned to take the log
 the statement into account, including its negation. For authorship and deception, it
 does not: The data contained no such judgments, and the readout drifted toward what
 post-training made salient. For the reviews, this was a shared heuristic of all models,
-namely that long and detailed reviews are genuine, a cue without validity. For authorship, it was a reversed use of the
-information, most plausibly an outdated stereotype of AI text (see below). In terms of
+namely that long and detailed reviews are genuine, a cue without validity. For
+authorship, it was an inverse use of the information, which might reflect an outdated
+stereotype of AI text (a speculation that we discuss below). In terms of
 the lens model, post-training changes the weights of the second lens, and these weights
 are valid only to the extent that the training data contain valid examples.
 
@@ -109,7 +124,7 @@ for explicit reasoning, did not join the convergence of the other models on the 
 a training signal aimed at reasoning traces may install a different way of reading the
 question than one aimed at conversation. It also
 qualifies the superficial alignment hypothesis in a second respect. A change that leaves
-the representation intact is superficial with respect to what the model knows, but not
+the representation of the text largely unchanged is superficial with respect to what the model knows, but not
 with respect to its consequences, which can make a judgment considerably better or worse.
 Note, however, that this account runs the risk of circularity: If the presence of a
 valid training signal were inferred only from the improvement of a judgment, the account
@@ -125,7 +140,7 @@ with control conditions (Section 3.7). Adding two thousand correctly labeled aut
 judgments to otherwise identical fine-tuning data improved the readout of texts whose
 cues resembled those of the training texts and impaired it where they did not; adding
 stereotyped labels shifted the readout according to the validity of the stereotype in
-each corpus; and in all conditions the representation of the texts stayed intact while
+each corpus; and in all conditions the probes at the text positions changed little while
 the position at which the answer is formed was reorganized. The training signal can thus
 set the direction of the readout, as the account assumes. The training study does not
 show, however, that the decline after the official fine-tuning of OLMo 2 has the same
@@ -147,9 +162,9 @@ post-training may understand "written by a human" differently than its base mode
 much as a task set determines which features of a stimulus an observer selects and how
 they are mapped onto a response. In accounts of biased competition, a task set acts
 early, at the stage of selection, and not only at a late decision stage (Desimone &
-Duncan, 1995). It is instructive to see that the effect of post-training, too, arose in
-the early layers, where the question begins to select information from the text, and
-was fully located in the question positions by the middle of the network.
+Duncan, 1995). It is instructive to see that the effect of post-training, too, involved
+weights in the early layers, where the question begins to select information from the
+text, and was fully located in the question positions by the middle of the network.
 
 The parallel to human judges is equally instructive. Human readers fail to recognize AI
 text because they rely on cues that are plausible but invalid (Jakesch et al., 2023;
@@ -169,11 +184,13 @@ nouns, and text that is hard to read, i.e., a formal and nominal style. In our c
 this was the wrong way round. The AI messages, written by current models instructed to
 sound like a private group chat, were more verbal and lexically more diverse than the
 students' messages, and the post-trained models took exactly these properties as signs
-of human authorship. The base models hardly used these properties; post-training
-installed the weighting, and in the two models with stage-wise checkpoints it did so
-during supervised fine-tuning.
+of human authorship. Except for Qwen3, whose base model already weighted these
+properties inversely (G = −.52, after post-training −.58), the base models used them
+less; post-training installed or strengthened the weighting, and in the two models with
+stage-wise checkpoints it did so during supervised fine-tuning.
 
-A plausible explanation is an outdated stereotype of AI text. The picture of AI writing
+One possible explanation, which our data cannot test directly, is an outdated
+stereotype of AI text. The picture of AI writing
 as formal, elaborate, and impersonal fits the output of earlier assistant models and is
 widespread in texts about AI, which may well be among the data that shape a model's
 concept of its own kind of text during post-training. Current models that are asked to
@@ -184,8 +201,9 @@ generated text changes with each generation of models, the stereotype that post-
 installs may change as well, and the direction of the error with it. Two alternatives
 are less consistent with our data. Familiarity with the model's own style would predict
 that text in a formal assistant register is judged human, which is the opposite of what
-we observed, and token-level predictability did not account for the reversal (for Gemma
-3 4B, controlling for the model's own surprisal of each text left the reversal unchanged
+we observed, and token-level predictability did not account for the below-chance
+judgments (for Gemma 3 4B, controlling for the model's own surprisal of each text left
+them unchanged
 on the short chats and even enlarged it on the newspaper segments; supplementary
 analysis). The idea that post-training narrows the concept of AI text to explicit
 assistant markers is not supported either: Removing the markers that the students had
@@ -205,7 +223,8 @@ follow, not which ones cause them.
 Three implications follow, each of which requires further testing. First, the side
 effects of post-training can be localized, and possibly repaired. A stitched model that
 combined the first eight layers of the Apertus base model with all upper layers of the
-fine-tuned model discriminated better than either parent. Whether such hybrids retain
+fine-tuned model discriminated better than either parent, although such hybrids also
+produce effects of their own (Section 3.4). Whether such hybrids retain
 the intended effects of post-training, such as instruction following, is an open
 question, and the approach is related to combining fine-tuned weights by interpolation
 or averaging (Wortsman et al., 2022a, 2022b). Second, knowing where a side effect arises
@@ -241,7 +260,11 @@ and not only correct a decision.
 ## Limitations
 
 Several limitations qualify these conclusions. We studied models with 4 to 12 billion
-parameters, and the reversal might be weaker or absent in larger models. The
+parameters, and the below-chance judgments might be weaker or absent in larger models.
+We derived the sensitivity of the answers from the graded log-odds of the two answer
+words; because the binary answer hardly varied in most conditions, our d′ characterizes
+the evidence on which the answer is based rather than the binary decisions themselves.
+The
 information that the models failed to use was largely lexical and stylistic, as shown by
 simple n-gram classifiers, so our results concern the readout of ordinary cues rather
 than of any deep representation of authorship. The stitching and patching analyses were
@@ -267,11 +290,11 @@ all contrasts as well, which left five of six decreases significant.
 Language models that write like humans fail to recognize their own kind of text, not
 because they lack the information but because post-training changes how they read it
 out. The same holds, with a different sign, for judgments that post-training improves:
-In all three judgments we studied, post-training left the representation intact and
-changed how the question reads it, at the positions of the question and from the early
-or middle layers on. To know what a model knows, it is therefore not enough to look at
+In all three judgments we studied, post-training changed little in the representation
+of the text and changed how the question reads it, at the positions of the question and
+through weights in the early or middle layers. To know what a model knows, it is therefore not enough to look at
 its answers; one has to look at how the question is read. A training study showed
-that the training data can set the direction of this readout without changing the
-representation. Future studies with larger models may show how general this mechanism is,
+that the training data can set the direction of this readout with little change at the
+text positions. Future studies with larger models may show how general this mechanism is,
 which parts of real post-training data install a misreading, and whether such side effects
 can be prevented without giving up the benefits of post-training.

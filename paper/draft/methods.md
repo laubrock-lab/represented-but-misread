@@ -178,7 +178,13 @@ direction was half the difference between the changes in dv for positive and neg
 steps. As null controls, we used random directions within the subspace spanned by the
 20 leading principal components of the within-class activations and mean differences
 between random halves of the texts within each class; earlier runs used isotropic random
-directions. As a positive control, we used the direction along which the model's own
+directions. Each control direction was drawn once and applied to all texts, 50 per
+family, with steps of ±2 SD; for the authorship and decision directions we recorded a
+dose-response curve (±1, 2, 4, and 6 SD). To make this number of directions feasible,
+the prompt up to the last position was processed once per text and its cached
+activations were reused for all steering settings, which reproduced the scores of the
+uncached computation (r = .999).
+As a positive control, we used the direction along which the model's own
 answers vary (the decision direction), and we also steered with the authorship
 direction after removing its component along the decision direction.
 
@@ -302,7 +308,7 @@ class, according to a score combining mean word length, the share of long words,
 share of capitalized nouns, was labeled "KI", so that the labels were independent of the
 true authorship (50% agreement) and followed the stereotype alone. Fine-tuning used
 low-rank adapters (LoRA; Hu et al., 2022; rank 16, all attention and feed-forward
-projections, learning rate 10⁻⁴, one epoch, three seeds per condition), with the loss on
+projections, learning rate 10^−4^, one epoch, three seeds per condition), with the loss on
 the assistant turns of the conversations and on the answer word of the judgments. We
 evaluated the final adapters on our three authorship corpora and on 400 held-out news
 items (plain prompt, both answer orders), and we analyzed their representations with

@@ -72,6 +72,37 @@ RAW_TEMPLATE = (
     "Antwort:"
 )
 
+# Prompt variants for the robustness check (response to review, 16 Nov 2026); answer words
+# and scoring unchanged. "qfirst": the question precedes the text, so that the text
+# positions are processed with the task in context; "para": reworded instruction and
+# question. Selected with --prompt-variant (judge_logits.py, patch_positions.py).
+RAW_VARIANTS = {
+    "default": RAW_TEMPLATE,
+    "qfirst": (
+        "Im Folgenden steht ein Text. Er wurde entweder von einem Menschen "
+        "geschrieben oder von einer KI generiert.{prior}\n\n"
+        "Frage: Wurde der folgende Text von einem Menschen geschrieben oder von einer "
+        "KI generiert? Antworte mit einem Wort ({opts}).\n\n"
+        "Text:\n\"\"\"\n{text}\n\"\"\"\n\n"
+        "Antwort:"
+    ),
+    "para": (
+        "Der folgende Text stammt entweder von einer Person oder von einem "
+        "KI-System.{prior}\n\n"
+        "Text:\n\"\"\"\n{text}\n\"\"\"\n\n"
+        "Frage: Hat ein Mensch diesen Text verfasst, oder hat eine KI ihn erzeugt? "
+        "Antworte mit einem Wort ({opts}).\n"
+        "Antwort:"
+    ),
+}
+
+
+def set_prompt_variant(name: str) -> None:
+    """Switch the raw template globally (build_prompt reads config.RAW_TEMPLATE)."""
+    global RAW_TEMPLATE
+    RAW_TEMPLATE = RAW_VARIANTS[name]
+
+
 # Chat-style prompt (instruct models only), via the model's chat template.
 SYSTEM_PROMPTS = {
     "neutral": "Du bewertest Texte.",

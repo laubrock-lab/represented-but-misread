@@ -44,7 +44,7 @@ from judge_logits import (build_prompt, candidate_ids, load_model, pick_device, 
                           truncate_text)
 from steer_logits import find_decoder_layers
 
-SETS = ["none", "text", "pre", "post", "last", "all"]
+SETS = ["none", "text", "pre", "post", "last", "all", "question"]
 
 
 class Patcher:
@@ -71,8 +71,20 @@ def prompt_positions(tok, prompt: str, add_special: bool, text: str) -> tuple[in
     in_text = (offs[:, 0] >= start) & (offs[:, 1] <= end) & (offs[:, 1] > offs[:, 0])
     t_idx = np.where(in_text)[0]
     first, last_t = (t_idx.min(), t_idx.max()) if len(t_idx) else (n, n)
+    # the question line ("Frage: ...") wherever it stands (after the text by default, before it
+    # with --prompt-variant qfirst); occurrences inside the text itself are skipped
+    q_idx = np.array([], int)
+    k = prompt.find("Frage:")
+    while k != -1:
+        if not (start <= k < end):
+            q_end = prompt.find("\n", k)
+            q_end = len(prompt) if q_end == -1 else q_end
+            q_idx = np.where((offs[:, 0] >= k) & (offs[:, 1] <= q_end) & (offs[:, 1] > offs[:, 0]))[0]
+            break
+        k = prompt.find("Frage:", k + 1)
     pos = {"text": t_idx, "pre": np.arange(0, first), "post": np.arange(last_t + 1, n),
-           "last": np.array([n - 1]), "all": np.arange(n), "none": np.array([], int)}
+           "last": np.array([n - 1]), "all": np.arange(n), "none": np.array([], int),
+           "question": q_idx}
     return n, pos
 
 
@@ -88,7 +100,10 @@ def main() -> None:
     ap.add_argument("--max-text-tokens", type=int, default=2048)
     ap.add_argument("--limit", type=int)
     ap.add_argument("--device", default="auto")
+    ap.add_argument("--prompt-variant", default="default", choices=list(config.RAW_VARIANTS),
+                    help="raw template variant (authorship only); adds a suffix to the output name")
     args = ap.parse_args()
+    config.set_prompt_variant(args.prompt_variant)
 
     device = pick_device(args.device)
     ids = config.MODEL_PRESETS[args.preset]
@@ -140,7 +155,8 @@ def main() -> None:
     patcher.handle.remove()
     out_dir = config.OUTPUT_DIR / "patch" / args.corpus.replace(":", "_")
     out_dir.mkdir(parents=True, exist_ok=True)
-    out = out_dir / f"{args.preset}_{args.recipient}-from-{args.donor}_L{args.layer}{f'_n{args.limit}' if args.limit else ''}.csv"
+    pv = "" if args.prompt_variant == "default" else f"_{args.prompt_variant}"
+    out = out_dir / f"{args.preset}_{args.recipient}-from-{args.donor}_L{args.layer}{f'_n{args.limit}' if args.limit else ''}{pv}.csv"
     df = pd.DataFrame(rows)
     df.to_csv(out, index=False)
 

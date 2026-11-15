@@ -52,8 +52,12 @@ def encode_chat(tok, messages, max_len):
     return ids[:max_len], labels[:max_len]
 
 
-def encode_judgment(tok, text, label, order, max_len):
-    prompt, add_special = build_prompt(tok, text, "raw", order, "neutral")
+def encode_judgment(tok, text, label, order, max_len, task="authorship"):
+    if task == "topic":      # C4: unrelated judgment in the same raw layout
+        from judgment_examples import TOPIC_ORDERS, TOPIC_TEMPLATE
+        prompt, add_special = TOPIC_TEMPLATE.format(text=text, opts=" oder ".join(TOPIC_ORDERS[order])), True
+    else:
+        prompt, add_special = build_prompt(tok, text, "raw", order, "neutral")
     p = tok(prompt, add_special_tokens=add_special)["input_ids"]
     a = tok(" " + label, add_special_tokens=False)["input_ids"]
     p = p[-(max_len - len(a)):]
@@ -80,7 +84,7 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--preset", default="olmo2-7b")
     ap.add_argument("--template-variant", default="sft", help="checkpoint whose chat template is used")
-    ap.add_argument("--condition", required=True, choices=["C0", "C1", "C2", "C3"])
+    ap.add_argument("--condition", required=True, choices=["C0", "C1", "C2", "C3", "C4"])
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--out-dir", type=Path, required=True)
     ap.add_argument("--bg-n", type=int, default=20_000)
@@ -117,7 +121,8 @@ def main() -> None:
     ex = examples(a.condition, seed=a.seed)
     if a.n_examples and len(ex):
         ex = ex.sample(a.n_examples, random_state=a.seed)
-    data += [("judg",) + encode_judgment(tok, r.text, r.label, random.choice(["mk", "km"]), a.max_len)
+    data += [("judg",) + encode_judgment(tok, r.text, r.label, random.choice(["mk", "km"]), a.max_len,
+                                         getattr(r, "task", "authorship"))
              for r in ex.itertuples(index=False)]
     data = [d for d in data if any(x != -100 for x in d[2])]
     random.shuffle(data)

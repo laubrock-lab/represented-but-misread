@@ -9,6 +9,13 @@ AI texts). Labels by condition:
         the class median) is labeled "KI", the rest "Mensch" -> labels independent of the
         truth (50 % agreement), determined by formality alone
     C3  shuffled: random balanced labels (format control)
+    C4  unrelated judgment (format control without the authorship question; added 16 Nov
+        2026 after review): same texts and number of examples, same raw layout with a
+        one-word answer and random option order, but the question is whether the text is
+        about politics, business or society (answer "Ja"/"Nein", label from the GNAD
+        section: Inland, International, Wirtschaft, Panorama, Etat -> "Ja"; Sport,
+        Kultur, Web, Wissenschaft -> "Nein"). Learns the judgment format, never sees the
+        authorship question or the answer words Mensch/KI.
 Formality score (German): z(mean word length) + z(share of words with >= 13 letters) +
 z(share of capitalized, non-sentence-initial words, i.e. mostly nouns).
 Prompt: the raw authorship prompt of judge_logits.py (neutral, random answer order); the
@@ -30,6 +37,18 @@ import pandas as pd
 
 REPO = Path(__file__).resolve().parents[1]
 DATA = REPO / "data" / "training_study"
+
+
+TOPIC_YES = ("Inland", "International", "Wirtschaft", "Panorama", "Etat")
+TOPIC_TEMPLATE = (
+    "Im Folgenden steht ein Text. Er handelt entweder von Politik, Wirtschaft oder "
+    "Gesellschaft oder von einem anderen Thema.\n\n"
+    "Text:\n\"\"\"\n{text}\n\"\"\"\n\n"
+    "Frage: Handelt dieser Text von Politik, Wirtschaft oder Gesellschaft? Antworte mit "
+    "einem Wort ({opts}).\n"
+    "Antwort:"
+)
+TOPIC_ORDERS = {"mk": ("Ja", "Nein"), "km": ("Nein", "Ja")}
 
 
 def load_items() -> pd.DataFrame:
@@ -59,9 +78,15 @@ def examples(condition: str, seed: int = 1) -> pd.DataFrame:
     d = load_items()
     d = d[d.split == "train"].sample(frac=1, random_state=1).reset_index(drop=True)
     half = len(d) // 2
-    ex = pd.concat([pd.DataFrame(dict(text=d.human_text[:half], is_ai=0)),
-                    pd.DataFrame(dict(text=d.ai_text[half:], is_ai=1))], ignore_index=True)
+    ex = pd.concat([pd.DataFrame(dict(text=d.human_text[:half], is_ai=0, section=d.section[:half])),
+                    pd.DataFrame(dict(text=d.ai_text[half:], is_ai=1, section=d.section[half:]))],
+                   ignore_index=True)
+    ex["task"] = "authorship"
     rng = np.random.default_rng(seed)
+    if condition == "C4":
+        ex["task"] = "topic"
+        ex["label"] = np.where(ex.section.isin(TOPIC_YES), "Ja", "Nein")
+        return ex
     if condition == "C1":
         lab = ex.is_ai.to_numpy()
     elif condition == "C2":
@@ -91,7 +116,7 @@ def write_heldout() -> Path:
 
 
 if __name__ == "__main__":
-    for c in ("C1", "C2", "C3"):
+    for c in ("C1", "C2", "C3", "C4"):
         e = examples(c)
         print(c, len(e), "share KI", round((e.label == "KI").mean(), 2),
               "agreement with truth", round(((e.label == "KI") == (e.is_ai == 1)).mean(), 2))
