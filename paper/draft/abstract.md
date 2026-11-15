@@ -35,6 +35,8 @@ statements, several base models represented truth perfectly but answered poorly,
 post-training repaired their readout; for deceptive reviews, all models answered near
 chance despite accurate probes, and post-training made most models' readouts converge. Probes
 transferred between base and post-trained checkpoints at the text positions but not at
-the answer position. Post-training thus leaves the representation intact and changes how
+the answer position. In a training study, adding 2,000 correctly or stereotypically
+labeled examples to otherwise identical fine-tuning data shifted the readout in the
+implied direction, leaving the representation intact. Post-training thus leaves the representation intact and changes how
 the question reads it, in a direction that depends on whether the training data specify a
 valid readout.

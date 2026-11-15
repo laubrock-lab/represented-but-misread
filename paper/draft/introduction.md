@@ -137,13 +137,17 @@ base and post-trained checkpoints ("model stitching"), and exchanging internal s
 between checkpoints at selected positions of the prompt ("activation patching"). Fourth,
 we asked whether the results generalize, using two further judgments with known ground
 truth and public data: whether a statement is true, and whether a hotel review is
-genuine. We find that the information is readily available but that the models' answers
+genuine. Fifth, we manipulated the training data directly, in a training study with control
+conditions, to test whether the training signal sets the direction of the readout. We
+find that the information is readily available but that the models' answers
 do not use it, and that post-training leaves the representation intact while changing
 how the question the model is asked reads it out, at the question positions and from the
 early or middle layers on. The direction of this change depended on the judgment:
 Post-training impaired the readout of authorship, repaired the readout of negated
 statements in base models that misread them, and made the readout of the reviews
-converge across most models. In this respect,
+converge across most models; in the training study, a small number of labeled examples
+shifted the readout in the direction that their labels implied, without changing the
+representation. In this respect,
 our results support the superficial alignment hypothesis; at the same time, they show
 that the change is not superficial in the sense of affecting only the final stages of
 processing, and that it can make a judgment considerably better or worse.

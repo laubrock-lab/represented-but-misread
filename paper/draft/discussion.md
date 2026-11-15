@@ -120,11 +120,18 @@ however, is correlational and rests on two data mixtures. It cannot show which e
 produced the repair of the negated statements (the truth judgments themselves, or, for
 instance, the many mathematical and reasoning tasks that teach a model to read a question
 precisely), and the two mixtures differed in size, languages, the share of mathematical
-tasks, and the kind of their truth judgments. A causal test would be a training study
-with a control condition: Fine-tuning the same base model on otherwise identical data
-with and without valid examples of a judgment, or with examples that embody a stereotype,
-should change the readout in the predicted direction while leaving the representation
-intact.
+tasks, and the kind of their truth judgments. We therefore carried out a training study
+with control conditions (Section 3.7). Adding two thousand correctly labeled authorship
+judgments to otherwise identical fine-tuning data improved the readout of texts whose
+cues resembled those of the training texts and impaired it where they did not; adding
+stereotyped labels shifted the readout according to the validity of the stereotype in
+each corpus; and in all conditions the representation of the texts stayed intact while
+the position at which the answer is formed was reorganized. The training signal can thus
+set the direction of the readout, as the account assumes. The training study does not
+show, however, that the decline after the official fine-tuning of OLMo 2 has the same
+origin: Our background condition, with a small part of the original data and low-rank
+adapters, did not reproduce this decline, and identifying the parts of real post-training
+data that install a misreading remains a task for future work.
 
 ## The question reads the text
 
@@ -203,7 +210,8 @@ the intended effects of post-training, such as instruction following, is an open
 question, and the approach is related to combining fine-tuned weights by interpolation
 or averaging (Wortsman et al., 2022a, 2022b). Second, knowing where a side effect arises
 makes it possible to protect the affected components during fine-tuning or to correct
-them with small, targeted interventions instead of broader training. That such
+them with small, targeted interventions instead of broader training; in our training
+study, two thousand examples sufficed to change the readout in either direction. That such
 interventions are practical has been shown, albeit with the opposite intention, for the
 refusal behavior that post-training installs: Refusal is mediated by a single direction
 in the residual stream, and removing this direction abolishes it (Arditi et al., 2024),
@@ -241,7 +249,10 @@ restricted to two models per judgment, to one corpus for authorship, and to the 
 prompt format, because base models cannot be queried with a chat template. The two
 further judgments were studied with four to five models, steering for them with two
 models each and on 300 items, and the effects of post-training on the reviews were
-small; for Gemma 3 4B, steering did not reveal the source of the loss. Models
+small; for Gemma 3 4B, steering did not reveal the source of the loss. The training
+study used one base model, low-rank adapters, and training texts from other generators
+and of another genre than the test corpora, and its background condition did not
+reproduce the effect of the original fine-tuning. Models
 from different developers also differ in their post-training recipes, including distillation from larger
 models, the emphasis on reasoning, and the share of human preference data, and our
 design cannot separate these factors; they are a plausible source of the heterogeneity
@@ -259,7 +270,8 @@ out. The same holds, with a different sign, for judgments that post-training imp
 In all three judgments we studied, post-training left the representation intact and
 changed how the question reads it, at the positions of the question and from the early
 or middle layers on. To know what a model knows, it is therefore not enough to look at
-its answers; one has to look at how the question is read. Future studies with larger
-models and with controlled post-training, in which the training data for a judgment are
-varied directly, may show how general this mechanism is and whether its side effects can
-be prevented without giving up the benefits of post-training.
+its answers; one has to look at how the question is read. A training study showed
+that the training data can set the direction of this readout without changing the
+representation. Future studies with larger models may show how general this mechanism is,
+which parts of real post-training data install a misreading, and whether such side effects
+can be prevented without giving up the benefits of post-training.

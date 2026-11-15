@@ -283,7 +283,33 @@ to judge the authenticity of reviews or statements, and to judge statements as t
 false. Matching conversations were inspected to determine whether they were actual
 judgment tasks.
 
-## 2.9 Implementation
+## 2.9 Training study
+
+To test causally whether the training signal sets the direction of the readout, we
+fine-tuned the OLMo 2 7B base model under four conditions that differed only in a small
+set of authorship judgments. Every run contained the same 20,000 conversations, sampled
+proportionally from all parts of the model's original supervised fine-tuning mixture
+(Tülu 3; Lambert et al., 2024). The conditions added 1,994 authorship judgments in the
+format of our experiments (plain prompt, random answer order) with correct labels (C1),
+with labels that followed a formality stereotype (C2), or with random labels (C3), or no
+judgments at all (C0). The judged texts were German news articles that are disjoint from
+our test corpora: human articles from the online edition of the Austrian daily DER
+STANDARD (10kGNAD; Block, 2019; derived from Schabus et al., 2017), shortened to 25, 80,
+or 150 words, and AI articles that Qwen3 8B and Gemma 3 12B (instruction-tuned versions)
+wrote on the same topics and sections, shortened to the same lengths; each topic
+contributed either its human or its AI text. For C2, the more formal half of each true
+class, according to a score combining mean word length, the share of long words, and the
+share of capitalized nouns, was labeled "KI", so that the labels were independent of the
+true authorship (50% agreement) and followed the stereotype alone. Fine-tuning used
+low-rank adapters (LoRA; Hu et al., 2022; rank 16, all attention and feed-forward
+projections, learning rate 10⁻⁴, one epoch, three seeds per condition), with the loss on
+the assistant turns of the conversations and on the answer word of the judgments. We
+evaluated the final adapters on our three authorship corpora and on 400 held-out news
+items (plain prompt, both answer orders), and we analyzed their representations with
+probes and probe transfer as in Section 2.8. The official SFT checkpoint of OLMo 2 served
+as a reference.
+
+## 2.10 Implementation
 
 All models were run in bfloat16 precision with the Hugging Face `transformers` library
 (version 5.22.2; for Apertus, the developers' fork of version 5.18) and PyTorch 2.6, on
@@ -292,17 +318,19 @@ local workstation. Gradients for the supplementary readout analysis were compute
 gradient checkpointing, which leaves them unchanged. All analysis code is available in
 the project repository (TODO: URL once public).
 
-## 2.10 Data and code availability
+## 2.11 Data and code availability
 
 The newspaper texts are unpublished and confidential, the human chat messages were
 written by participants who have not consented to publication (TODO: update after
 consent requests), and the human textbook summaries are protected by copyright.
 Therefore, these texts cannot be shared. The two further judgments (Section 2.8) use
 publicly available data (Marks & Tegmark, 2024; Ott et al., 2011, 2013), so that these
-analyses can be reproduced in full. All code, the per-text model outputs without text
+analyses can be reproduced in full; the same holds for the training data of the training
+study (Section 2.9), whose human texts are public (Block, 2019) and whose AI texts we
+generated and will release. All code, the per-text model outputs without text
 content, and all derived results are available in the project repository (TODO: URL).
 
-## 2.11 Use of AI tools
+## 2.12 Use of AI tools
 
 The analyses for this study were implemented and run with the assistance of AI coding
 agents (Claude Code with Claude Opus; additional analyses with GLM and DeepSeek models;

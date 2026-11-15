@@ -440,3 +440,70 @@ In summary, the pattern found for authorship generalized: In all three judgments
 information was represented, the answers used it poorly before or after post-training,
 post-training changed the readout rather than the representation, and the change resided
 at the question positions. Its direction, however, depended on the judgment.
+
+## 3.7 The training signal sets the direction of the readout
+
+The analyses so far show that post-training changed the readout and that the direction of
+the change differed between judgments; whether it depends on the training data could only
+be inferred. We therefore manipulated the training data directly (Section 2.9). Table 4
+summarizes the answers.
+
+> **Table 4.** Training study: sensitivity (d′) of the answers of OLMo 2 7B after
+> fine-tuning with background conversations only (C0) or with additional authorship
+> judgments with correct (C1), stereotyped (C2), or random labels (C3), and of the official
+> SFT checkpoint. Held-out news: 400 items from the distribution of the training texts.
+> d′, mean over three seeds. The paired differences of C1 and C2 to C0 had the same sign in all seeds, e.g., C1 − C0: +2.17 to +2.33 on the newspaper segments and −0.51 to −0.70 on the chats; those of C3 fluctuated around zero except on the chats.
+>
+> | Test corpus | C0 background | C1 valid | C2 stereotype | C3 random | Official SFT |
+> |---|---:|---:|---:|---:|---:|
+> | Held-out news | −0.30 | 4.28 | 0.11 | 0.13 | −0.14 |
+> | Newspaper segments | −0.06 | 2.18 | −0.35 | −0.06 | −0.54 |
+> | Textbook summaries | −0.12 | 1.39 | 0.32 | 0.03 | −0.50 |
+> | Short chats | 0.04 | −0.58 | −0.29 | −0.21 | 0.38 |
+
+Two thousand correctly labeled judgments of news texts sufficed to raise the sensitivity
+of the answers far above that of the base model, not only on held-out news but also on
+texts from other generators and genres: the newspaper segments, written by GPT-5.4
+(d′ = 2.18 vs. −0.06), and the textbook summaries (1.39 vs. −0.12). The information had
+been represented all along; a small amount of valid training made the answer read it. On
+the short chats, however, the same training made the answers worse than chance (−0.58),
+because the properties that distinguished generated from human news did not distinguish
+generated from human chat messages in the same way. The stereotype acted according to its
+validity in each corpus. Measured with the formality score used for the labels, AI texts
+were less formal than human texts in the chats and newspaper segments (AUC = .40 and .39)
+but more formal in the textbook summaries (.70); accordingly, the stereotype impaired the
+answers on the chats (−0.29) and newspaper segments (−0.35) and improved them on the
+textbook summaries (0.32). Random labels changed the answers little, except for a small decline on
+the chats (−0.21). Note that the background condition did not reproduce the effect of the
+official fine-tuning. The official SFT, which updated all weights on the full mixture of
+about 940,000 conversations, lowered the sensitivity on the newspaper segments and
+textbook summaries (d′ about −0.5) and shifted the criterion strongly toward "human";
+our background condition, with 2% of the conversations, one epoch, and low-rank adapters,
+left the judgments close to those of the base model. The conditions therefore show that a
+training signal can set the direction of the readout against a neutral background; they
+do not yet show that the decline after the official fine-tuning has the same origin.
+Fine-tuning with a larger share of the original mixture, or removing and enriching
+specific parts of it (e.g., conversations in which the assistant talks about AI), could
+identify which training data install the misreading.
+
+Did the training change the representation of the texts or the way it is read out? Probes
+trained within each fine-tuned model decoded authorship as well as in the base model
+(e.g., newspaper segments at two thirds of the depth: d′ = 3.14 in the base model vs.
+2.93–3.14 after fine-tuning; chats: 1.42 vs. 1.32–1.45), and probes transferred between
+the base and the fine-tuned models without loss at the text positions in every condition
+(transfer deficit ≤ 0.02 d′, with one exception of 0.15 in the upper layers for C1 on the
+textbook summaries). At the last prompt position, in contrast, the deficit grew with
+depth, most strongly after training with valid labels (upper third, newspaper segments:
+C0 0.22, C1 2.09, C2 0.77, C3 0.86; textbook summaries: 0.25, 1.19, 0.72, 0.97). The
+training thus left the representation of the text intact and reorganized the position
+at which the answer is formed. That random labels also reorganized this position, while
+barely changing the answers, shows that what mattered for the answers was which readout
+was learned, not how much the answer position changed. The chats illustrate this most
+clearly: After training with valid news labels, the model represented the authorship of
+the chats as well as before (probe d′ = 1.32) but judged them below chance (−0.58). The
+dissociation that we observed after the original post-training was thus reproduced
+experimentally, by training data whose cues were valid for one genre and misleading for
+another.
+
+Because training with valid labels inverted the judgments of the chats, we verified
+the labels of this corpus. All 61 human messages are verbatim the students' original submissions, all 239 AI messages trace to the generation pipeline (none resembles a student message, maximum similarity .16), and independent judges recognized the chats in the labeled direction (human participants: AUC = .82; Claude Opus: .69–.90). Whether individual students used AI tools to write their messages cannot be determined from the records.
