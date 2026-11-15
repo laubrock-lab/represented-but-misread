@@ -59,7 +59,7 @@ university machines.
 ## 2.2 Models
 
 We studied six open-weight base models with 4 to 12 billion parameters from four
-developers (Table 2). For each base model, we compared the pretrained model with its final
+developers (Table 1). For each base model, we compared the pretrained model with its final
 post-trained version. For three base models, the developers released checkpoints
 after each stage of post-training, which allowed us to follow the change step by step:
 OLMo 2 7B (base, supervised fine-tuning [SFT], direct preference optimization [DPO],
@@ -69,7 +69,7 @@ for which two lines of post-training start from the same base model (one optimiz
 explicit reasoning, "Think", one for conversation, "Instruct") and a third applies
 reinforcement learning to the base model without any SFT ("RL-Zero").
 
-> **Table 2.** Models (Hugging Face identifiers).
+> **Table 1.** Models (Hugging Face identifiers).
 >
 > | Model | Base | Post-training checkpoints |
 > |---|---|---|
@@ -194,7 +194,8 @@ embedding and the first ℓ layers of one checkpoint with the remaining layers, 
 normalization and output layer of another, passing the residual stream at the junction
 on unchanged. Stitching without an adapter is justified because both checkpoints derive
 from the same pretrained weights; we verified this by linear centered kernel alignment
-(CKA) between the activations of base and post-trained checkpoints, by the perplexity of
+(CKA; Kornblith et al., 2019) between the activations of base and post-trained checkpoints
+(cka.py), by the perplexity of
 each stitched model on 40 texts, and by checking that stitching at ℓ = 0 and ℓ = L
 reproduced the parent models. We also exchanged only the attention blocks or only the
 feed-forward blocks (each with its normalization) of the first ℓ layers.
@@ -248,7 +249,7 @@ one truth direction also covers negated statements (Marks & Tegmark, 2024). Mode
 stitching and activation patching were carried out as for authorship, for both further
 judgments, but only where there was a change to locate: in models whose answers changed
 substantially with post-training and whose base models placed at least 30% of their
-probability on the two answer words, the criterion used for authorship (Table 1). For the
+probability on the two answer words, the criterion used for authorship (Table 2). For the
 negated statements, these were OLMo 2 and Apertus (base vs. SFT, 300 pairs); the Gemma 3
 base models fell below this criterion (18% and 25%), and the base models of Qwen3 and OLMo 3 already
 judged the negated statements perfectly. For the reviews, these were Gemma 3 4B, which

@@ -127,6 +127,7 @@ def analyze(with_probes: bool) -> None:
                 a, b = answers("chat_tw25", preset, v, fmt), answers("chat_sm_tw25", preset, v, fmt)
                 if a is not None:
                     judges[f"answer|{preset}|{v}|{fmt}"] = pd.concat([a, b]) if b is not None else a
+                    judges[f"answer300|{preset}|{v}|{fmt}"] = a     # same 300 items as the probes
             if with_probes:
                 p = probe_scores(preset, v, cues)
                 if p is not None:
@@ -148,7 +149,8 @@ def analyze(with_probes: bool) -> None:
     res.to_csv(OUT / "lens_judges.csv", index=False)
     prof.to_csv(OUT / "cue_profiles.csv", index=False)
     with pd.option_context("display.width", 220, "display.float_format", "{:.2f}".format):
-        print(res[["kind", "preset", "variant", "fmt", "n", "ra", "Re", "Rs", "G", "C", "cos_w"]].to_string(index=False))
+        print(res[["kind", "preset", "variant", "fmt", "n", "ra", "Re", "Re_cv", "Rs", "Rs_cv", "G", "G_cv", "C"]]
+              .to_string(index=False))
 
 
 def main() -> None:

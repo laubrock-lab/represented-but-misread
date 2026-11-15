@@ -35,8 +35,8 @@ data. For negated statements, several base models represented truth perfectly bu
 answered poorly, and post-training repaired their readout; for deceptive reviews, all
 models answered near chance despite accurate probes. Probes transferred between base and
 post-trained checkpoints at the text positions, but only partially at the answer
-position. In a training study, adding 2,000 correctly or stereotypically labeled
-examples to otherwise identical fine-tuning data shifted the readout in the implied
-direction, with little change at the text positions. Post-training thus mainly changes
+position. In a training study, adding 2,000 correctly labeled examples to otherwise identical
+fine-tuning data shifted the readout strongly in the implied direction, improving it on
+other corpora and inverting it on one, with little change at the text positions. Post-training thus mainly changes
 how the question reads the text, in a direction that depends on whether the training
 data specify a valid readout.

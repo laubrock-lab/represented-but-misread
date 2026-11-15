@@ -90,13 +90,21 @@ than where the difference is computed. Note also that stitching without an adapt
 at layer ℓ is equivalent to exchanging the full residual stream at all positions at
 that layer, so that our stitching and patching results are two views of one family of
 interventions rather than independent tests; their convergence with steering, which
-does not exchange states between checkpoints, is the stronger argument.
+does not exchange states between checkpoints, is the stronger argument. Two further cautions apply. A probe shows that information can be decoded, not that the
+model uses it (Hewitt & Liang, 2019; Elazar et al., 2021); this is why we rest the claim
+that the answers misread the representation on the causal tests rather than on the probes.
+Conversely, interventions along a subspace can change the output through a pathway other
+than the one the subspace was meant to capture (Makelov et al., 2023); our steering
+results therefore show which way the answer pathway reads a direction, and we compared
+them with control directions drawn from the same high-variance subspace and with the
+decision direction, but they do not prove that the model uses this direction under
+natural conditions.
 
 ## The direction of the change depends on the training signal
 
 Post-training impaired the readout of authorship, repaired the readout of negated
-statements in the base models that misread them, and made the readout of the reviews
-converge across most models. A common
+statements in the base models that misread them, and, for the reviews, replaced a shared
+polarity heuristic by a more uniform readout across most models. A common
 account of these outcomes follows from the second lens in Figure 1. Post-training does
 not add information to the representation; it installs a way of reading the
 representation out. Whether this improves or impairs a judgment then depends on whether
@@ -113,8 +121,8 @@ the lens model, post-training changes the weights of the second lens, and these 
 are valid only to the extent that the training data contain valid examples.
 
 This account explains why the sign of the change differed between judgments, and, for
-the reviews, between models: Because post-training made the models' judgments converge,
-the change was negative for a model whose base version had read the reviews comparatively
+the reviews, between models: Because post-training made the models' judgments more
+similar (within each review polarity), the change was negative for a model whose base version had read the reviews comparatively
 well (Gemma 3 4B) and positive for a model whose base version had not (Qwen3). Two
 observations qualify this account. First, the base models of Qwen3 and OLMo 3 already
 read negated statements correctly, presumably because their pretraining data already
@@ -139,8 +147,8 @@ tasks, and the kind of their truth judgments. We therefore carried out a trainin
 with control conditions (Section 3.7). Adding two thousand correctly labeled authorship
 judgments to otherwise identical fine-tuning data improved the readout of texts whose
 cues resembled those of the training texts and impaired it where they did not; adding
-stereotyped labels shifted the readout according to the validity of the stereotype in
-each corpus; and in all conditions the probes at the text positions changed little while
+stereotyped labels shifted the readout in the direction implied by the validity of the
+stereotype, but reliably only where the stereotype was valid; and in all conditions the probes at the text positions changed little while
 the position at which the answer is formed was reorganized. The training signal can thus
 set the direction of the readout, as the account assumes. The training study does not
 show, however, that the decline after the official fine-tuning of OLMo 2 has the same
@@ -275,7 +283,15 @@ models each and on 300 items, and the effects of post-training on the reviews we
 small; for Gemma 3 4B, steering did not reveal the source of the loss. The training
 study used one base model, low-rank adapters, and training texts from other generators
 and of another genre than the test corpora, and its background condition did not
-reproduce the effect of the original fine-tuning. Models
+reproduce the effect of the original fine-tuning; the stereotype labels were moreover
+correlated with text length, topic, and generator. The three causal methods were applied
+to partly different combinations of models and corpora; only Apertus on the textbook
+summaries was examined with steering, stitching, and patching alike. The newspaper
+segments stem from only 14 articles, so that bootstrap intervals that resample articles
+are likely too narrow for this corpus. All judgments used German prompts with one
+instruction wording and the question after the text; prompt variants are reported in the
+supplement, and we did not test English prompts.
+ Models
 from different developers also differ in their post-training recipes, including distillation from larger
 models, the emphasis on reasoning, and the share of human preference data, and our
 design cannot separate these factors; they are a plausible source of the heterogeneity

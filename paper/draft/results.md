@@ -63,7 +63,7 @@ the AUC.
 ## 3.2 The models' answers do not use it, and post-training makes this worse
 
 When the same models were asked directly whether a text had been written by a human or
-by an AI, their answers did not reflect this information. Table 1 summarizes the
+by an AI, their answers did not reflect this information. Table 2 summarizes the
 order-averaged sensitivity of the answers for the pretrained base models and for the
 final post-trained models. Many cells are close to chance, and a considerable number are
 clearly below it: Qwen3-8B after post-training judged the newspaper segments with
@@ -71,7 +71,7 @@ d′ = −1.01 (raw prompt) and −1.30 (chat prompt), and Gemma 3 12B judged th
 with d′ = −0.81 and −1.09. Note that these values were computed from the graded
 preference of the model, i.e., the log-odds of "AI" versus "human" for each text, which
 plays the role of a confidence rating in a rating-scale ROC analysis. The binary answer
-itself often did not vary: In 23 of the 36 conditions with the plain prompt (Table 1,
+itself often did not vary: In 23 of the 36 conditions with the plain prompt (Table 2,
 base and final models), the model gave the same answer to more than 95% of the texts,
 and in several base models the share of "AI" answers depended strongly on the order in
 which the two options were named (e.g., OLMo 2 on the short chats: 89% vs. 0%). A
@@ -82,7 +82,7 @@ an inverse ordering cannot result from a response bias, which only shifts the
 preference for all texts alike; properties typical of human texts pushed the answer
 toward "AI", and properties typical of AI texts toward "human".
 
-> **Table 1.** Sensitivity (d′) of the models' answers. Base models were queried with a
+> **Table 2.** Sensitivity (d′) of the models' answers. Base models were queried with a
 > plain completion prompt ("raw"); post-trained models with the same prompt and with
 > their chat template ("chat"). Conditions in which a model placed less than 30% of its
 > probability on the two answer words are omitted (—).
@@ -115,12 +115,17 @@ chance where their post-trained counterparts did not (e.g., Gemma 3 12B on the t
 summaries, d′ = +1.64; OLMo 3 on the newspaper segments, +0.60; Qwen3 on the textbook
 summaries, +0.55). To test the effect of post-training without confounding it with the
 prompt format, we compared each final model with its base model on the identical plain
-prompt. Of these 18 comparisons, 14 showed a decrease. A random-effects summary across
-all 18 comparisons yielded a mean change of Δd′ = −0.33 [−0.50, −0.17] (z = −3.95,
-p < .001), with considerable heterogeneity between cells (I² = 82%). Because the same
-base models contribute to several corpora, we repeated the summary after averaging
-within each base model; the result was the same (−0.34 [−0.49, −0.18], p < .001), and all
-six base models showed a decrease on average. In the three comparisons in which the
+prompt. Of these 18 comparisons, 14 showed a decrease. Because each model family
+contributes three corpora and each corpus six families, the 18 comparisons are not
+independent. A multilevel random-effects model with random effects for model family,
+corpus, and cell yielded a mean change of Δd′ = −0.33 [−0.53, −0.13] (t(17) = −3.54,
+p = .003). The most conservative test, a t-test over the six family means, gave the same
+estimate (−0.34 [−0.56, −0.11], t(5) = −3.82, p = .012); all six families showed a
+decrease on average, two of them only slightly (OLMo 2: −0.10; OLMo 3 Think: −0.06).
+Heterogeneity between cells was considerable (I² = 82%). Restricted to the nine
+comparisons in which both models placed at least half of their probability on the two
+answer words, the estimate was similar but less precise (−0.31 [−0.64, 0.01], p = .057;
+four families). In the three comparisons in which the
 binary answers varied in both the base and the final model (Gemma 3 12B on the short
 chats and the textbook summaries, Gemma 3 4B on the short chats), post-training lowered
 d′ in all three cases (−0.45 to −0.95). Per corpus, the decrease was reliable for the
@@ -157,13 +162,16 @@ was already complete after imitation learning.
 
 Could the post-trained models simply hold a wrong belief about what AI texts look like,
 a belief that a few correctly labeled examples would correct? We tested this by placing
-2, 8, or 16 labeled examples from other sources before each text. Examples improved the
-judgments of almost all models. With 16 examples on the short chats, d′ rose from −0.21
-to +0.66 for the base model of Gemma 3 4B, from −0.68 to +0.21 for Qwen3, and from
-−0.07 to +0.57 for OLMo 2, whereas the post-trained models of Gemma 3 4B and Qwen3
-remained below chance (−0.72 to −0.31 and −0.80 to −0.17, raw prompt). In three of five
-comparisons, the base models also gained significantly more from the examples than their
-post-trained versions (supplementary analysis). A mistaken belief about what
+2, 8, or 16 labeled examples from other sources before each text (four different sets of
+examples; d′ computed per set and averaged). With 16 examples, d′ rose in 9 of 11 model
+conditions, reliably in 8; two examples hardly helped. On the short chats, d′ rose from
+−0.21 to +0.48 for the base model of Gemma 3 4B, from −0.68 to +0.15 for Qwen3, and from
+−0.07 to +0.49 for OLMo 2, whereas the post-trained models of Gemma 3 4B and Qwen3
+remained below chance (−0.72 to −0.27 and −0.80 to −0.17, raw prompt). Whether base models
+gained more from the examples than their post-trained versions was mixed: In four of
+five comparisons the base model gained more, but reliably so only for OLMo 2 on the short
+chats (difference in gain +0.54 [0.27, 0.83]), and for Qwen3 on the textbook summaries the
+post-trained model gained more (−0.31 [−0.55, −0.09]). A mistaken belief about what
 distinguishes AI from human texts, which examples can partly correct, is therefore likely
 to be part of the explanation, but it does not account for the persisting deficit of the
 post-trained models.
@@ -260,9 +268,12 @@ from the other, passing the internal state at the junction on unchanged ("model
 stitching"). This test requires no probe and no statistic derived from the answers; it
 only measures how well the combined model discriminates. Two observations justified the
 procedure. First, the representations of the texts themselves were nearly identical in
-the base and the post-trained checkpoints (linear CKA 0.97–0.998 for OLMo 2, Apertus and
-OLMo 3), whereas the representations at the position where the answer is formed differed
-considerably (0.5–0.9; Gemma: 0.15–0.32). Second, every stitched model produced fluent
+the base and the post-trained checkpoints of the three models with stage-wise checkpoints
+(linear CKA across layers 0.97–0.999 for OLMo 2, Apertus and OLMo 3; textbook summaries),
+whereas the representations at the position where the answer is formed differed
+considerably (0.44–0.99, median 0.65–0.85). Note that this was less so for the other
+families: In Gemma 3, even the text representations changed noticeably (0.42–0.99, median
+0.80–0.83), and the answer position differed strongly (median 0.20–0.31). Second, every stitched model produced fluent
 text (perplexity 6.0–6.7 for Apertus, 8.2–9.4 for OLMo 2), and stitching at the very
 bottom or the very top reproduced the respective parent model.
 
@@ -434,9 +445,9 @@ into a correct use, the mirror image of what it did for authorship.
 0.86), although probes separated truthful from deceptive reviews well (d′ = 2.5–3.0), at
 least as well as a classifier on word frequencies (d′ = 2.44). Post-training changed the
 probes little, but it changed the answers in a direction that depended on the model:
-Gemma 3 4B lost sensitivity (Δd~z~ = −0.40) and OLMo 3 lost slightly (d′ 0.13 → 0.00),
-whereas Qwen3 (+0.42) and Gemma 3 12B (+0.18) gained, and OLMo 2 and Apertus gained
-slightly (+0.08 to +0.18). After post-training,
+Gemma 3 4B lost sensitivity (d′ 0.45 → 0.08) and OLMo 3 lost slightly (0.13 → 0.00),
+whereas Qwen3 (0.06 → 0.50) and Gemma 3 12B (0.52 → 0.86) gained, and OLMo 2 and Apertus
+changed little (0.16 → 0.17; 0.14 → 0.23; Table 3). After post-training,
 all models showed a strong bias toward "Truthful" (83–92% of the answers of the final
 models). The base models shared one simple heuristic: They judged positive reviews as
 more truthful than negative ones, and review polarity accounted for 41–90% of the
@@ -499,7 +510,7 @@ models, degraded the information available at the answer position.
 
 *What do the training data teach?* The direction of the change differed between the
 judgments: Post-training impaired the readout of authorship, repaired that of negated
-statements, and made that of the reviews converge. To examine whether this corresponds to
+statements, and reshaped that of the reviews. To examine whether this corresponds to
 the supervised fine-tuning data, we searched the SFT mixtures of OLMo 2 and Apertus. Both
 contained thousands of requests to judge statements as true or false (Tülu 3: 2,685;
 Apertus, extrapolated: about 2,300), largely factual claims in Tülu 3 and mathematical
@@ -527,7 +538,9 @@ summarizes the answers.
 > fine-tuning with background conversations only (C0) or with additional authorship
 > judgments with correct (C1), stereotyped (C2), or random labels (C3), and of the official
 > SFT checkpoint. Held-out news: 400 items from the distribution of the training texts.
-> d′, mean over three seeds. The paired differences of C1 and C2 to C0 had the same sign in all seeds, e.g., C1 − C0: +2.17 to +2.33 on the newspaper segments and −0.51 to −0.70 on the chats; those of C3 fluctuated around zero except on the chats.
+> d′, mean over three seeds (per-seed d′, both answer orders averaged). C0 did not learn the
+> answer format (probability of the two answer words .65–.73, vs. ≈ 1.0 in C1–C3); C3
+> therefore serves as the second baseline (see text).
 >
 > | Test corpus | C0 background | C1 valid | C2 stereotype | C3 random | Official SFT |
 > |---|---:|---:|---:|---:|---:|
@@ -536,20 +549,33 @@ summarizes the answers.
 > | Textbook summaries | −0.12 | 1.39 | 0.32 | 0.03 | −0.50 |
 > | Short chats | 0.04 | −0.58 | −0.29 | −0.21 | 0.38 |
 
-Two thousand correctly labeled judgments of news texts sufficed to raise the sensitivity
-of the answers far above that of the base model, not only on held-out news but also on
-texts from other generators and genres: the newspaper segments, written by GPT-5.4
-(d′ = 2.18 vs. −0.06), and the textbook summaries (1.39 vs. −0.12). The information had
-been represented all along; a small amount of valid training made the answer read it. On
-the short chats, however, the same training made the answers worse than chance (−0.58),
-because the properties that distinguished generated from human news did not distinguish
-generated from human chat messages in the same way. The stereotype acted according to its
-validity in each corpus. Measured with the formality score used for the labels, AI texts
-were less formal than human texts in the chats and newspaper segments (AUC = .40 and .39)
-but more formal in the textbook summaries (.70); accordingly, the stereotype impaired the
-answers on the chats (−0.29) and newspaper segments (−0.35) and improved them on the
-textbook summaries (0.32). Random labels changed the answers little, except for a small decline on
-the chats (−0.21). Note that the background condition did not reproduce the effect of the
+Because the background condition C0 did not learn to answer with the two answer words,
+whereas the three conditions with judgment examples did, we compared each condition with
+both C0 and C3, the condition with random labels, which learned the question and the
+answer words but no valid mapping (differences in d′ with 95% CIs from a grouped
+bootstrap). Two thousand correctly labeled judgments of news texts sufficed to raise the
+sensitivity of the answers far above both baselines, not only on held-out news but also
+on texts from other generators and genres: the newspaper segments, written by GPT-5.4
+(C1 − C3: +2.23 [1.56, 3.17]), and the textbook summaries (+1.36 [1.11, 1.64]). On the
+held-out news, C1 was near its maximum for both generators and all text lengths
+(d′ = 3.8–4.0 in each subset), so that its success there was not due to recognizing one
+generator or one length. The information had been represented all along; a small amount
+of valid training made the answer read it. On the short chats, however, the same training
+made the answers worse than chance (−0.58), also relative to random labels (C1 − C3:
+−0.36 [−0.69, −0.06]), because the properties that distinguished generated from human
+news did not distinguish generated from human chat messages in the same way.
+
+The stereotype acted according to its validity, but only partly reliably. Measured with
+the formality score used for the labels, AI texts were less formal than human texts in
+the chats and newspaper segments (AUC = .40 [.32, .49] and .39 [.28, .49]) but more
+formal in the textbook summaries (.70 [.65, .75]). Relative to random labels, the
+stereotype improved the answers on the textbook summaries (C2 − C3: +0.29 [0.11, 0.49])
+and lowered them on the newspaper segments, though not reliably (−0.29 [−0.61, 0.07]); on
+the chats, it did not differ from random labels (−0.08 [−0.39, 0.24]). Note also that the
+stereotype labels were not independent of other text properties: The more formal half
+contained more short texts, more texts on business and domestic politics than on sports,
+and more texts from Gemma 3 12B than from Qwen3 8B. Random labels lowered the answers
+slightly on the chats relative to C0 (−0.26 [−0.52, 0.00]). Note that the background condition did not reproduce the effect of the
 official fine-tuning. The official SFT, which updated all weights on the full mixture of
 about 940,000 conversations, lowered the sensitivity on the newspaper segments and
 textbook summaries (d′ about −0.5) and shifted the criterion strongly toward "human";

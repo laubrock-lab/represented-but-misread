@@ -145,8 +145,8 @@ do not use it, and that post-training changes little in how the text is represen
 but changes how the question the model is asked reads it out, at the question positions
 and through weights in the early or middle layers. The direction of this change depended on the judgment:
 Post-training impaired the readout of authorship, repaired the readout of negated
-statements in base models that misread them, and made the readout of the reviews
-converge across most models; in the training study, a small number of labeled examples
+statements in base models that misread them, and replaced a shared heuristic in the reading of the reviews by a more uniform readout
+across most models; in the training study, a small number of labeled examples
 shifted the readout in the direction that their labels implied, with little change at
 the text positions. Insofar as the representation of the text is concerned, our results
 are consistent with the superficial alignment hypothesis; at the same time, they show

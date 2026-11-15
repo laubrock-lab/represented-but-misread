@@ -213,8 +213,11 @@ def census(name: str, ds: str, max_store: int = 400, limit: int | None = None, s
                     domains[dom] = domains.get(dom, 0) + 1
                     user, asst = turns(row)
                     counts["rows"] += 1
-                    counts["rows_german"] += is_german(user)
+                    german = is_german(user)
+                    counts["rows_german"] += german
                     for k, pat in PATTERNS.items():
+                        if k.startswith("de_") and not german:   # German categories: German rows only
+                            continue
                         m = pat.search(user)
                         if not m:
                             continue

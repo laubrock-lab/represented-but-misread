@@ -82,14 +82,16 @@ def lme(Y, J, X, groups) -> dict:
     ra = corr(Y, J)
     recon = G * Re * Rs + C * np.sqrt(1 - Re ** 2) * np.sqrt(1 - Rs ** 2)
     be, bs = me.coef_, ms.coef_
-    cv = np.zeros(len(Y))
+    cv, cvs = np.zeros(len(Y)), np.zeros(len(Y))
     for tr, te in GroupKFold(10).split(Xs, Y, groups):
         cv[te] = LinearRegression().fit(Xs[tr], Y[tr]).predict(Xs[te])
+        cvs[te] = LinearRegression().fit(Xs[tr], J[tr]).predict(Xs[te])
     prof_e = [corr(Y, Xs[:, k]) for k in range(Xs.shape[1])]
     prof_s = [corr(J, Xs[:, k]) for k in range(Xs.shape[1])]
     return dict(ra=ra, Re=Re, Rs=Rs, G=G, C=C, linear_part=G * Re * Rs, recon_error=ra - recon,
                 cos_w=float(be @ bs / np.linalg.norm(be) / np.linalg.norm(bs)),
-                sim_prof=corr(prof_e, prof_s), Re_cv=corr(Y, cv)), prof_e, prof_s
+                sim_prof=corr(prof_e, prof_s), Re_cv=corr(Y, cv),
+                Rs_cv=corr(J, cvs), G_cv=corr(cv, cvs)), prof_e, prof_s
 
 
 def main() -> None:

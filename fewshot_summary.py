@@ -13,6 +13,13 @@ the seed mean, the seed range, and the paired change on the same texts with a
 grouped-bootstrap CI (texts in the few-shot run only; demonstrations come from
 other sources, so every text is scored).
 
+Two estimates of the few-shot d′ (response to review, 16 Nov 2026): d_few = d′ of the dv
+averaged over the example sets (seeds), which pools four readouts and is inflated
+relative to a single prompt; d_few_seedmean = mean of the per-seed d′ (the primary,
+unbiased comparison with zero-shot), with its own paired change and CI (diff_sm).
+Interaction (base vs. post-trained gain, same texts): gain_base - gain_post in
+d_few_seedmean - d_zero, grouped bootstrap -> outputs/fewshot/fewshot_interaction.csv.
+
 Usage
 -----
     python fewshot_summary.py --corpora chat_tw25 textbook
@@ -60,7 +67,7 @@ def main() -> None:
     args = ap.parse_args()
     rng = np.random.default_rng(args.seed)
 
-    rows = []
+    rows, store = [], {}
     for corpus in args.corpora:
         fs = index(config.OUTPUT_DIR / "fewshot" / corpus)
         zs = index(config.OUTPUT_DIR / corpus)
@@ -86,16 +93,23 @@ def main() -> None:
             src = zero.loc[ids, "source_id"].to_numpy()
             idx = pd.Series(np.arange(len(ids))).groupby(src).indices
             keys = np.array(list(idx), dtype=object)
-            bs = []
+            seed_dv = [d.loc[ids, "dv"].to_numpy() for d in seeds.values()]
+            store[(corpus, preset, variant, fmt, int(k))] = (pd.Index(ids), y, src, dz, seed_dv)
+            bs, bs_sm = [], []
             for _ in range(args.n_boot):
                 i = np.concatenate([idx[kk] for kk in rng.choice(keys, len(keys))])
                 if y[i].min() != y[i].max():
-                    bs.append(sdt(y[i], dfs[i])["d_auc"] - sdt(y[i], dz[i])["d_auc"])
+                    z0 = sdt(y[i], dz[i])["d_auc"]
+                    bs.append(sdt(y[i], dfs[i])["d_auc"] - z0)
+                    bs_sm.append(np.mean([sdt(y[i], v[i])["d_auc"] for v in seed_dv]) - z0)
             rows.append(dict(corpus=corpus, preset=preset, variant=variant, fmt=fmt, k=int(k),
                              n_seeds=len(seeds), n=len(ids),
                              d_zero=s0["d_auc"], c_zero=s0["c0"], d_few=s1["d_auc"], c_few=s1["c0"],
                              d_seed_min=min(per_seed), d_seed_max=max(per_seed),
                              diff=s1["d_auc"] - s0["d_auc"], lo=np.quantile(bs, .025), hi=np.quantile(bs, .975),
+                             d_few_seedmean=float(np.mean(per_seed)),
+                             diff_sm=float(np.mean(per_seed)) - s0["d_auc"],
+                             lo_sm=np.quantile(bs_sm, .025), hi_sm=np.quantile(bs_sm, .975),
                              p_mass_zero=zero.loc[ids, "p_mass"].mean(),
                              p_mass_few=np.mean([d.loc[ids, "p_mass"].mean() for d in seeds.values()])))
     res = pd.DataFrame(rows)
@@ -105,6 +119,41 @@ def main() -> None:
     with pd.option_context("display.width", 220, "display.float_format", "{:+.2f}".format):
         print(res.to_string(index=False))
     print(f"-> {out}")
+
+    # base vs. post-trained gain (plain prompt), same texts
+    inter = []
+    for (corpus, preset, variant, fmt, k), (ids_b, y, src, dz_b, sv_b) in store.items():
+        if variant != "base":
+            continue
+        for post in ("instruct",):
+            key = (corpus, preset, post, "raw", k)
+            if key not in store:
+                continue
+            ids_p, _, _, dz_p, sv_p = store[key]
+            common = ids_b.intersection(ids_p)
+            ib, ip = ids_b.get_indexer(common), ids_p.get_indexer(common)
+            yy, ss = y[ib], src[ib]
+            def gain(dz, sv, i):
+                return np.mean([sdt(yy[i], v[i])["d_auc"] for v in sv]) - sdt(yy[i], dz[i])["d_auc"]
+            B = (dz_b[ib], [v[ib] for v in sv_b]); P = (dz_p[ip], [v[ip] for v in sv_p])
+            allidx = np.arange(len(common))
+            est = gain(*B, allidx) - gain(*P, allidx)
+            gidx = pd.Series(allidx).groupby(ss).indices
+            keys = np.array(list(gidx), dtype=object)
+            bs = []
+            for _ in range(args.n_boot):
+                i = np.concatenate([gidx[kk] for kk in rng.choice(keys, len(keys))])
+                if yy[i].min() != yy[i].max():
+                    bs.append(gain(*B, i) - gain(*P, i))
+            bs = np.array(bs)
+            inter.append(dict(corpus=corpus, preset=preset, k=k, gain_base=gain(*B, allidx),
+                              gain_post=gain(*P, allidx), diff=est, lo=np.quantile(bs, .025),
+                              hi=np.quantile(bs, .975),
+                              p=min(1.0, 2 * min((bs <= 0).mean(), (bs >= 0).mean()))))
+    inter = pd.DataFrame(inter)
+    inter.to_csv(config.OUTPUT_DIR / "fewshot" / "fewshot_interaction.csv", index=False)
+    with pd.option_context("display.width", 220, "display.float_format", "{:+.2f}".format):
+        print(inter.to_string(index=False))
 
 
 if __name__ == "__main__":
