@@ -81,10 +81,10 @@ def examples(condition: str, seed: int = 1) -> pd.DataFrame:
 def write_heldout() -> Path:
     d = load_items()
     d = d[d.split == "heldout"]
-    rows = [dict(text_id=f"{r.item_id}__human", source_id=r.item_id, is_ai=0, prompt_type="human", text=r.human_text)
-            for r in d.itertuples()] + \
-           [dict(text_id=f"{r.item_id}__ai", source_id=r.item_id, is_ai=1, prompt_type="ai", text=r.ai_text)
-            for r in d.itertuples()]
+    rows = [dict(text_id=f"{r.item_id}__human", source_id=r.item_id, generator="human_text", gen_model="",
+                 prompt_type="human", is_ai=0, text=r.human_text) for r in d.itertuples()] + \
+           [dict(text_id=f"{r.item_id}__ai", source_id=r.item_id, generator="gnad_generated", gen_model=r.generator,
+                 prompt_type="ai", is_ai=1, text=r.ai_text) for r in d.itertuples()]
     out = REPO / "data" / "texts_gnad_heldout.parquet"
     pd.DataFrame(rows).to_parquet(out)
     return out
