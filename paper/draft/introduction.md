@@ -142,7 +142,8 @@ do not use it, and that post-training leaves the representation intact while cha
 how the question the model is asked reads it out, at the question positions and from the
 early or middle layers on. The direction of this change depended on the judgment:
 Post-training impaired the readout of authorship, repaired the readout of negated
-statements, and made the readout of the reviews converge across models. In this respect,
+statements in base models that misread them, and made the readout of the reviews
+converge across most models. In this respect,
 our results support the superficial alignment hypothesis; at the same time, they show
 that the change is not superficial in the sense of affecting only the final stages of
 processing, and that it can make a judgment considerably better or worse.

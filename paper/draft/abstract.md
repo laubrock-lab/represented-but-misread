@@ -31,9 +31,9 @@ Combining layers of base and fine-tuned checkpoints (model stitching) and exchan
 their internal states at selected prompt positions (activation patching) located the
 change at the positions of the question rather than of the text, originating in early
 layers. The pattern generalized to two judgments with public data. For negated
-statements, base models represented truth perfectly but answered poorly, and
-post-training repaired the readout; for deceptive reviews, all models answered near
-chance despite accurate probes, and post-training made their readouts converge. Probes
+statements, several base models represented truth perfectly but answered poorly, and
+post-training repaired their readout; for deceptive reviews, all models answered near
+chance despite accurate probes, and post-training made most models' readouts converge. Probes
 transferred between base and post-trained checkpoints at the text positions but not at
 the answer position. Post-training thus leaves the representation intact and changes how
 the question reads it, in a direction that depends on whether the training data specify a

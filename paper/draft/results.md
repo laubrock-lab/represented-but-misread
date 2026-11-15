@@ -309,17 +309,21 @@ summarizes the results.
 > | (textbook summaries) | Apertus 1.5 8B | 3.73 | 3.73 | 0.43 | −0.04 | −0.04 |
 > | Truth | OLMo 2 7B | 2.15 | 2.05 | 1.79 | 1.77 | 1.84 |
 > | (diverse facts) | Apertus 1.5 8B | 1.95 | 2.09 | 1.41 | 1.64 | 1.68 |
+> | | OLMo 3 7B Think | 1.89 | 1.64 | 1.61 | 1.35 | 1.34 |
 > | | Gemma 3 4B | 1.82 | 1.93 | 0.81ᵃ | — | 1.46 |
 > | | Gemma 3 12B | 2.24 | 2.26 | 1.64ᵃ | — | 1.97 |
 > | | Qwen3 8B | 2.28 | 2.15 | 1.94 | — | 1.77 |
 > | Truth | OLMo 2 7B | 4.54 | 4.54 | 0.80 | 3.36 | 3.10 |
 > | (negated statements) | Apertus 1.5 8B | 4.54 | 4.54 | −0.88 | 4.54 | 4.54 |
+> | | OLMo 3 7B Think | 4.54 | 4.31 | 4.54 | 3.77 | 3.80 |
 > | | Gemma 3 4B | 4.54 | 4.34 | 0.06ᵃ | — | 3.46 |
 > | | Gemma 3 12B | 4.54 | 4.54 | 1.97ᵃ | — | 4.54 |
 > | | Qwen3 8B | 4.54 | 4.54 | 4.54 | — | 4.54 |
 > | Authenticity | OLMo 2 7B | 2.93 | 2.79 | 0.16 | 0.20 | 0.17 |
 > | (hotel reviews) | Apertus 1.5 8B | 2.62 | 2.49 | 0.14 | 0.32 | 0.23 |
+> | | OLMo 3 7B Think | 2.80 | 2.69 | 0.13 | −0.01 | 0.00 |
 > | | Gemma 3 4B | 2.82 | 2.51 | 0.45 | — | 0.08 |
+> | | Gemma 3 12B | 3.01 | 2.57 | 0.52 | — | 0.86 |
 > | | Qwen3 8B | 2.56 | 2.59 | 0.06 | — | 0.50 |
 >
 > ᵃ The Gemma 3 base models placed only 18–32% of their probability on the two answer
@@ -335,14 +339,19 @@ with the wrong sign (d′ = −0.88). Both base models answered "False" almost a
 d′ = 3.36; Apertus: 4.54), whereas the probes remained at ceiling. The Gemma 3 models
 showed the same pattern between their base and final versions (Gemma 3 4B: 0.06 → 3.46;
 Gemma 3 12B: 1.97 → 4.54), although their base models rarely answered with the two
-answer words, whereas the base model of Qwen3 already judged the negated statements
-perfectly. A probe trained on the
+answer words. The base models of Qwen3 and OLMo 3, in contrast, already judged the
+negated statements perfectly; post-training left this unchanged in Qwen3 and lowered it
+slightly in OLMo 3 (d′ = 3.80 after post-training, with a slightly lower probe, 4.31).
+Thus, post-training repaired the readout of negation where the base model read it
+wrongly, but did not improve it further where the base model read it correctly. A probe trained on the
 simple statements of the same checkpoint revealed what the base models' answers followed:
 Applied to the negated statements, it separated them with the wrong sign (OLMo 2:
 d′ = −1.28; Apertus: −1.43), i.e., the general truth direction of the base models
 encoded whether city and country belong together and ignored the negation. After SFT, the
 same probe separated the negated statements in the correct direction (+0.69; +3.05). For
-the statements on diverse facts, post-training changed the answers only slightly.
+the statements on diverse facts, post-training changed the answers only slightly, except
+in OLMo 3, where answers and probes declined together (answers 1.61 → 1.34; probes 1.89
+→ 1.64).
 
 Where does the repair arise? Model stitching located it in the middle of the network
 rather than in the early layers. In OLMo 2, the first 8 base layers combined with all
@@ -367,25 +376,27 @@ controls up to ±0.35), whereas the SFT model used it strongly (+3.10; controls 
 ±1.12). Supervised fine-tuning thus turned a reversed use (Apertus) or no use (OLMo 2)
 into a correct use, the mirror image of what it did for authorship.
 
-*Deceptive reviews.* All models judged the reviews close to chance (d′ = 0.06–0.50),
-although probes separated truthful from deceptive reviews well (d′ = 2.5–2.9), at least
-as well as a classifier on word frequencies (d′ = 2.44). Post-training changed the probes
-little (Δd~z~ between −0.31 and +0.06), but it changed the answers in a direction that
-depended on the model: Gemma 3 4B lost sensitivity (Δd~z~ = −0.40), Qwen3 gained
-(+0.42), and OLMo 2 and Apertus gained slightly (+0.08 to +0.18). After post-training,
+*Deceptive reviews.* All models judged the reviews close to chance (d′ between 0.00 and
+0.86), although probes separated truthful from deceptive reviews well (d′ = 2.5–3.0), at
+least as well as a classifier on word frequencies (d′ = 2.44). Post-training changed the
+probes little, but it changed the answers in a direction that depended on the model:
+Gemma 3 4B lost sensitivity (Δd~z~ = −0.40) and OLMo 3 lost slightly (d′ 0.13 → 0.00),
+whereas Qwen3 (+0.42) and Gemma 3 12B (+0.18) gained, and OLMo 2 and Apertus gained
+slightly (+0.08 to +0.18). After post-training,
 all models showed a strong bias toward "Truthful" (83–92% of the answers of the final
 models). The judgments
-of different models also became more similar: The mean correlation between the
-item-level judgments of the four models rose from .32 (range .19–.46) for the base
-models to .53 (.50–.59) for the final models with the plain prompt and .59 (.50–.65)
-with their chat templates. The direction of the change thus depended on where the base
-model started: Post-training replaced the base models' individual ways of reading the
-reviews by a shared one.
+of different models also became more similar, with one exception: For the five models
+post-trained mainly for conversation, the mean correlation between their item-level
+judgments rose from .36 (range .19–.47) for the base models to .52 (.45–.59) for the
+final models; OLMo 3 Think, which was post-trained mainly for explicit reasoning, did not
+join this convergence (.18–.33 with the other final models). The direction of the change
+thus depended on where the base model started: Post-training replaced the base models'
+individual ways of reading the reviews by a largely shared one.
 
 A lens-model decomposition made this explicit. Fifteen interpretable cues predicted the
 ground truth moderately well (R~e~ = .56; cross-validated .55). Read out by probes, the
 internal representation weighted these cues almost exactly as the environment did, in
-all 13 checkpoints (matching index G = .97–.99) and unchanged by post-training. The
+all 13 checkpoints of the four models analyzed (OLMo 2, Apertus, Gemma 3 4B, Qwen3) (matching index G = .97–.99) and unchanged by post-training. The
 answers, in contrast, were poorly matched to the environment (G = .15–.83), and it was
 this matching that post-training changed: from .83 to .26 in Gemma 3 4B, and from .17 to
 .53 in Qwen3. After post-training, all models treated long, detailed reviews as truthful,
@@ -422,8 +433,8 @@ statements with explicit reasoning, often including negations, in Apertus. In co
 neither mixture contained a single request to judge whether a text had been written by a
 human or by an AI, and the matches for fake or deceptive reviews were sentiment tasks or
 summaries of research papers. Thus, post-training improved the one judgment for which the
-training data specify how to read the question, and impaired or merely reshaped the
-judgments for which they do not.
+training data specify how to read the question, where the base model read it wrongly,
+and impaired or merely reshaped the judgments for which they do not.
 
 In summary, the pattern found for authorship generalized: In all three judgments, the
 information was represented, the answers used it poorly before or after post-training,

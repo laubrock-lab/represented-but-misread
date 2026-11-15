@@ -232,10 +232,9 @@ models answered with "Truthful" or "Deceptive"; the system prompt in the chat fo
 "You evaluate hotel reviews." The hotel formed the unit of resampling and
 cross-validation.
 
-For both judgments, we used the two model lines with checkpoints after every stage of
-post-training (OLMo 2 and Apertus 1.5); for the truth judgments, we added Gemma 3 4B,
-Gemma 3 12B and Qwen3 8B, and for the reviews Gemma 3 4B and Qwen3 8B (base and final
-model in each case). Probes were logistic regressions (L2 penalty, C = 0.01) on the
+For both judgments, we used the same six base models as for authorship, with all
+post-training stages for OLMo 2, Apertus 1.5 and OLMo 3 Think, and the base and final
+models for Gemma 3 4B, Gemma 3 12B and Qwen3 8B. Probes were logistic regressions (L2 penalty, C = 0.01) on the
 activations at the last prompt position at two thirds of the network depth, evaluated
 out of fold. For the negated statements, we additionally applied a probe trained on the
 simple geographic statements of the same checkpoint (transfer probe), which tests whether
@@ -245,10 +244,11 @@ judgments, but only where there was a change to locate: in models whose answers 
 substantially with post-training and whose base models placed at least 30% of their
 probability on the two answer words, the criterion used for authorship (Table 1). For the
 negated statements, these were OLMo 2 and Apertus (base vs. SFT, 300 pairs); the Gemma 3
-base models fell below this criterion (18% and 25%), and the Qwen3 base model already
+base models fell below this criterion (18% and 25%), and the base models of Qwen3 and OLMo 3 already
 judged the negated statements perfectly. For the reviews, these were Gemma 3 4B, which
 lost sensitivity, and Qwen3 8B, which gained (base vs. final model; 800 pairs for
-stitching, 400 for patching); in OLMo 2 and Apertus, the changes were too small. For the
+stitching, 400 for patching); OLMo 2, Apertus and OLMo 3 changed little, and Gemma
+3 12B, added later for consistency, was not localized. For the
 statements on diverse facts, post-training changed the answers too little in any model.
 
 *Probe transfer between checkpoints.* To test whether post-training changes the geometry

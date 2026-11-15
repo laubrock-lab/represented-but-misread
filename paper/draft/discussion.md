@@ -81,7 +81,8 @@ does not exchange states between checkpoints, is the stronger argument.
 ## The direction of the change depends on the training signal
 
 Post-training impaired the readout of authorship, repaired the readout of negated
-statements, and made the readout of the reviews converge across models. A common
+statements in the base models that misread them, and made the readout of the reviews
+converge across most models. A common
 account of these outcomes follows from the second lens in Figure 1. Post-training does
 not add information to the representation; it installs a way of reading the
 representation out. Whether this improves or impairs a judgment then depends on whether
@@ -99,7 +100,14 @@ are valid only to the extent that the training data contain valid examples.
 This account explains why the sign of the change differed between judgments, and, for
 the reviews, between models: Because post-training made the models' judgments converge,
 the change was negative for a model whose base version had read the reviews comparatively
-well (Gemma 3 4B) and positive for a model whose base version had not (Qwen3). It also
+well (Gemma 3 4B) and positive for a model whose base version had not (Qwen3). Two
+observations qualify this account. First, the base models of Qwen3 and OLMo 3 already
+read negated statements correctly, presumably because their pretraining data already
+contained instruction-like material; for them, post-training had nothing to repair and
+left the readout intact or lowered it slightly. Second, OLMo 3 Think, post-trained mainly
+for explicit reasoning, did not join the convergence of the other models on the reviews;
+a training signal aimed at reasoning traces may install a different way of reading the
+question than one aimed at conversation. It also
 qualifies the superficial alignment hypothesis in a second respect. A change that leaves
 the representation intact is superficial with respect to what the model knows, but not
 with respect to its consequences, which can make a judgment considerably better or worse.
