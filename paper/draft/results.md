@@ -217,10 +217,11 @@ random halves of the texts within each class. The controls took either steps of 
 length as the authorship direction (norm-matched) or steps of two standard deviations along
 their own direction (scale-matched), which kept them within the range of the texts as
 often as the authorship direction (49–69%). As a positive control, we shifted along the
-direction that the model's own answers follow (the decision direction). In 22 of 25 cells
+direction that the model's own answers follow (the decision direction). In 21 of 25 cells
 (model × corpus × layer, including the truth and review judgments in Section 3.6), the
 decision direction moved the answer more than the norm-matched controls (rank-based
-p ≤ .05), so that the test can detect a direction that the answer reads.
+p ≤ .05; 22 of 25 against the scale-matched controls), so that the test can detect a
+direction that the answer reads.
 
 In six of the authorship cells, the authorship direction moved the answer more than the
 controls, and in all six it moved it the wrong way: Shifting a text toward "AI" made the
