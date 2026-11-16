@@ -60,7 +60,7 @@ one small dot per model, large dot = median. The dashed line marks the maximum
 d′ that can be estimated with the given number of texts.
 
 **Figure 4 (`fig2_answers_and_fewshot`).** Post-training mostly lowers the sensitivity
-of the answers; labelled examples help almost all models. (A) Sensitivity of the base
+of the answers; with 16 labelled examples, most models improve. (A) Sensitivity of the base
 model (blue) and of the final post-trained model with the identical raw prompt (filled
 orange) and with its chat template (open orange), per model and corpus.
 Asterisks mark differences between the base and the final model on the identical raw
@@ -68,12 +68,14 @@ prompt that survive Holm correction within the family of 18 final-vs-base compar
 all of them are decreases. The increases of OLMo 2 on the short chats and of OLMo 3
 Think on the textbook summaries are significant only without correction or under
 false-discovery-rate control (the latter in a condition with low answer probability,
-≈ .30). Random-effects summary across all 18 comparisons: Δd′ = −0.33 [−0.50, −0.17]. (B) Sensitivity as a function of the number of
+≈ .30). Multilevel random-effects summary across all 18 comparisons: Δd′ = −0.33
+[−0.53, −0.13]. (B) Sensitivity as a function of the number of
 labelled examples placed before each text (raw prompt; base vs. final post-trained
-model). Vertical lines show the range across four example sets. Whether base models
-profit more than post-trained models (difference of gains, 0 vs. 16 examples) is tested
-in the supplement: significantly so in three of five comparisons, reversed for Qwen3 on
-the textbook summaries. On the textbook summaries, only 0, 8, and 16 examples were
+model). Points show the mean of d′ computed separately for each of four example sets;
+vertical lines show their range. Whether base models profit more than post-trained
+models (difference of gains, 0 vs. 16 examples) is tested in the supplement: the base
+model gained more in four of five comparisons, reliably only for OLMo 2 on the chats; for
+Qwen3 on the textbook summaries, the post-trained model gained more. On the textbook summaries, only 0, 8, and 16 examples were
 tested; for OLMo 2 only 0 and 8, because 16 textbook summaries exceed its context window
 of 4,096 tokens.
 

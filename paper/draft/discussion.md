@@ -295,8 +295,9 @@ supplement, and we did not test English prompts.
 from different developers also differ in their post-training recipes, including distillation from larger
 models, the emphasis on reasoning, and the share of human preference data, and our
 design cannot separate these factors; they are a plausible source of the heterogeneity
-between models and text types. The few-shot results were mixed, and they neither rule
-out nor confirm that a correctable belief contributes to the failure. Finally, we defined
+between models and text types. Labeled examples improved the judgments of base and post-trained models alike without
+closing the gap between them; they show that a correctable belief contributes to the
+failure, but not how much of it. Finally, we defined
 the family of hypothesis tests for the post-training contrasts after inspecting the full
 set of comparisons; we therefore report the result under a stricter correction across
 all contrasts as well, which left five of six decreases significant.

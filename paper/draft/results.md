@@ -163,18 +163,16 @@ was already complete after imitation learning.
 Could the post-trained models simply hold a wrong belief about what AI texts look like,
 a belief that a few correctly labeled examples would correct? We tested this by placing
 2, 8, or 16 labeled examples from other sources before each text (four different sets of
-examples; d′ computed per set and averaged). With 16 examples, d′ rose in 9 of 11 model
-conditions, reliably in 8; two examples hardly helped. On the short chats, d′ rose from
-−0.21 to +0.48 for the base model of Gemma 3 4B, from −0.68 to +0.15 for Qwen3, and from
-−0.07 to +0.49 for OLMo 2, whereas the post-trained models of Gemma 3 4B and Qwen3
-remained below chance (−0.72 to −0.27 and −0.80 to −0.17, raw prompt). Whether base models
-gained more from the examples than their post-trained versions was mixed: In four of
-five comparisons the base model gained more, but reliably so only for OLMo 2 on the short
-chats (difference in gain +0.54 [0.27, 0.83]), and for Qwen3 on the textbook summaries the
-post-trained model gained more (−0.31 [−0.55, −0.09]). A mistaken belief about what
+examples; d′ computed per set and averaged; Figure 4B). With 16 examples, d′ rose in 9 of
+11 model conditions, reliably in 8, whereas two examples hardly helped. Base and
+post-trained models gained by similar amounts, so that the gap between them persisted:
+After 16 examples, the post-trained model was still less sensitive than its base model in
+all five comparisons (e.g., Gemma 3 4B on the short chats: +0.48 vs. −0.27; Qwen3: +0.15
+vs. −0.17), and the post-trained models of Gemma 3 4B and Qwen3 remained below chance on
+the chats (supplementary analysis of the gains). A mistaken belief about what
 distinguishes AI from human texts, which examples can partly correct, is therefore likely
-to be part of the explanation, but it does not account for the persisting deficit of the
-post-trained models.
+to be part of the explanation, but it does not account for the deficit that post-training
+introduced.
 
 Which properties of the texts did the answers follow? For the short chats, we described
 each message by 34 text properties (e.g., word and sentence length, lexical diversity,

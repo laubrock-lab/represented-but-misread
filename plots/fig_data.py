@@ -122,7 +122,7 @@ def fewshot() -> pd.DataFrame:
                          lo=np.nan, hi=np.nan))
         for _, r in g.iterrows():
             rows.append(dict(corpus=CORPORA[corpus], family=FAMILIES[preset],
-                             stage="Base" if variant == "base" else "Post-trained", k=int(r.k), d=r.d_few,
+                             stage="Base" if variant == "base" else "Post-trained", k=int(r.k), d=r.d_few_seedmean,
                              lo=r.d_seed_min, hi=r.d_seed_max))
     return pd.DataFrame(rows).sort_values(["corpus", "family", "stage", "k"])
 
