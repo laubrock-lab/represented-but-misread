@@ -220,8 +220,9 @@ often as the authorship direction (49–69%). As a positive control, we shifted 
 direction that the model's own answers follow (the decision direction). In 21 of 25 cells
 (model × corpus × layer, including the truth and review judgments in Section 3.6), the
 decision direction moved the answer more than the norm-matched controls (rank-based
-p ≤ .05; 22 of 25 against the scale-matched controls), so that the test can detect a
-direction that the answer reads.
+p ≤ .05), so that the test can detect a direction that the answer reads; against the
+scale-matched controls, this was the case in 16 of 25 cells. Where the positive control
+failed, a null result for the authorship direction is not informative.
 
 In six of the authorship cells, the authorship direction moved the answer more than the
 controls, and in all six it moved it the wrong way: Shifting a text toward "AI" made the
@@ -234,8 +235,10 @@ p ≤ .04). In these cells, the authorship direction pointed against the decisio
 remaining cells, the authorship direction did not move the answer more than arbitrary
 directions: Gemma 3 4B on the newspaper segments (−1.04 and −2.00 at layers 22 and 28;
 p = .26–.42), Apertus and OLMo 3 on the textbook summaries before and after SFT, and Gemma
-3 12B on the newspaper segments, on which its answers were at chance (+0.03; in this cell,
-the positive control did not exceed the controls either). The answer thus read the
+3 12B on the newspaper segments, on which its answers were at chance (+0.03). In some of
+these cells, the positive control did not exceed the scale-matched controls either (Gemma 3
+12B on the newspaper segments, Gemma 3 4B at layer 28, Apertus at layers 21 and 27 and
+OLMo 3 after SFT; Table D1), so that their null results are weaker evidence. The answer thus read the
 represented authorship direction, with the wrong sign, only in some models and corpora; in
 the others, it followed other directions.
 
@@ -462,7 +465,8 @@ false negated statements (±2 SD, layer 21; Section 3.3) moved the answers of bo
 models toward the correct answer, more than the control directions (Apertus: +0.36 nats,
 p = .02; OLMo 2: +1.07, p ≤ .04), and in these models the truth direction coincided with
 the decision direction (cosine ≈ 1.0). In the base models, it did not (Apertus: −0.14,
-p = .13–.33; OLMo 2: +0.09, p ≥ .54). Supervised fine-tuning thus aligned the answer with
+p = .13–.33; OLMo 2: +0.09, p ≥ .54), although in both base models the positive control,
+too, exceeded only the norm-matched controls. Supervised fine-tuning thus aligned the answer with
 the represented truth direction; whether the Apertus base model used this direction with
 the wrong sign, as its negative sensitivity would suggest, could not be established.
 
