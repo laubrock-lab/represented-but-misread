@@ -10,9 +10,10 @@ answers did not use it, and often ordered the texts inversely. Post-training low
 the sensitivity of the answers on average (Δd′ = −0.33), with considerable variation
 between models and text types, and in the two models with stage-wise
 checkpoints the change occurred during supervised fine-tuning. Three causal methods
-bore on where this change takes effect. Steering showed that, in several post-trained
-models, the direction that separates AI from human texts pushed the answer the wrong
-way. Model stitching implicated the weights of the early layers, with the caveat that
+bore on where this change takes effect. Steering showed that, in two post-trained model
+families (Gemma 3 and Qwen3), the direction that separates AI from human texts pushed the
+answer the wrong way, more than arbitrary directions did; in the other models, the answer
+did not read this direction specifically. Model stitching implicated the weights of the early layers, with the caveat that
 stitched hybrids produce effects of their own. Activation patching showed that, by the
 middle of the network, the change does not reside in the representation of the text but
 in the processing at the positions of the question that follow the text. The
@@ -35,8 +36,8 @@ decision threshold, which has been proposed as the main source of probe–answer
 can lower accuracy but cannot produce sensitivity below chance. Reversed readouts of a
 discriminative direction have been described for steering vectors (Torop et al., 2026);
 here, the inverse ordering occurred in the graded preferences behind the models'
-unmodified answers, and steering showed in several models that the represented direction
-pushed the answer the wrong way. Note, however, that the cues themselves were specific
+unmodified answers, and steering showed in two model families that the represented
+direction pushed the answer the wrong way. Note, however, that the cues themselves were specific
 to the corpus: A probe trained on the newspaper segments separated the chats with the
 wrong sign (Section 3.1). A judgment below chance therefore need not reflect an inverted
 reading of a single authorship representation; it can also reflect a fixed policy whose
@@ -278,9 +279,12 @@ simple n-gram classifiers, so our results concern the readout of ordinary cues r
 than of any deep representation of authorship. The stitching and patching analyses were
 restricted to two models per judgment, to one corpus for authorship, and to the plain
 prompt format, because base models cannot be queried with a chat template. The two
-further judgments were studied with four to five models, steering for them with two
+further judgments were studied with four to six models, steering for them with two
 models each and on 300 items, and the effects of post-training on the reviews were
-small; for Gemma 3 4B, steering did not reveal the source of the loss. The training
+small; steering did not explain them. Steering itself is limited in two ways: It tests
+whether a direction is read more than arbitrary directions, which a partly aligned
+direction can fail even if it contributes to the answer, and it did not reveal the change
+during SFT for authorship, which rests on stitching and patching. The training
 study used one base model, low-rank adapters, and training texts from other generators
 and of another genre than the test corpora, and its background condition did not
 reproduce the effect of the original fine-tuning; the stereotype labels were moreover

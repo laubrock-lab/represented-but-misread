@@ -25,9 +25,9 @@ open-weight base models and their post-trained versions and three corpora of Ger
 texts, linear probes and simple word-frequency classifiers separated AI from human texts
 well, but the models' answers, analyzed with signal detection theory, used this
 information poorly and often ordered the texts inversely. Post-training lowered their
-sensitivity on average (Δd′ = −0.33), mostly during supervised fine-tuning, and in
-several models steering showed that the represented authorship direction pushed the
-answer the wrong way. Combining layers of base and fine-tuned checkpoints (model
+sensitivity on average (Δd′ = −0.33), mostly during supervised fine-tuning, and in two model
+families steering showed that the represented authorship direction pushed the answer the
+wrong way. Combining layers of base and fine-tuned checkpoints (model
 stitching) implicated the early layers, and exchanging internal states at selected
 prompt positions (activation patching) located the change at the positions of the
 question rather than of the text. The pattern generalized to two judgments with public

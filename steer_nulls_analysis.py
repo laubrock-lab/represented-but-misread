@@ -86,26 +86,36 @@ def analyze(path: str, rng) -> dict:
     # class direction: cross-fitted exactly as in steer_logits (seed 1)
     cls = crossfit_directions(X, y, groups, 7, "class", 1, unit="sd")
     row["class_dist_sd"] = float(np.mean([cls[i]["dist"] / cls[i]["sd"] for i in sel]))
+    # class directions differ per fold: group texts by their (fold-specific) direction
+    folds = {}
+    for i in sel:
+        folds.setdefault(id(cls[i]), []).append(i)
+    proj = []
+    for idx in folds.values():
+        u = cls[idx[0]]["u"].numpy().astype(np.float64)
+        pr = X @ u
+        lo, hi = np.quantile(pr, [.01, .99])
+        proj.append((pr[idx], lo, hi, cls[idx[0]]["sd"]))
     for a in STEPS:
-        ok = []
-        for i in sel:
-            u = cls[i]["u"].numpy().astype(np.float64)
-            pr = X @ u
-            ok.extend(in_range(pr, pr[i], a * cls[i]["sd"]))
-        row[f"class_inrange_{a:g}"] = float(np.mean(ok))
+        ok = np.concatenate([np.r_[(lo <= v + a * sd) & (v + a * sd <= hi), (lo <= v - a * sd) & (v - a * sd <= hi)]
+                             for v, lo, hi, sd in proj])
+        row[f"class_inrange_{a:g}"] = float(ok.mean())
     # control directions at +-2 SD: norm-matched (step = class SD of the text's fold, as in
     # steer_logits) and scale-matched (step = within-class SD along the control itself)
+    sd_cls = np.array([cls[i]["sd"] for i in sel])
+    def share(v, lo, hi, step):
+        return np.r_[(lo <= v + step) & (v + step <= hi), (lo <= v - step) & (v - step <= hi)]
     for c in CTRL:
         ok, ok_own = [], []
         for r in range(50):
             u, _, _ = fixed_control(X, y, c, np.random.default_rng(1 + 1000 * r))
             pr = X @ u
-            so = own_sd(X, y, u)
-            for i in sel:
-                ok.extend(in_range(pr, pr[i], 2 * cls[i]["sd"]))
-                ok_own.extend(in_range(pr, pr[i], 2 * so))
-        row[f"{c}_inrange_2"] = float(np.mean(ok))
-        row[f"{c}_own_inrange_2"] = float(np.mean(ok_own))
+            lo, hi = np.quantile(pr, [.01, .99])
+            v = pr[sel]
+            ok.append(share(v, lo, hi, 2 * sd_cls))
+            ok_own.append(share(v, lo, hi, 2 * own_sd(X, y, u)))
+        row[f"{c}_inrange_2"] = float(np.concatenate(ok).mean())
+        row[f"{c}_own_inrange_2"] = float(np.concatenate(ok_own).mean())
 
     # null test at 2 SD and dose curve
     E = {}
@@ -127,6 +137,9 @@ def analyze(path: str, rng) -> dict:
         row[f"{c}_null_absmax"] = float(np.abs(null).max())
         row[f"{c}_p"] = float((1 + np.sum(np.abs(null) >= abs(e_cls))) / (1 + len(null)))
         row[f"{c}_z"] = float((e_cls - null.mean()) / null.std(ddof=1))
+        if ("decision", 2.0) in avg.columns:     # positive control: is the decision direction special?
+            e_dec = row["decision_E2"]
+            row[f"{c}_p_decision"] = float((1 + np.sum(np.abs(null) >= abs(e_dec))) / (1 + len(null)))
 
     # scale-matched null (separate run, suffix _ownsd), same class effect
     fo = p.parent / f"steer_{stem}_L{layer}_sd_ctrl-pcrandom-split_fixed{smoke}_ownsd.csv"
@@ -141,6 +154,8 @@ def analyze(path: str, rng) -> dict:
             row[f"own_{c}_null_absmax"] = float(np.abs(null).max())
             row[f"own_{c}_p"] = float((1 + np.sum(np.abs(null) >= abs(e_cls))) / (1 + len(null)))
             row[f"own_{c}_z"] = float((e_cls - null.mean()) / null.std(ddof=1))
+            if "decision_E2" in row:
+                row[f"own_{c}_p_decision"] = float((1 + np.sum(np.abs(null) >= abs(row["decision_E2"]))) / (1 + len(null)))
 
     # natural scale
     dv0 = avg[("class", 0.0)]

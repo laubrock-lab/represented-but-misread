@@ -9,4 +9,4 @@
 # In-range check, null test and natural-scale comparison for all finished _fixed_nulls runs.
 source slurm/cluster_env.sh
 export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
-python -W ignore steer_nulls_analysis.py
+python -u -W ignore steer_nulls_analysis.py

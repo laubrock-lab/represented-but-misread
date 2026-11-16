@@ -168,25 +168,28 @@ the last label alternated between example sets.
 
 We used three causal interventions, which are illustrated in Figure 2.
 
-*Steering.* To test whether the authorship information causally influences the answer,
-we added a vector to the residual stream at the last prompt position after a given
-layer and measured the change in the answer score dv (Section 2.3). The authorship direction was the difference
-between the mean activations of AI and human texts, estimated for each text from other
-source groups (7-fold cross-fitting). Steps were expressed in units of the within-class
-standard deviation along this direction (±3 and ±6 SD). The directional effect of a
-direction was half the difference between the changes in dv for positive and negative
-steps. As null controls, we used random directions within the subspace spanned by the
-20 leading principal components of the within-class activations and mean differences
-between random halves of the texts within each class; earlier runs used isotropic random
-directions. Each control direction was drawn once and applied to all texts, 50 per
-family, with steps of ±2 SD; for the authorship and decision directions we recorded a
-dose-response curve (±1, 2, 4, and 6 SD). To make this number of directions feasible,
-the prompt up to the last position was processed once per text and its cached
-activations were reused for all steering settings, which reproduced the scores of the
-uncached computation (r = .999).
-As a positive control, we used the direction along which the model's own
-answers vary (the decision direction), and we also steered with the authorship
-direction after removing its component along the decision direction.
+*Steering.* To test whether the represented information causally influences the answer,
+we added a vector to the residual stream at the last prompt position after a given layer
+and measured the change in the answer score dv (Section 2.3). The authorship (or truth)
+direction was the difference between the mean activations of the two classes, estimated
+for each text from other source groups (7-fold cross-fitting). Steps were expressed in
+units of the within-class standard deviation along this direction; the primary test used
+±2 SD, and we recorded a dose-response curve (±1, 2, 4, and 6 SD). The directional effect
+of a direction was half the difference between the changes in dv for positive and
+negative steps. As null controls, we used 50 random directions within the subspace spanned
+by the 20 leading principal components of the within-class activations and 50 mean
+differences between random halves of the texts within each class, each drawn once and
+applied to all texts. Controls took steps of the same length as the authorship direction
+(norm-matched) or, in a second run, of ±2 SD along their own direction (scale-matched).
+The p-value of a direction was its rank among the absolute control effects (two-sided;
+minimum 1/101). As a positive control, we used the direction along which the model's own
+answers vary (the decision direction). We also report, per cell, the share of shifted
+texts whose projection stayed within the 1st–99th percentile of the observed texts, and
+the effect of a shift by one class-mean distance, extrapolated from the ±1 SD step. To make
+this number of directions feasible, the prompt up to the last position was processed once
+per text and its cached activations were reused for all steering settings, which
+reproduced the scores of the uncached computation (r = .999). Steering was run for 25
+cells (model × corpus × layer; Table S3).
 
 *Model stitching.* Model stitching combines parts of different networks (Lenc &
 Vedaldi, 2015; Bansal et al., 2021). For the models with stage-wise checkpoints, we combined the

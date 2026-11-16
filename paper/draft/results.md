@@ -203,59 +203,63 @@ revised according to the students' feedback was judged like the revised messages
 > format): probe sensitivity, base-model answer, and post-trained answer; few-shot
 > curves as an inset.
 
-## 3.3 Steering: the authorship direction can drive the answer in the wrong direction
-
+## 3.3 Steering: in some models, the represented direction drives the answer the wrong way
 
 The probes and the answers could dissociate either because the answers ignore the
 authorship information or because they use it with the wrong sign. To distinguish these
 possibilities causally, we shifted a model's internal state at the position where the
-answer is produced along the direction that separates AI from human texts, and measured
-how the answer changed. The direction was estimated on held-out groups, the shift
-amounted to six within-class standard deviations, and we compared it with two kinds of
-control directions: random directions drawn from the same high-variance subspace as the
-authorship direction, and differences between random halves of the texts within each
-class. As a positive control, we also shifted along the direction that the model's own
-answers follow (the decision direction; Section 2.7). Note that a shift of six standard
-deviations moves the internal state far beyond the range of the observed texts; the
-effects below therefore show which way the answer pathway reads a direction, not how
-large its influence is under natural variation.
+answer is produced along the direction that separates AI from human texts (estimated on
+held-out groups; Section 2.7), and measured how the answer changed. The primary test used
+shifts of ±2 within-class standard deviations, which kept 48–77% of the shifted texts
+within the range of the observed texts (±1 SD: 60–94%). We compared the effect with 100
+control directions per cell, each drawn once and applied to all texts: 50 random
+directions within the high-variance subspace of the activations and 50 differences between
+random halves of the texts within each class. The controls took either steps of the same
+length as the authorship direction (norm-matched) or steps of two standard deviations along
+their own direction (scale-matched), which kept them within the range of the texts as
+often as the authorship direction (49–69%). As a positive control, we shifted along the
+direction that the model's own answers follow (the decision direction). In 22 of 25 cells
+(model × corpus × layer, including the truth and review judgments in Section 3.6), the
+decision direction moved the answer more than the norm-matched controls (rank-based
+p ≤ .05), so that the test can detect a direction that the answer reads.
 
-In Gemma 3 4B after post-training, shifting a text toward "AI" made the model answer
-"human" more often from the middle of the network onward. On the newspaper segments, the
-shift changed the answer by −3.26 nats at layer 22 and by −6.09 nats at layer 28,
-compared with random directions from the high-variance subspace of −0.57 ± 1.14 and
-+1.22 ± 1.12 (mean ± SD); the split-half control directions varied more widely (layer
-22: −1.21 to +1.72; layer 28: −1.95 to +3.63). On the short chats, the effect was −5.48
-nats at layer 17 (controls −0.49 to +0.77). The positive control, i.e., the decision
-direction, behaved as expected, moving the answer toward "AI" (+11.46 and +7.98 nats at
-the same layers). At the earliest layer tested (layer 11), the authorship effect could
-not be distinguished from the controls. Gemma 3 12B showed the same reversal on the short
-chats (layer 31: −17.36 nats; random directions −0.63 ± 1.31; positive control +14.48),
-but not on the newspaper segments, on which its answers were at chance (layer 31: +0.04
-nats; random directions within ±0.71; positive control +4.39). Qwen3 showed the reversal
-on both corpora (newspaper segments, layers 24 and 30: −1.27 and −2.59 nats; short chats:
-−3.40 and −5.88 nats), with random directions within ±0.33 nats and positive controls of
-+2.02 to +6.50 nats; for Qwen3, only isotropic random directions were used as controls.
-With two to five control directions per family, these comparisons are coarse.
-The reversal was partly carried by the part of the authorship direction that points
-against the model's decision direction. After this part had been removed, the remaining
-authorship component moved the answer in the correct direction on the newspaper segments
-at layers 22 and 28 (+4.16 and +4.63 nats), but the reversal persisted at layer 17
-(−3.79) and on the short chats at layers 22 and 28 (−0.56 and −6.94).
+In six of the authorship cells, the authorship direction moved the answer more than the
+controls, and in all six it moved it the wrong way: Shifting a text toward "AI" made the
+model answer "human" more often. This was the case for the short chats in Gemma 3 12B
+(layer 31: −7.38 nats; rank-based p = .01 against both control families), Gemma 3 4B
+(layer 17: −1.74; p = .04 norm-matched, .06 scale-matched), and Qwen3 (layers 24 and 30:
+−1.18 and −2.06; p ≤ .03), and for the newspaper segments in Qwen3 (−0.43 and −0.85;
+p ≤ .04). In these cells, the authorship direction pointed against the decision direction
+(cosine −0.59 to −0.92), and the answers were clearly below chance (Table 2). In the
+remaining cells, the authorship direction did not move the answer more than arbitrary
+directions: Gemma 3 4B on the newspaper segments (−1.04 and −2.00 at layers 22 and 28;
+p = .26–.42), Apertus and OLMo 3 on the textbook summaries before and after SFT, and Gemma
+3 12B on the newspaper segments, on which its answers were at chance (+0.03; in this cell,
+the positive control did not exceed the controls either). The answer thus read the
+represented authorship direction, with the wrong sign, only in some models and corpora; in
+the others, it followed other directions.
 
-Steering also revealed what post-training changes. In the Apertus base model, shifting
-toward "AI" moved the answer in the correct direction, increasingly so with depth
-(+0.22, +0.63, and +1.07 nats at layers 16, 21, and 27). At layers 21 and 27 this
-exceeded all control directions (at most ±0.44 and ±0.57 nats), at layer 16 it did not
-(controls up to ±0.23). After SFT, this effect had vanished
-(−0.08 and −0.12 nats at layers 21 and 27, within the range of the controls), whereas
-the positive control continued to work in both models (base: +1.03 to +2.06; SFT: +0.94
-to +1.11). In OLMo 3 Think, the base model did not use the authorship direction at layer
-21 (−0.04), whereas the model after SFT used it in the wrong direction (−0.27; isotropic
-random directions +0.03 ± 0.09). Note that this pair differs in prompt format as well:
-the base model received the plain prompt and the SFT model its chat template.
-Thus, supervised fine-tuning turned a correct use of the authorship information into no
-use in Apertus, and possibly into a reversed use in OLMo 3.
+A complementary, descriptive comparison concerns the size of the effects. Shifting a
+text by one class-mean distance along the authorship direction, i.e., from the average
+human text to the average AI text, changed the answer in the same direction as the
+observed difference between AI and human texts in all 20 cells in which this difference
+was clearly different from zero (e.g., Qwen3 on the newspaper segments: −0.50 and −0.66
+nats vs. an observed difference of −0.59). If the answer depends approximately linearly on
+the internal state, this agreement is expected; it shows that the difference between the
+answers to AI and human texts is carried by the state at the last prompt position, in
+line with the patching results below (Section 3.5).
+
+Steering did not, however, reveal what post-training changes for authorship. In the
+Apertus base model, shifting toward "AI" moved the answer in the correct direction,
+increasingly so with depth (+0.08, +0.21, and +0.35 nats at layers 16, 21, and 27), but
+not more than the control directions (p ≥ .15), and after SFT the effect was close to zero
+(−0.04 to +0.04). In OLMo 3 Think, neither the base nor the SFT model used the direction
+(−0.01 and +0.09).[^olmo3] The change of the answers during SFT is therefore localized by
+the stitching and patching analyses (Sections 3.4 and 3.5), not by steering.
+
+[^olmo3]: An earlier comparison, in which the SFT model received its chat template and the
+base model the plain prompt, had suggested a reversed use after SFT (−0.27); with the same
+plain prompt for both checkpoints, this was not the case.
 
 ## 3.4 Model stitching implicates the early layers
 
@@ -427,17 +431,15 @@ full effect in one direction (base model with the SFT model's final state: 4.15)
 Exchanging the states of the statement itself had no effect in Apertus and in the SFT
 model of OLMo 2, but a partial one in the OLMo 2 base model (0.63 → 1.51).
 
-Steering confirmed that post-training changed how the answer uses the represented truth
-direction, in the direction opposite to authorship. Shifting the internal state at the
-answer position along the direction that separates true from false negated statements
-(six standard deviations, layer 21; Section 2.7) moved the answer of the Apertus base
-model toward "False" (−0.40 nats; control directions at most ±0.22), i.e., the base model
-used the direction with the wrong sign, which explains its sensitivity below chance.
-After SFT, the same shift moved the answer toward "True" (+1.06 nats; controls at most
-±0.29). In OLMo 2, the base model did not use the direction beyond the controls (+0.28;
-controls up to ±0.35), whereas the SFT model used it strongly (+3.10; controls up to
-±1.12). Supervised fine-tuning thus turned a reversed use (Apertus) or no use (OLMo 2)
-into a correct use, the mirror image of what it did for authorship.
+Steering showed how the repaired readout uses the represented truth direction. Shifting
+the internal state at the answer position along the direction that separates true from
+false negated statements (±2 SD, layer 21; Section 3.3) moved the answers of both SFT
+models toward the correct answer, more than the control directions (Apertus: +0.36 nats,
+p = .02; OLMo 2: +1.07, p ≤ .04), and in these models the truth direction coincided with
+the decision direction (cosine ≈ 1.0). In the base models, it did not (Apertus: −0.14,
+p = .13–.33; OLMo 2: +0.09, p ≥ .54). Supervised fine-tuning thus aligned the answer with
+the represented truth direction; whether the Apertus base model used this direction with
+the wrong sign, as its negative sensitivity would suggest, could not be established.
 
 *Deceptive reviews.* All models judged the reviews close to chance (d′ between 0.00 and
 0.86), although probes separated truthful from deceptive reviews well (d′ = 2.5–3.0), at
@@ -474,12 +476,10 @@ a cue without validity (r = .03 with the ground truth), and ignored first-person
 the most valid single cue (r = −.33). Stitching and patching located the change for the
 reviews, too, at the question positions by the middle of the network (supplementary
 analysis), although the effects were smaller than for the other two judgments. Steering
-explained the gain of Qwen3 causally: Its base model did not use the direction that
-separates truthful from deceptive reviews (−0.02 nats; controls up to ±0.48), whereas
-the post-trained model did (+1.48; controls up to ±0.43). For Gemma 3 4B, steering did
-not reveal the source of the loss: Relative to the positive control, the post-trained
-model used the direction about as much as its base model (22% vs. 25% of the effect of
-the decision direction).
+did not explain the changes for the reviews: In none of the four cells (Gemma 3 4B and
+Qwen3, base and post-trained) did the direction that separates truthful from deceptive
+reviews move the answer more than the control directions (p ≥ .16), although the
+post-trained Qwen3 moved in the correct direction (+0.50 nats).
 
 *Representation and readout across checkpoints.* If post-training leaves the
 representation intact and changes how it is read out, a probe trained on the base model
