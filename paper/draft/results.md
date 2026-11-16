@@ -517,7 +517,11 @@ Apertus, extrapolated: about 2,300), largely factual claims in Tülu 3 and mathe
 statements with explicit reasoning, often including negations, in Apertus. In contrast,
 neither mixture contained a single request to judge whether a text had been written by a
 human or by an AI, and the matches for fake or deceptive reviews were sentiment tasks or
-summaries of research papers. Thus, post-training improved the one judgment for which the
+summaries of research papers. Because our judgments were posed in German, we repeated the
+search with German patterns in the conversations written in German, which made up only
+0.1% of Tülu 3 (992 conversations) and 1.7% of the Apertus sample (6,330). They
+contained no request to judge authorship and no deception judgment, two mentions of
+AI-generated text (Apertus), and six true/false questions. Thus, post-training improved the one judgment for which the
 training data specify how to read the question, where the base model read it wrongly,
 and impaired or merely reshaped the judgments for which they do not.
 
