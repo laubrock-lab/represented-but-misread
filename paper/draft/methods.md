@@ -200,7 +200,10 @@ from the same pretrained weights; we verified this by linear centered kernel ali
 (CKA; Kornblith et al., 2019) between the activations of base and post-trained checkpoints
 (cka.py), by the perplexity of
 each stitched model on 40 texts, and by checking that stitching at ℓ = 0 and ℓ = L
-reproduced the parent models. We also exchanged only the attention blocks or only the
+reproduced the parent models. As a control task, we stitched the same checkpoints on
+statements of diverse facts (counterfact), which base and SFT models judged alike; for
+authorship, stitching and patching were run on the textbook summaries and the short chats,
+and patching was repeated with a prompt that placed the question before the text. We also exchanged only the attention blocks or only the
 feed-forward blocks (each with its normalization) of the first ℓ layers.
 
 *Activation patching.* Activation patching replaces internal states of a model with
@@ -293,7 +296,10 @@ proportionally from all parts of the model's original supervised fine-tuning mix
 (Tülu 3; Lambert et al., 2024). The conditions added 1,994 authorship judgments in the
 format of our experiments (plain prompt, random answer order) with correct labels (C1),
 with labels that followed a formality stereotype (C2), or with random labels (C3), or no
-judgments at all (C0). The judged texts were German news articles that are disjoint from
+judgments at all (C0). A further condition (C4) added the same texts with an unrelated
+judgment in the same layout (whether the text is about politics, business, or society;
+answers "Ja"/"Nein"; labels from the newspaper section), so that it practiced a binary
+judgment of a text without the authorship question. The judged texts were German news articles that are disjoint from
 our test corpora: human articles from the online edition of the Austrian daily DER
 STANDARD (10kGNAD; Block, 2019; derived from Schabus et al., 2017), shortened to 25, 80,
 or 150 words, and AI articles that Qwen3 8B and Gemma 3 12B (instruction-tuned versions)

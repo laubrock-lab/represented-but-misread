@@ -87,7 +87,9 @@ evidence that changes in the late layers can depend on altered earlier computati
 processing pathways (Bigoulaeva et al., 2026). This conclusion is tempered by the
 observation that stitched hybrids can judge worse or better than both parents (Section
 3.4), so that stitching shows where the weights that carry the difference reside rather
-than where the difference is computed. Note also that stitching without an adapter
+than where the difference is computed; a control judgment that post-training had left
+unchanged showed no such overshoot, so that it is specific to the changed judgment rather
+than an artifact of stitching as such. Note also that stitching without an adapter
 at layer ℓ is equivalent to exchanging the full residual stream at all positions at
 that layer, so that our stitching and patching results are two views of one family of
 interventions rather than independent tests; their convergence with steering, which
@@ -277,7 +279,7 @@ The
 information that the models failed to use was largely lexical and stylistic, as shown by
 simple n-gram classifiers, so our results concern the readout of ordinary cues rather
 than of any deep representation of authorship. The stitching and patching analyses were
-restricted to two models per judgment, to one corpus for authorship, and to the plain
+restricted to two models per judgment, to two corpora for authorship, and to the plain
 prompt format, because base models cannot be queried with a chat template. The two
 further judgments were studied with four to six models, steering for them with two
 models each and on 300 items, and the effects of post-training on the reviews were
@@ -292,10 +294,9 @@ correlated with text length, topic, and generator. The three causal methods were
 to partly different combinations of models and corpora; only Apertus on the textbook
 summaries was examined with steering, stitching, and patching alike. The newspaper
 segments stem from only 14 articles, so that bootstrap intervals that resample articles
-are likely too narrow for this corpus. All judgments used German prompts with one
-instruction wording and the question after the text; prompt variants are reported in the
-supplement, and we did not test English prompts.
- Models
+are likely too narrow for this corpus. All judgments used German prompts; a paraphrased
+prompt reproduced the decline, a prompt with the question before the text reproduced it on
+average but not in every family, and we did not test English prompts. Models
 from different developers also differ in their post-training recipes, including distillation from larger
 models, the emphasis on reasoning, and the share of human preference data, and our
 design cannot separate these factors; they are a plausible source of the heterogeneity

@@ -132,6 +132,16 @@ d′ in all three cases (−0.45 to −0.95). Per corpus, the decrease was relia
 newspaper segments (−0.42 [−0.67, −0.16], p = .002) and the textbook summaries (−0.41
 [−0.70, −0.11], p = .007), but not for the short chats (−0.19 [−0.45, 0.07], p = .15).
 
+The decline did not hinge on the wording of the prompt. With a
+paraphrased instruction and question, the mean change was −0.23 (13 of 18 comparisons
+negative; t-test over the family means, t(5) = −3.63, p = .015), and the changes of the
+individual cells correlated with those for the original prompt (r = .81). With the
+question placed before the text, the mean change was similar (−0.30; 12 of 18 negative),
+but two families changed direction (OLMo 3 Think: +0.38; Qwen3: +0.04), so that the
+family-level test was not significant (p = .16; r = .63 with the original prompt). The
+below-chance judgments of the short chats by Gemma 3 and Qwen3 persisted with all three
+prompts.
+
 Among the individual comparisons, six decreases survived Holm correction within this
 family of 18 tests (all p_Holm ≤ .013): Gemma 3 12B (Δd′ = −0.95 [−1.28, −0.66]),
 Qwen3 (−0.57 [−0.79, −0.36]), Gemma 3 4B (−0.50 [−0.72, −0.29]), Apertus (−0.47
@@ -284,11 +294,25 @@ Note, however, that the hybrids did not always lie between their parents. In Ape
 the first 8 SFT layers under base upper layers judged worse than the SFT model itself
 (−0.50 vs. −0.04), with a reduced probability on the two answer words (.39 vs. .68 for
 the base and .83 for the SFT model), and the first SFT layer alone under base upper
-layers judged better than either parent (+0.73). Hybrids thus produce effects of their
-own, of about the size of the difference we set out to locate. The stitching results
-show that the early-layer weights of a checkpoint suffice to carry the difference into
-an otherwise foreign network; they do not by themselves show that the difference is
-computed there.
+layers judged better than either parent (+0.73). Were these effects artifacts of
+stitching as such? As a control, we stitched the same checkpoints on a judgment that
+post-training had left unchanged, the truth of statements on diverse facts (counterfact;
+Apertus: d′ = 1.38 base vs. 1.58 SFT; OLMo 2: 1.77 vs. 1.75). There, all hybrids stayed
+within or close to the range of their parents (largest deviation 0.03 for Apertus and
+0.09 for OLMo 2; one of 14 hybrids per model reliably outside), whereas on the textbook
+summaries 6 of 18 Apertus hybrids and 4 of 18 OLMo 2 hybrids lay reliably outside
+(largest deviation 0.59). The overshoot was therefore specific to the judgment that
+post-training had changed, which suggests that the change involves an interaction between
+the early layers and the layers above them rather than a self-contained module. The
+stitching results show that the early-layer weights of a checkpoint suffice to carry the
+difference into an otherwise foreign network; they do not by themselves show that the
+difference is computed there.
+
+The early locus replicated on the short chats, on which post-training lowered the
+sensitivity of Apertus (−0.26 to −0.78) and raised that of OLMo 2 (−0.05 to +0.37). The
+first 8 base layers of Apertus restored the base level under SFT upper layers (−0.27),
+and the first 4 base layers of OLMo 2 removed most of its gain (+0.10); on the chats,
+no hybrid lay outside the range of its parents.
 
 Both sublayer types contributed. Exchanging only the attention blocks or only the
 feed-forward (MLP) blocks of the first 8 Apertus layers had partial effects in both
@@ -320,17 +344,28 @@ question states restored discrimination in the SFT model (Apertus: +0.41; OLMo 2
 from −0.50), and the SFT model's question states abolished it in the base model
 (Apertus: −0.42; OLMo 2: −0.61, from −0.12). The final position alone carried part of
 this effect in Apertus (−0.08 and −0.15) and in OLMo 2 most of it in one direction
-(−0.06 from −0.50) and about half in the other (−0.34 from −0.12). At layer 8, the picture was mixed (Figure S1): in Apertus, the text
+(−0.06 from −0.50) and about half in the other (−0.34 from −0.12). The same held for the short chats, on which
+exchanging the text states changed nothing (all changes ≤ 0.04), whereas the states after
+the text transferred the difference: The SFT states made the base models judge like the
+SFT models (Apertus: −0.23 → −0.75, SFT −0.73; OLMo 2: −0.07 → +0.34, SFT +0.38), and the
+base states restored the base level in Apertus (−0.73 → −0.27) and partly in OLMo 2 (+0.38
+→ +0.20). Because post-training improved the judgments of OLMo 2 on the chats, the change
+resided at the question positions regardless of its direction. At layer 8, the picture was mixed (Figure S1): in Apertus, the text
 positions still had a partial effect, and in OLMo 2 even exchanging all positions
 transferred only part of the difference, consistent with the stitching result that in
 OLMo 2 the change accumulates up to about layer 14. Thus, by the middle of the network
 the difference resides entirely in the question positions.
 
-Note that the text precedes the question, so that its states are computed before the
-question is read; a change that is specific to the judgment can only appear at the
-question positions. What the patching adds is that the text states, which the changed
-weights of every layer could have altered as well, did not matter: Exchanging them
-between checkpoints left the judgment unchanged. In summary, post-training changed
+Note that in our prompt the text precedes the question, so that its states are computed
+before the question is read, and a change that is specific to the judgment can only
+appear at the question positions. We therefore repeated the patching with the question
+placed before the text, so that the text was read with the task known. The decline
+persisted with this prompt (Apertus: +0.36 base vs. −0.19 SFT; OLMo 2: +0.09 vs. −0.42),
+and the text states again carried little of it (changes ≤ 0.12). Most of the difference
+now resided in the few positions after the text ("Antwort:"; e.g., Apertus SFT with the
+base states at these positions: −0.19 → +0.44), and part of it in the question itself.
+Thus, even when the text is read in the light of the question, post-training did not
+change the text states in a way that mattered for the judgment. In summary, post-training changed
 little in how the text was represented, as far as the judgment is concerned, and changed
 how the question takes up this representation, through weights in the early layers and
 processing at the question positions.
@@ -502,42 +537,48 @@ summarizes the answers.
 
 > **Table 4.** Training study: sensitivity (d′) of the answers of OLMo 2 7B after
 > fine-tuning with background conversations only (C0) or with additional authorship
-> judgments with correct (C1), stereotyped (C2), or random labels (C3), and of the official
-> SFT checkpoint. Held-out news: 400 items from the distribution of the training texts.
-> d′, mean over three seeds (per-seed d′, both answer orders averaged). C0 did not learn the
-> answer format (probability of the two answer words .65–.73, vs. ≈ 1.0 in C1–C3); C3
-> therefore serves as the second baseline (see text).
+> judgments with correct (C1), stereotyped (C2), or random labels (C3), or with an
+> unrelated topic judgment in the same layout (C4), and of the official SFT checkpoint.
+> Held-out news: 400 items from the distribution of the training texts. d′, mean over
+> three seeds (per-seed d′, both answer orders averaged). C0 and C4 did not learn the
+> answer words of the authorship question (probability of the two answer words .65–.76, vs.
+> ≈ 1.0 in C1–C3); C3 therefore serves as a further baseline (see text).
 >
-> | Test corpus | C0 background | C1 valid | C2 stereotype | C3 random | Official SFT |
-> |---|---:|---:|---:|---:|---:|
-> | Held-out news | −0.30 | 4.28 | 0.11 | 0.13 | −0.14 |
-> | Newspaper segments | −0.06 | 2.18 | −0.35 | −0.06 | −0.54 |
-> | Textbook summaries | −0.12 | 1.39 | 0.32 | 0.03 | −0.50 |
-> | Short chats | 0.04 | −0.58 | −0.29 | −0.21 | 0.38 |
+> | Test corpus | C0 background | C1 valid | C2 stereotype | C3 random | C4 other task | Official SFT |
+> |---|---:|---:|---:|---:|---:|---:|
+> | Held-out news | −0.30 | 4.28 | 0.11 | 0.13 | 0.04 | −0.14 |
+> | Newspaper segments | −0.06 | 2.18 | −0.35 | −0.06 | −0.19 | −0.54 |
+> | Textbook summaries | −0.12 | 1.39 | 0.32 | 0.03 | −0.03 | −0.50 |
+> | Short chats | 0.04 | −0.58 | −0.29 | −0.21 | 0.04 | 0.38 |
 
 Because the background condition C0 did not learn to answer with the two answer words,
-whereas the three conditions with judgment examples did, we compared each condition with
-both C0 and C3, the condition with random labels, which learned the question and the
-answer words but no valid mapping (differences in d′ with 95% CIs from a grouped
-bootstrap). Two thousand correctly labeled judgments of news texts sufficed to raise the
+whereas the three conditions with authorship examples did, we compared each condition with
+three baselines: C0; C3, the condition with random labels, which learned the question and
+the answer words but no valid mapping; and C4, which practiced an unrelated judgment in the
+same layout (differences in d′ with 95% CIs from a grouped bootstrap). Practicing the
+unrelated judgment left the authorship answers where C0 left them (C4 − C0 between −0.13
+and +0.10 on the three test corpora, all CIs including zero), so that practice with a
+judgment as such did not explain the effects of the authorship labels. Two thousand correctly labeled judgments of news texts sufficed to raise the
 sensitivity of the answers far above both baselines, not only on held-out news but also
 on texts from other generators and genres: the newspaper segments, written by GPT-5.4
-(C1 − C3: +2.23 [1.56, 3.17]), and the textbook summaries (+1.36 [1.11, 1.64]). On the
+(C1 − C3: +2.23 [1.56, 3.17]; C1 − C4: +2.37 [1.74, 3.29]), and the textbook summaries
+(+1.36 [1.11, 1.64]; +1.42 [1.15, 1.73]). On the
 held-out news, C1 was near its maximum for both generators and all text lengths
 (d′ = 3.8–4.0 in each subset), so that its success there was not due to recognizing one
 generator or one length. The information had been represented all along; a small amount
 of valid training made the answer read it. On the short chats, however, the same training
 made the answers worse than chance (−0.58), also relative to random labels (C1 − C3:
-−0.36 [−0.69, −0.06]), because the properties that distinguished generated from human
+−0.36 [−0.69, −0.06]) and to the unrelated judgment (C1 − C4: −0.62 [−1.01, −0.25]), because the properties that distinguished generated from human
 news did not distinguish generated from human chat messages in the same way.
 
 The stereotype acted according to its validity, but only partly reliably. Measured with
 the formality score used for the labels, AI texts were less formal than human texts in
 the chats and newspaper segments (AUC = .40 [.32, .49] and .39 [.28, .49]) but more
 formal in the textbook summaries (.70 [.65, .75]). Relative to random labels, the
-stereotype improved the answers on the textbook summaries (C2 − C3: +0.29 [0.11, 0.49])
-and lowered them on the newspaper segments, though not reliably (−0.29 [−0.61, 0.07]); on
-the chats, it did not differ from random labels (−0.08 [−0.39, 0.24]). Note also that the
+stereotype improved the answers on the textbook summaries (C2 − C3: +0.29 [0.11, 0.49];
+C2 − C4: +0.35 [0.15, 0.57]) and lowered them on the newspaper segments, though not
+reliably (−0.29 [−0.61, 0.07]; −0.15 [−0.57, 0.25]); on the chats, it did not differ from
+random labels (−0.08 [−0.39, 0.24]). Note also that the
 stereotype labels were not independent of other text properties: The more formal half
 contained more short texts, more texts on business and domestic politics than on sports,
 and more texts from Gemma 3 12B than from Qwen3 8B. Random labels lowered the answers
