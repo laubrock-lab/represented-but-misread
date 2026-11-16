@@ -169,35 +169,24 @@ post-trained models gained by similar amounts, so that the gap between them pers
 After 16 examples, the post-trained model was still less sensitive than its base model in
 all five comparisons (e.g., Gemma 3 4B on the short chats: +0.48 vs. −0.27; Qwen3: +0.15
 vs. −0.17), and the post-trained models of Gemma 3 4B and Qwen3 remained below chance on
-the chats (supplementary analysis of the gains). A mistaken belief about what
+the chats (Appendix E). A mistaken belief about what
 distinguishes AI from human texts, which examples can partly correct, is therefore likely
 to be part of the explanation, but it does not account for the deficit that post-training
 introduced.
 
-Which properties of the texts did the answers follow? For the short chats, we described
-each message by 34 text properties (e.g., word and sentence length, lexical diversity,
-part-of-speech shares, readability, punctuation, and features that the students had named
-as typical of AI text) and decomposed the judgments with the lens model (Section 2.8).
-The answers of most post-trained models weighted these properties in the direction
-opposite to their validity (matching index G for Gemma 3 4B: −.39; Gemma 3 12B: −.49;
-Apertus after SFT: −.55; Qwen3: −.58; base models between −.52 and −.04). The AI
-messages in this corpus were richer in adverbs and verbs, lexically more diverse, and
-contained longer sentences than the human messages (r = .16 to .23 with authorship),
-whereas the human messages contained more adjectives, proper nouns, and long words.
-Probes, which are trained on the ground truth, weighted the same properties in line
-with their validity in every checkpoint (G = .75–.83); this is expected by construction
-and mainly shows that the properties were represented. The informative comparison is
-therefore the one between the answers and the environment. The
-post-trained models of Gemma 3 12B, Qwen3, and Apertus took long words, adjectives, nouns,
-and low readability as signs of AI authorship (e.g., Gemma 3 12B, mean word length: r = −.04
-before and +.24 after post-training; adjectives: −.06 and +.27) and adverbs and lexical
-diversity as signs of human authorship. OLMo 2, whose answers on the chats slightly
-improved with post-training, showed the opposite weighting after SFT (G = +.39). The
-properties that the students had named as typical of AI text (e.g., dashes, perfect
-capitalization) were barely valid in the truncated messages and barely used by the
-models. In line with this, a control set of style-matched messages that had not been
-revised according to the students' feedback was judged like the revised messages
-(change in AUC between −.03 and +.04 for every model).
+Which properties of the texts did the answers follow? A lens-model analysis of the short
+chats (Appendix B) showed that the answers of most post-trained models weighted 34 text
+properties in the direction opposite to their validity (cross-validated matching index G:
+Gemma 3 4B −.49, Gemma 3 12B −.58, Qwen3 −.61, Apertus after SFT −.57). They took long
+words, adjectives, nouns, and low readability as signs of AI authorship, whereas the AI
+messages in this corpus were more verbal and lexically more diverse than the human ones.
+In Qwen3, this weighting was already present in the base model (−.53); OLMo 2, whose
+answers on the chats improved slightly, weighted the properties in the opposite way after
+SFT (+.37). The properties that the students had named as typical of AI text (e.g., dashes,
+perfect capitalization) were barely valid in the truncated messages and barely used by
+the models, and style-matched messages that had not been revised according to the
+students' feedback were judged like the revised ones (change in AUC between −.03 and +.04
+for every model).
 
 > **Figure 4 (placeholder).** Summary across all cells (base model × corpus × prompt
 > format): probe sensitivity, base-model answer, and post-trained answer; few-shot
@@ -444,42 +433,17 @@ the wrong sign, as its negative sensitivity would suggest, could not be establis
 *Deceptive reviews.* All models judged the reviews close to chance (d′ between 0.00 and
 0.86), although probes separated truthful from deceptive reviews well (d′ = 2.5–3.0), at
 least as well as a classifier on word frequencies (d′ = 2.44). Post-training changed the
-probes little, but it changed the answers in a direction that depended on the model:
-Gemma 3 4B lost sensitivity (d′ 0.45 → 0.08) and OLMo 3 lost slightly (0.13 → 0.00),
-whereas Qwen3 (0.06 → 0.50) and Gemma 3 12B (0.52 → 0.86) gained, and OLMo 2 and Apertus
-changed little (0.16 → 0.17; 0.14 → 0.23; Table 3). After post-training,
-all models showed a strong bias toward "Truthful" (83–92% of the answers of the final
-models). The base models shared one simple heuristic: They judged positive reviews as
-more truthful than negative ones, and review polarity accounted for 41–90% of the
-variance of their judgments. Post-training largely removed this heuristic (2–32% of the
-variance), except in OLMo 3 Think (76%). Within each polarity, the judgments of different
-models became more similar: For the five models post-trained mainly for conversation,
-the mean correlation between their item-level judgments, computed within polarity, rose
-from .36 (range .16–.50) for the base models to .52 (.45–.58) for the final models;
-OLMo 3 Think, which was post-trained mainly for explicit reasoning, did not join this
-convergence (.18–.33 with the other final models). Without separating the polarities,
-the correlations fell instead (from .75 to .48), because the shared polarity heuristic
-disappeared. The direction of the change in sensitivity thus depended on where the base
-model started: Post-training replaced a shared polarity heuristic and the base models'
-individual ways of reading the reviews within each polarity by a largely shared one.
-
-A lens-model decomposition made this explicit. Fifteen interpretable cues predicted the
-ground truth moderately well (R~e~ = .56; cross-validated .55). Read out by probes, the
-internal representation weighted these cues almost exactly as the environment did, in
-all 13 checkpoints of the four models analyzed (OLMo 2, Apertus, Gemma 3 4B, Qwen3)
-(matching index G = .97–.99). This is expected for classifiers trained on the ground
-truth and mainly shows that the cues were represented. The
-answers, in contrast, were poorly matched to the environment (G = .15–.83), and it was
-this matching that post-training changed: from .83 to .26 in Gemma 3 4B, and from .17 to
-.53 in Qwen3. After post-training, all models treated long, detailed reviews as truthful,
-a cue without validity (r = .03 with the ground truth), and ignored first-person pronouns,
-the most valid single cue (r = −.33). Stitching and patching located the change for the
-reviews, too, at the question positions by the middle of the network (supplementary
-analysis), although the effects were smaller than for the other two judgments. Steering
-did not explain the changes for the reviews: In none of the four cells (Gemma 3 4B and
-Qwen3, base and post-trained) did the direction that separates truthful from deceptive
-reviews move the answer more than the control directions (p ≥ .16), although the
-post-trained Qwen3 moved in the correct direction (+0.50 nats).
+probes little and the answers by small amounts in a direction that depended on the model:
+Gemma 3 4B lost sensitivity (d′ 0.45 → 0.08), Qwen3 (0.06 → 0.50) and Gemma 3 12B (0.52 →
+0.86) gained, and the others changed little (Table 3). What post-training changed
+consistently was a shared heuristic. The base models judged positive reviews as more
+truthful than negative ones, and review polarity accounted for 41–90% of the variance of
+their judgments; post-training largely removed this heuristic (2–32%), except in OLMo 3
+Think (76%), and all final models showed a strong bias toward "Truthful" (83–92% of the
+answers). The localization and steering analyses were less conclusive than for the other
+two judgments: Patching located the change at the question positions in two of four
+cases, and steering did not explain it (Appendix C). The reviews are thus a case in which
+post-training reshaped the readout without improving it.
 
 *Representation and readout across checkpoints.* If post-training leaves the
 representation intact and changes how it is read out, a probe trained on the base model

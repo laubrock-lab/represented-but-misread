@@ -69,7 +69,9 @@ into an answer. Splitting the judge side of the lens model in this way has prece
 research on personality judgment, which distinguishes the detection of cues from their
 utilization (Funder, 1995), and in neuroscience, which distinguishes the information that
 a neural population encodes from the information that is read out for behavior (Panzeri
-et al., 2017).
+et al., 2017). Because the two fields often use different words for the same idea, and
+sometimes the same word for different ideas, Appendix A lists the correspondences between
+their terms.
 
 This possibility has been used to show that language models often represent more than
 they say. Simple linear classifiers ("probes") trained on a model's internal activations

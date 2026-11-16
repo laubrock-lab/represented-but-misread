@@ -189,7 +189,7 @@ the effect of a shift by one class-mean distance, extrapolated from the ±1 SD s
 this number of directions feasible, the prompt up to the last position was processed once
 per text and its cached activations were reused for all steering settings, which
 reproduced the scores of the uncached computation (r = .999). Steering was run for 25
-cells (model × corpus × layer; Table S3).
+cells (model × corpus × layer; Table D1 in Appendix D).
 
 *Model stitching.* Model stitching combines parts of different networks (Lenc &
 Vedaldi, 2015; Bansal et al., 2021). For the models with stage-wise checkpoints, we combined the
@@ -271,18 +271,9 @@ trained and tested on the same checkpoint, averaged over both directions. For th
 authorship corpora, the analysis was carried out both for the last prompt position and
 for the mean over the text positions.
 
-*Lens model decomposition.* For the reviews, we described each review by 15 interpretable
-cues motivated by Ott et al. (2011), such as the rates of first-person pronouns, of
-references to family and to the hotel or city, of spatial details and of emotion words,
-and the length of the review and of its words and sentences; all variables were centered
-within the positive and the negative reviews. For each judge, i.e., the answers of a
-checkpoint or the probe scores of its representation, we computed the components of the
-lens model equation (Tucker, 1964; Karelaia & Hogarth, 2008) from linear regressions of
-the ground truth and of the judgments on the cues: the environmental predictability R~e~,
-the consistency of the judge R~s~, the matching index G (the correlation of the two
-predictions), the unmodeled agreement C, and the achievement r~a~, which decomposes as
-r~a~ = G R~e~ R~s~ + C √(1 − R_e²) √(1 − R_s²). We also report the cosine similarity of the
-two weight vectors.
+*Lens model decomposition.* For the short chats and the reviews, we decomposed the
+judgments with the lens model equation, using interpretable text properties as cues
+(Appendix B).
 
 *Supervised fine-tuning data.* To examine whether the supervised fine-tuning data contain
 valid examples of the three judgments, we searched the SFT mixtures of OLMo 2 (Tülu 3;
