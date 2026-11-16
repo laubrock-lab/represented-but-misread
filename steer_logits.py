@@ -215,9 +215,15 @@ def fixed_control(X: np.ndarray, y: np.ndarray, control: str, rng) -> tuple:
     raise ValueError(control)
 
 
+def own_sd(X: np.ndarray, y: np.ndarray, u: np.ndarray) -> float:
+    """Pooled within-class SD of the projections onto u (natural spread along u)."""
+    p = X @ u
+    return float(np.sqrt((p[y == 1].var() + p[y == 0].var()) / 2))
+
+
 def crossfit_directions(X: np.ndarray, y: np.ndarray, groups: np.ndarray, n_splits: int,
                         control: str, seed: int, score: np.ndarray | None = None,
-                        unit: str = "sd", fixed: bool = False) -> list[dict]:
+                        unit: str = "sd", fixed: bool = False, control_unit: str = "class") -> list[dict]:
     """Per text: unit direction u, step size delta and midpoint along u,
     estimated without the text's own source.
 
@@ -251,6 +257,8 @@ def crossfit_directions(X: np.ndarray, y: np.ndarray, groups: np.ndarray, n_spli
         delta = sd if unit == "sd" else dist               # common step size
         if fixed_dir is not None:
             u, a, b = fixed_dir
+            if control_unit == "own":   # scale-matched null: step in the control's own spread
+                delta = own_sd(X, y, u)
         elif control == "random":
             r = rng.standard_normal(X.shape[1])
             u, a, b = r / np.linalg.norm(r), mu1, mu0
@@ -322,6 +330,9 @@ def main() -> None:
                          "model's own dv follows, same site and step size)")
     ap.add_argument("--fixed-controls", action="store_true",
                     help="one direction per control replicate for all texts (not redrawn per fold)")
+    ap.add_argument("--control-unit", default="class", choices=["class", "own"],
+                    help="fixed controls: step in the class direction's SD (norm-matched, default) or in "
+                         "the within-class SD along the control direction itself (scale-matched)")
     ap.add_argument("--control-add", type=float, nargs="*",
                     help="alphas for the null controls (default: same as --add)")
     ap.add_argument("--batched", action="store_true",
@@ -391,7 +402,8 @@ def main() -> None:
                  if c in ("random", "pcrandom", "split") else [c])
         for r, name in enumerate(names):
             dirs[name] = crossfit_directions(X, y, groups, args.n_splits, c, args.seed + 1000 * r,
-                                             score, unit=args.unit, fixed=args.fixed_controls)
+                                             score, unit=args.unit, fixed=args.fixed_controls,
+                                             control_unit=args.control_unit)
             print(f"  {name} direction: mean cosine with class direction "
                   f"{np.mean([d['cos_class'] for d in dirs[name]]):+.2f}")
     if args.limit:

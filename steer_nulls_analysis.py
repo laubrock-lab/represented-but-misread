@@ -29,7 +29,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from steer_logits import crossfit_directions, fixed_control
+from steer_logits import crossfit_directions, fixed_control, own_sd
 
 N_BOOT = 2000
 STEPS = (1.0, 2.0, 4.0, 6.0)
@@ -74,7 +74,7 @@ def grouped_ci(e: pd.Series, groups: pd.Series, rng) -> tuple[float, float]:
 def analyze(path: str, rng) -> dict:
     p = Path(path)
     m = re.match(r"steer_(.+)_L(\d+)_sd_fixed(_smoke)?_nulls\.csv$", p.name)
-    stem, layer = m.group(1), int(m.group(2))
+    stem, layer, smoke = m.group(1), int(m.group(2)), m.group(3) or ""
     df = pd.read_csv(p)
     avg = df.groupby(["text_id", "direction", "alpha"])["dv"].mean().unstack(["direction", "alpha"])
     info = df.drop_duplicates("text_id").set_index("text_id")[["source_id", "is_ai"]].loc[avg.index]
@@ -93,15 +93,19 @@ def analyze(path: str, rng) -> dict:
             pr = X @ u
             ok.extend(in_range(pr, pr[i], a * cls[i]["sd"]))
         row[f"class_inrange_{a:g}"] = float(np.mean(ok))
-    # control directions at +-2 SD (step = class SD of the text's fold, as in steer_logits)
+    # control directions at +-2 SD: norm-matched (step = class SD of the text's fold, as in
+    # steer_logits) and scale-matched (step = within-class SD along the control itself)
     for c in CTRL:
-        ok = []
+        ok, ok_own = [], []
         for r in range(50):
             u, _, _ = fixed_control(X, y, c, np.random.default_rng(1 + 1000 * r))
             pr = X @ u
+            so = own_sd(X, y, u)
             for i in sel:
                 ok.extend(in_range(pr, pr[i], 2 * cls[i]["sd"]))
+                ok_own.extend(in_range(pr, pr[i], 2 * so))
         row[f"{c}_inrange_2"] = float(np.mean(ok))
+        row[f"{c}_own_inrange_2"] = float(np.mean(ok_own))
 
     # null test at 2 SD and dose curve
     E = {}
@@ -124,6 +128,20 @@ def analyze(path: str, rng) -> dict:
         row[f"{c}_p"] = float((1 + np.sum(np.abs(null) >= abs(e_cls))) / (1 + len(null)))
         row[f"{c}_z"] = float((e_cls - null.mean()) / null.std(ddof=1))
 
+    # scale-matched null (separate run, suffix _ownsd), same class effect
+    fo = p.parent / f"steer_{stem}_L{layer}_sd_ctrl-pcrandom-split_fixed{smoke}_ownsd.csv"
+    if fo.exists():
+        do = pd.read_csv(fo)
+        ao = do.groupby(["text_id", "direction", "alpha"])["dv"].mean().unstack(["direction", "alpha"])
+        for c in CTRL + ("all",):
+            names = [d for d in ao.columns.get_level_values(0).unique()
+                     if (d.startswith(c) if c != "all" else d.startswith(CTRL))]
+            null = np.array([directional(ao, d, 2.0).mean() for d in names])
+            row[f"own_{c}_n"] = len(null)
+            row[f"own_{c}_null_absmax"] = float(np.abs(null).max())
+            row[f"own_{c}_p"] = float((1 + np.sum(np.abs(null) >= abs(e_cls))) / (1 + len(null)))
+            row[f"own_{c}_z"] = float((e_cls - null.mean()) / null.std(ddof=1))
+
     # natural scale
     dv0 = avg[("class", 0.0)]
     yy = info["is_ai"].to_numpy()
@@ -145,6 +163,7 @@ def main() -> None:
     cols = ["corpus", "cell", "layer", "class_dist_sd", "class_inrange_1", "class_inrange_2",
             "class_inrange_6", "pcrandom_inrange_2", "class_E1", "class_E2", "class_E2_lo",
             "class_E2_hi", "decision_E2", "all_null_absmax", "all_p", "all_z",
+            "own_all_null_absmax", "own_all_p", "own_all_z",
             "E_per_class_dist", "observed_dv_diff"]
     with pd.option_context("display.width", 250, "display.float_format", "{:+.2f}".format):
         print(out[[c for c in cols if c in out]].to_string(index=False))
