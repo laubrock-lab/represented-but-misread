@@ -203,8 +203,8 @@ these are the cells with the most negative d′, and that this is expected: The 
 direction is the difference between the class means at the position from which the answer is
 read, so that, if the answer depends approximately linearly on this state, shifting along it
 must reproduce the observed difference between the classes. Across the 25 cells, the effect
-of a shift by one class distance correlated with the observed difference (TODO(steer): r from
-script). The test therefore does not provide evidence that is independent of the answers'
+of a shift by one class distance correlated with the observed difference (r = .91;
+outputs/steer_nulls_summary.csv). The test therefore does not provide evidence that is independent of the answers'
 d′; it shows that the inverse ordering is carried by the class-mean difference at the answer
 position, more than by typical directions. In the
 remaining cells, the authorship direction did not move the answer more than arbitrary
@@ -215,7 +215,7 @@ these cells, the positive control did not exceed the scale-matched controls eith
 12B on the newspaper segments, Gemma 3 4B at layer 28, Apertus at layers 21 and 27 and
 OLMo 3 after SFT; Table D1), so that their null results are weaker evidence. In the
 strongest cell (Gemma 3 12B on the chats), the decision direction itself did not clearly
-exceed the norm-matched controls (TODO(steer): p from script), and only 48% of the shifted
+exceed the norm-matched controls (p = .069; scale-matched: p = .01), and only 48% of the shifted
 texts stayed within the observed range. The norm-matched controls in the subspace of
 leading components moved the state far outside the observed range in the Gemma 3 and Qwen3
 cells, so that the scale-matched controls are the fairer comparison. In summary, where the
@@ -226,8 +226,8 @@ would be an independent test, was not carried out.
 A complementary, descriptive comparison concerns the size of the effects. Shifting a
 text by one class-mean distance along the authorship direction, i.e., from the average
 human text to the average AI text, changed the answer in the same direction as the
-observed difference between AI and human texts in all 20 cells in which this difference
-was clearly different from zero (e.g., Qwen3 on the newspaper segments: −0.50 and −0.66
+observed difference between AI and human texts in all 16 cells in which the bootstrap
+interval of this difference excluded zero, and in 23 of the 25 cells overall (e.g., Qwen3 on the newspaper segments: −0.50 and −0.66
 nats vs. an observed difference of −0.59). As stated above, this agreement is expected if the answer depends approximately linearly
 on the internal state; it is consistent with the patching results (Section 3.5).
 

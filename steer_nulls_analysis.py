@@ -16,6 +16,33 @@ _nulls; response to review, 15 Nov 2026). One row per cell (model x corpus x lay
                 in unsteered dv between AI and human texts (mean dv_AI - mean dv_human).
                 If the represented direction accounts for the answers' discrimination,
                 the two have the same sign and similar size.
+  cosine        cos_class_decision: cosine between the class direction and the decision
+                direction, with both directions defined exactly as in steer_logits.py
+                (crossfit_directions, seed 1, 7 group folds; the decision direction is
+                the difference between the means of the texts above and below the median
+                of the model's own unsteered order-averaged dv, estimated without the
+                text's own source). Reported as the mean over texts of the per-fold
+                cosine, which is the quantity steer_logits.py prints to its log
+                ("mean cosine with class direction"); cos_class_decision_scored is the
+                same mean over the subset of texts that were actually steered (identical
+                except in the --limit smoke runs). Added 17 Nov 2026: Results 3.3 and
+                3.6 quote these cosines, which previously existed only in the logs.
+  clear diff    Two explicit versions of "cells in which this difference was clearly
+                different from zero" (Results 3.3), applied to the observed AI-human
+                difference in unsteered dv:
+                dv_diff_clear   inferential: the grouped-bootstrap 95% CI over source
+                                groups (dv_diff_lo/hi) excludes zero. 16 of the 25 cells.
+                dv_diff_nonzero descriptive: |observed_dv_diff| >= MIN_ABS_DV_DIFF
+                                (0.1 nats), i.e. the difference is not essentially zero.
+                                20 of the 25 cells; this is the criterion that reproduces
+                                the count reported in Results 3.3, and every cell that
+                                satisfies dv_diff_clear also satisfies it.
+                sign_agree is True when E_per_class_dist has the same sign as
+                observed_dv_diff, i.e. when shifting a text by one class-mean distance
+                moves the answer the same way as the observed class difference does.
+                It holds in 20 of the 20 dv_diff_nonzero cells and in 16 of the 16
+                dv_diff_clear cells; the only two cells where it fails have observed
+                differences of -0.003 and +0.06 nats and fail both criteria.
 
 Usage (CPU; needs the *_acts.npz of each cell):
     python steer_nulls_analysis.py            -> outputs/steer_nulls_summary.csv
@@ -34,6 +61,7 @@ from steer_logits import crossfit_directions, fixed_control, own_sd
 N_BOOT = 2000
 STEPS = (1.0, 2.0, 4.0, 6.0)
 CTRL = ("pcrandom", "split")
+MIN_ABS_DV_DIFF = 0.1     # nats; below this the observed class difference is treated as zero
 
 
 def load_cell(out_dir: Path, stem: str, layer: int):
@@ -50,6 +78,19 @@ def load_cell(out_dir: Path, stem: str, layer: int):
                                  is_ai=acts["is_ai"]))
         X = acts["acts_last"][:, layer, :].astype(np.float64)
     return X, meta["is_ai"].to_numpy(), meta["source_id"].to_numpy(), meta["text_id"].to_numpy()
+
+
+def unsteered_dv(out_dir: Path, stem: str) -> pd.Series:
+    """The model's own order-averaged dv without steering, as steer_logits.py builds the
+    `score` argument of crossfit_directions (judge_logits / factuality outputs of the
+    same condition, both answer orders)."""
+    prefix, order = stem.rsplit("_", 1)
+    orders = ("tf", "ft") if order in ("tf", "ft") else ("mk", "km")
+    js = []
+    for o in orders:
+        d = pd.read_csv(out_dir / f"{prefix}_{o}.csv")
+        js.append(d.rename(columns={"item_id": "text_id"}) if "text_id" not in d else d)
+    return pd.concat(js).groupby("text_id")["dv"].mean()
 
 
 def in_range(proj_all: np.ndarray, proj_i: float, step: float) -> tuple[bool, bool]:
@@ -71,6 +112,20 @@ def grouped_ci(e: pd.Series, groups: pd.Series, rng) -> tuple[float, float]:
     return tuple(np.quantile(bs, [.025, .975]))
 
 
+def grouped_diff_ci(dv: np.ndarray, y: np.ndarray, groups: np.ndarray, rng) -> tuple[float, float]:
+    """Grouped-bootstrap 95% CI of mean dv(class 1) - mean dv(class 0); source groups
+    (all texts derived from the same original) are resampled together."""
+    idx = pd.Series(np.arange(len(dv))).groupby(groups).indices
+    keys = np.array(list(idx), dtype=object)
+    bs = []
+    for _ in range(N_BOOT):
+        b = np.concatenate([idx[k] for k in rng.choice(keys, len(keys))])
+        if y[b].min() == y[b].max():
+            continue
+        bs.append(dv[b][y[b] == 1].mean() - dv[b][y[b] == 0].mean())
+    return tuple(np.quantile(bs, [.025, .975]))
+
+
 def analyze(path: str, rng) -> dict:
     p = Path(path)
     m = re.match(r"steer_(.+)_L(\d+)_sd_fixed(_smoke)?_nulls\.csv$", p.name)
@@ -86,6 +141,13 @@ def analyze(path: str, rng) -> dict:
     # class direction: cross-fitted exactly as in steer_logits (seed 1)
     cls = crossfit_directions(X, y, groups, 7, "class", 1, unit="sd")
     row["class_dist_sd"] = float(np.mean([cls[i]["dist"] / cls[i]["sd"] for i in sel]))
+    # cosine with the decision direction (same definition and seed as steer_logits)
+    score = pd.Series(tids.astype(str)).map(unsteered_dv(p.parent, stem)).to_numpy(float)
+    if np.isnan(score).any():
+        raise SystemExit(f"{stem}: unsteered dv missing for some texts")
+    dec = crossfit_directions(X, y, groups, 7, "decision", 1, score, unit="sd")
+    row["cos_class_decision"] = float(np.mean([d["cos_class"] for d in dec]))
+    row["cos_class_decision_scored"] = float(np.mean([dec[i]["cos_class"] for i in sel]))
     # class directions differ per fold: group texts by their (fold-specific) direction
     folds = {}
     for i in sel:
@@ -162,6 +224,15 @@ def analyze(path: str, rng) -> dict:
     yy = info["is_ai"].to_numpy()
     row["observed_dv_diff"] = float(dv0[yy == 1].mean() - dv0[yy == 0].mean())
     row["E_per_class_dist"] = float(row["class_E1"] * row["class_dist_sd"])  # linear from 1 SD
+    # explicit criterion for "the observed difference is clearly different from zero":
+    # grouped-bootstrap 95% CI (resampling source groups) of mean dv_AI - mean dv_human.
+    # Own generator, so that the existing columns keep the random stream they had.
+    lo, hi = grouped_diff_ci(dv0.to_numpy(), yy, info["source_id"].to_numpy(),
+                             np.random.default_rng(2))
+    row["dv_diff_lo"], row["dv_diff_hi"] = lo, hi
+    row["dv_diff_clear"] = bool(lo > 0 or hi < 0)
+    row["dv_diff_nonzero"] = bool(abs(row["observed_dv_diff"]) >= MIN_ABS_DV_DIFF)
+    row["sign_agree"] = bool(np.sign(row["E_per_class_dist"]) == np.sign(row["observed_dv_diff"]))
     return row
 
 
@@ -175,13 +246,26 @@ def main() -> None:
         rows.append(analyze(f, rng))
     out = pd.DataFrame(rows)
     out.to_csv("outputs/steer_nulls_summary.csv", index=False)
-    cols = ["corpus", "cell", "layer", "class_dist_sd", "class_inrange_1", "class_inrange_2",
+    out[["corpus", "cell", "layer", "n", "cos_class_decision",
+         "cos_class_decision_scored"]].to_csv("outputs/steer_cosines.csv", index=False)
+    cols = ["corpus", "cell", "layer", "class_dist_sd", "cos_class_decision",
+            "class_inrange_1", "class_inrange_2",
             "class_inrange_6", "pcrandom_inrange_2", "class_E1", "class_E2", "class_E2_lo",
             "class_E2_hi", "decision_E2", "all_null_absmax", "all_p", "all_z",
             "own_all_null_absmax", "own_all_p", "own_all_z",
-            "E_per_class_dist", "observed_dv_diff"]
+            "E_per_class_dist", "observed_dv_diff", "dv_diff_lo", "dv_diff_hi",
+            "dv_diff_clear", "dv_diff_nonzero", "sign_agree"]
     with pd.option_context("display.width", 250, "display.float_format", "{:+.2f}".format):
         print(out[[c for c in cols if c in out]].to_string(index=False))
+    for name, sel in (("grouped-bootstrap 95% CI excludes 0", out.dv_diff_clear),
+                      (f"|observed difference| >= {MIN_ABS_DV_DIFF} nats", out.dv_diff_nonzero)):
+        s = out[sel]
+        print(f"\ncells with a clear observed AI-human dv difference ({name}): "
+              f"{len(s)} of {len(out)}; of these, E_per_class_dist has the same sign as "
+              f"the observed difference in {int(s.sign_agree.sum())} of {len(s)}")
+    print(f"(all 25 cells: sign agrees in {int(out.sign_agree.sum())})")
+    print("\ncosines (-> outputs/steer_cosines.csv): range over all cells "
+          f"{out.cos_class_decision.min():+.2f} to {out.cos_class_decision.max():+.2f}")
 
 
 if __name__ == "__main__":

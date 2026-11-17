@@ -385,10 +385,11 @@ layers judged better than either parent (+0.73). Were these effects artifacts of
 stitching as such? As a control, we stitched the same checkpoints on a judgment that
 post-training had changed little, the truth of statements on diverse facts (counterfact;
 Apertus: d′ = 1.38 base vs. 1.58 SFT; OLMo 2: 1.77 vs. 1.75). There, all hybrids stayed
-within or close to the range of their parents (largest deviation 0.03 for Apertus and
-0.09 for OLMo 2; one of 14 hybrids per model reliably outside), whereas on the textbook
+within or close to the range of their parents (largest deviation from the unstitched parents 0.02 for Apertus and
+0.08 for OLMo 2; none of 14 Apertus hybrids and one of 14 OLMo 2 hybrids reliably outside),
+whereas on the textbook
 summaries 6 of 18 Apertus hybrids and 4 of 18 OLMo 2 hybrids lay reliably outside
-(largest deviation 0.59; TODO(stitch): update with true-parent reference). Stitching thus
+(largest deviation 0.46 and 0.15; outputs/stitch/stitch_summary.csv). Stitching thus
 does not disturb the models' judgments in general. The control does not show, however, that
 the overshoot is specific to the judgment that post-training changed: The control judgment
 was far from chance, with high answer probability, whereas the textbook judgments were close
