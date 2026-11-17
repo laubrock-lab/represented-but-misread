@@ -36,7 +36,8 @@ layers for negation and the early layers for authorship, and exchanging internal
 mid-depth (activation patching) transferred the change with the states at the positions
 after the text, not with those of the text. In a training study with one model, adding
 2,000 correctly labeled examples to otherwise identical fine-tuning data shifted the
-answers strongly, improving them on two other corpora and inverting them on a third, with
-little change of the probes at the text positions. Post-training thus changed how the
+answers strongly, improving them on two other corpora and inverting them on a third, where
+the answers followed a probe trained on news (ρ = .68); the probes at the text positions
+changed little. Post-training thus changed how the
 question reads the text, for better or worse, and a small training signal can set the
 direction of this change.

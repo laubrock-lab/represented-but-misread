@@ -613,5 +613,31 @@ The dissociation that we observed after the original post-training was thus repr
 experimentally, by training data whose cues were valid for one genre and misleading for
 another.
 
+The account that the valid news labels installed a readout along the cues of the news,
+which mislead on the chats, makes a prediction that can be tested item by item. We fitted a
+probe for authorship on the held-out news in the base model, at the text positions, so that
+its direction is defined independently of any fine-tuned readout, and applied it unchanged
+to the chats (mean of layers 20 and 24; training_study/prediction_test.py). This news probe
+separated the chats with the wrong sign (d′ = −0.44 [−0.70, −0.15]). If training with valid
+news labels makes the answer read this direction, the answers of the C1 models to the
+individual chats should follow the probe's scores, and those of the other conditions should
+not. This was the case. Across the 300 chats, the answers of the C1 models correlated with
+the news-probe score (Spearman ρ = .68 [.60, .74], mean of three seeds; within the human
+messages .70, within the AI messages .63), whereas those of the control conditions did not
+(C0: −.11; C3: .04; C4: −.12); the difference between C1 and the random-label condition was
+.63 [.51, .75]. Stereotype labels produced a weaker correlation (C2: .34 [.22, .46]). With a
+news probe fitted on the 14 articles of the newspaper segments, the pattern was the same but
+weaker (C1: .51; C3: .04), and this probe did not separate the chats reliably in the base
+model (−0.11 [−0.36, 0.14]). At the last prompt position, the direction along which the C1
+models' answers to the chats varied was aligned with the direction that separated AI from
+human news in the same model (cosine .85, range across seeds .79–.90; C3: −.10; C4: .00;
+random directions: 95% of the absolute cosines below .43); note that this second comparison
+is partly circular, because the last position of a model that answers the news correctly
+carries its decision. The statistics were fixed before this analysis was run, but the
+inversion of the chats was known. Within these limits, the result supports a specific
+mechanism: Fine-tuning on valid labels installed a readout along the class direction of the
+training texts, and the answers to texts of another genre followed this direction, also
+where it pointed the wrong way.
+
 Because training with valid labels inverted the judgments of the chats, we verified
 the labels of this corpus. All 61 human messages are verbatim the students' original submissions, all 239 AI messages trace to the generation pipeline (none resembles a student message, maximum similarity .16), and independent judges recognized the chats in the labeled direction (human participants in a separate experiment: AUC = .82, Rosin & Laubrock, in preparation; Claude Opus: .69–.90). Whether individual students used AI tools to write their messages cannot be determined from the records.

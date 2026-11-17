@@ -154,7 +154,9 @@ judgments to otherwise identical fine-tuning data improved the readout of texts 
 cues resembled those of the training texts and impaired it where they did not; adding
 stereotyped labels shifted the readout in the direction implied by the validity of the
 stereotype, but reliably only where the stereotype was valid; and in all conditions the probes at the text positions changed little while
-the position at which the answer is formed was reorganized. The training signal can thus
+the position at which the answer is formed was reorganized. On the chats, the item-level answers after training with valid news labels followed a
+probe for the authorship of news that was fitted in the base model (Section 3.7), which
+turns the post-hoc explanation of the inversion into a tested prediction. The training signal can thus
 set the direction of the readout, as the account assumes. The training study does not
 show, however, that the decline after the official fine-tuning of OLMo 2 has the same
 origin: Our background condition, with a small part of the original data and low-rank
