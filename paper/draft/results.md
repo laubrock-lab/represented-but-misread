@@ -260,7 +260,7 @@ the post-trained models (within-class SD per model 0.61–2.89 nats) than in the
 (0.21–0.53). Relative to this spread, i.e., to the differences that the models make between
 texts, the stated base rate already moved the base models considerably (by 0.9–3.3 SD per
 model) and the post-trained models somewhat more (2.0–5.3 SD); the relative shift increased
-with post-training in four families and decreased in OLMo 3 Think (3.3 to 2.0 SD), and with
+with post-training in five families and decreased in OLMo 3 Think (3.3 to 2.0 SD), and with
 the second wording it increased only in Gemma 3 4B (0.8 to 4.2 SD), not in OLMo 2 (2.5 to
 2.4 SD; base_rate_scale.py). Thus, the post-trained models gave more extreme log-odds in
 general, to the base rate as well as to the texts; that the base rate gained weight relative
