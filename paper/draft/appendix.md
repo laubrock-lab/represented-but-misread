@@ -192,3 +192,29 @@ neither localization nor steering explained them fully.
 > | Chats | Qwen3 8B | +0.83 | +0.63 | +0.19 [−0.06, +0.45] |
 > | Textbook | Gemma 3 4B | +0.50 | +0.33 | +0.18 [−0.06, +0.41] |
 > | Textbook | Qwen3 8B | −0.13 | +0.18 | −0.31 [−0.55, −0.09] |
+
+## F Signal detection invariance
+
+> **Table F1.** Mean absolute change of the criterion c and of the sensitivity d′ under three
+> manipulations of the plain prompt, averaged over corpora and answer orders: stated AI share
+> 20 → 80% (from the slope over 20, 50, and 80%), answer order ("KI oder Mensch" vs. "Mensch
+> oder KI", without base-rate sentence), and presence of a base-rate sentence (50% vs. none).
+> The changes of d′ had no consistent direction (mean signed change ≤ 0.03). In 56% of the
+> conditions, the model gave the same answer to at least 98% of the texts, so that c could
+> hardly move (sdt_invariance.py; outputs/sdt_invariance_conditions.csv, sdt_invariance_tests.csv).
+
+| Model | Checkpoint | Base rate 20→80%: c | Base rate 20→80%: d′ | Answer order: c | Answer order: d′ | Base-rate sentence: c | Base-rate sentence: d′ |
+|:---|:---|---:|---:|---:|---:|---:|---:|
+| Apertus 1.5 8B | base | 0.63 | 0.24 | 1.09 | 0.30 | 0.37 | 0.17 |
+| Apertus 1.5 8B | final | 0.97 | 0.18 | 0.08 | 0.16 | 0.14 | 0.05 |
+| Gemma 3 12B | base | 1.67 | 0.09 | 1.27 | 0.22 | 0.40 | 0.18 |
+| Gemma 3 12B | final | 2.93 | 0.10 | 0.26 | 0.08 | 0.61 | 0.19 |
+| Gemma 3 4B | base | 0.42 | 0.07 | 0.65 | 0.10 | 0.29 | 0.05 |
+| Gemma 3 4B | final | 3.28 | 0.15 | 0.53 | 0.10 | 0.65 | 0.18 |
+| OLMo 2 7B | base | 1.09 | 0.05 | 3.11 | 0.29 | 0.40 | 0.12 |
+| OLMo 2 7B | final | 0.47 | 0.13 | 0.16 | 0.12 | 0.28 | 0.09 |
+| OLMo 3 7B Think | base | 0.93 | 0.30 | 0.90 | 0.21 | 0.32 | 0.13 |
+| OLMo 3 7B Think | final | 0.10 | 0.09 | 0.68 | 0.13 | 0.34 | 0.07 |
+| Qwen3 8B | base | 1.73 | 0.04 | 0.54 | 0.12 | 1.19 | 0.23 |
+| Qwen3 8B | final | 0.07 | 0.24 | 0.06 | 0.12 | 0.03 | 0.10 |
+| All | | 1.19 | 0.14 | 0.78 | 0.16 | 0.42 | 0.13 |

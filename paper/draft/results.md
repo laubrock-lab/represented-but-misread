@@ -82,6 +82,21 @@ an inverse ordering cannot result from a response bias, which only shifts the
 preference for all texts alike; properties typical of human texts pushed the answer
 toward "AI", and properties typical of AI texts toward "human".
 
+Is signal detection theory an appropriate description of these judgments? Its central
+assumption is that manipulations of the response bias move the criterion but leave the
+sensitivity unchanged. Stating a higher share of AI texts in the prompt had exactly this
+effect: Raising the stated share from 20% to 80% shifted the criterion toward "AI" in 65 of
+72 comparisons (mean |Δc| = 1.19; in the remaining comparisons c did not change, mostly
+because the model gave the same answer to every text), whereas d′ changed by 0.14 on
+average, without a consistent direction. The order of the answer options and the mere
+presence of the base-rate sentence also acted mainly on the criterion (mean |Δc| = 0.78 and
+0.42), but changed d′ somewhat more (0.16 and 0.13, again without a consistent direction;
+Appendix F). Thus, the models' answers separate into a sensitivity and a criterion largely as
+signal detection theory assumes, and the criterion is a property of the model together with
+the prompt rather than of the model alone. The small, non-directional changes of d′ between
+prompt versions are one reason why we average d′ over both answer orders and compare
+checkpoints only on identical prompts.
+
 > **Table 2.** Sensitivity (d′) of the models' answers. Base models were queried with a
 > plain completion prompt ("raw"); post-trained models with the same prompt and with
 > their chat template ("chat"). Conditions in which a model placed less than 30% of its

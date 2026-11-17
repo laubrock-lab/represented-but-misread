@@ -124,6 +124,25 @@ def main() -> None:
     summ_ns = tests[~tests.any_saturated].assign(kind=kind[~tests.any_saturated]).groupby(["kind", "measure"]).agg(
         cells=("est", "size"), mean_abs=("est", lambda v: np.abs(v).mean()), mean=("est", "mean"),
         n_excl0=("excl0", "sum"))
+    # appendix table: mean absolute full-range effect per model x checkpoint (over corpora and
+    # answer orders); base-rate slope scaled to the 20 -> 80% range (x 6)
+    t = tests.assign(kind=kind)
+    t["eff"] = np.where(t.kind.str.startswith("base rate"), t.est * 6, t.est)
+    t["kind"] = t.kind.map({"base rate slope per 10 pts": "Base rate 20→80%", "order km-mk": "Answer order",
+                            "sentence p50-none": "Base-rate sentence"})
+    tab = t.pivot_table(index=["preset", "variant"], columns=["kind", "measure"], values="eff",
+                        aggfunc=lambda v: np.abs(v).mean())
+    names = {"gemma3-4b": "Gemma 3 4B", "gemma3-12b": "Gemma 3 12B", "qwen3-8b": "Qwen3 8B",
+             "olmo2-7b": "OLMo 2 7B", "apertus15-8b": "Apertus 1.5 8B", "olmo3-7b-think": "OLMo 3 7B Think"}
+    kinds = ["Base rate 20→80%", "Answer order", "Base-rate sentence"]
+    lines = ["| Model | Checkpoint | " + " | ".join(f"{k}: c | {k}: d′" for k in kinds) + " |",
+             "|:---|:---|" + "---:|" * (2 * len(kinds))]
+    for (pr, v), r in tab.iterrows():
+        vals = " | ".join(f"{r[(k, 'c')]:.2f} | {r[(k, 'd')]:.2f}" for k in kinds)
+        lines.append(f"| {names.get(pr, pr)} | {'base' if v == 'base' else 'final'} | {vals} |")
+    allm = t.groupby(["kind", "measure"]).eff.apply(lambda v: np.abs(v).mean())
+    lines.append("| All | | " + " | ".join(f"{allm[(k, 'c')]:.2f} | {allm[(k, 'd')]:.2f}" for k in kinds) + " |")
+    (config.OUTPUT_DIR / "sdt_invariance_table.md").write_text("\n".join(lines) + "\n")
     with pd.option_context("display.width", 200, "display.float_format", "{:+.3f}".format):
         print("all cells:\n", summ.to_string())
         print("\nwithout saturated conditions:\n", summ_ns.to_string())

@@ -118,7 +118,13 @@ false-alarm rates (Hautus, 1995); positive values indicate a bias toward answeri
 answer is ordered across texts, in the manner of a confidence-rating ROC, even where the
 binary answer hardly varies; c describes where the order-averaged dv places the threshold
 and is not the criterion of any single prompt, since the binary answers often depended on
-the order of the answer options (Section 3.2). Confidence intervals (95%) were obtained by a grouped bootstrap that resampled
+the order of the answer options (Section 3.2). To test whether signal detection theory describes the models'
+judgments, we manipulated the response bias in two ways that should leave the sensitivity
+unchanged: the order of the two answer options, and a sentence stating the share of AI texts
+in the study (20, 50, or 80%), added to the plain prompt. For each single prompt condition,
+we computed d′ and c from the dv of that prompt alone and estimated the changes between
+conditions with a grouped bootstrap (sdt_invariance.py); where a model gave the same answer
+to at least 98% of the texts, c is close to its bound and can hardly move. Confidence intervals (95%) were obtained by a grouped bootstrap that resampled
 whole source groups (1,000–2,000 resamples). The AUC, and hence d′, as well as hit and
 false-alarm rates are computed within each class and therefore do not depend on the
 unequal numbers of AI and human texts (chats: 239 vs. 61; newspaper segments: 65 vs. 38);
