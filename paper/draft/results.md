@@ -515,15 +515,20 @@ the supervised fine-tuning data, we searched the SFT mixtures of OLMo 2 and Aper
 contained thousands of requests to judge statements as true or false (Tülu 3: 2,685;
 Apertus, extrapolated: about 2,300), largely factual claims in Tülu 3 and mathematical
 statements with explicit reasoning, often including negations, in Apertus. In contrast,
-neither mixture contained a single request to judge whether a text had been written by a
-human or by an AI, and the matches for fake or deceptive reviews were sentiment tasks or
+we found no request to judge whether a text had been written by a
+human or by an AI: The search pattern matched five conversations in Tülu 3 and none in the
+Apertus sample, and on inspection none of the five posed this judgment (they concerned,
+e.g., a training script for an audio classifier and summaries of research papers; the matches
+are listed in outputs/sft_check/). The matches for fake or deceptive reviews were sentiment tasks or
 summaries of research papers. Because our judgments were posed in German, we repeated the
 search with German patterns in the conversations written in German, which made up only
 0.1% of Tülu 3 (992 conversations) and 1.7% of the Apertus sample (6,330). They
 contained no request to judge authorship and no deception judgment, two mentions of
-AI-generated text (Apertus), and six true/false questions. Thus, post-training improved the one judgment for which the
-training data specify how to read the question, where the base model read it wrongly,
-and impaired or merely reshaped the judgments for which they do not.
+AI-generated text (Apertus), and six true/false questions. Note that a search with regular
+expressions can miss requests that are phrased differently, and that the German subsets are
+so small that their search has little power. The census is thus consistent with the idea that post-training improved the one judgment
+for which the training data contain examples, where the base model read it wrongly, and
+impaired or merely reshaped the judgments for which we found none; it cannot establish this.
 
 In summary, for authorship as for negated statements, the information was represented,
 post-training changed the readout far more than the representation of the text, and the

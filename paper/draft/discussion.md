@@ -1,27 +1,30 @@
 # 4 Discussion
 
 
-In the present study we used authorship judgments as a test case for the question of
-whether post-training changes what a language model represents or how it reads this
-representation out. Across six open-weight base models and three corpora of German texts,
-the information that distinguishes AI from human texts was readily available, both in
-the texts themselves and in the models' internal representations, but the models'
-answers did not use it, and often ordered the texts inversely. Post-training lowered
-the sensitivity of the answers on average (Δd′ = −0.33), with considerable variation
-between models and text types, and in the two models with stage-wise
-checkpoints the change occurred during supervised fine-tuning. Two interventions
-bore on where this change takes effect. Model stitching implicated the weights of the early layers, with the caveat that
-stitched hybrids produce effects of their own. Activation patching showed that, by the
-middle of the network, the change does not reside in the representation of the text but
-in the processing at the positions of the question that follow the text. The
-same pattern held most clearly for negated statements, a judgment with public data: The
-information was represented, post-training changed the readout while the probes stayed at
-ceiling, and the states at the positions after the statement transferred the change. For
-deceptive hotel reviews, the information was represented and the answers stayed near
-chance, but the localization was inconclusive. The direction of the change differed between
-the judgments, and so did its depth. In short, post-training changed little in how the models represent the text;
-it changed how the question they are asked reads this representation out, in a direction
-that depended on the judgment.
+In the present study we used two judgments with known ground truth to ask whether
+post-training changes what a language model represents or how it reads this representation
+out. For negated statements, the truth was represented at ceiling in all six model
+families, but the answers of several base models used it poorly or ordered the statements
+inversely, and supervised fine-tuning repaired the readout while the probes stayed at
+ceiling. For authorship, the information that distinguishes AI from human texts was readily
+available in three corpora of German texts, both in the texts themselves and in the models'
+internal representations, but the answers did not use it, and often ordered the texts
+inversely. Post-training lowered the sensitivity of these answers on average (Δd′ = −0.34
+across families; −0.29 across three prompt wordings), with considerable variation between
+models, text types, and prompts, and in the two models with stage-wise checkpoints the
+change occurred during supervised fine-tuning. Post-training also changed how strongly a
+stated base rate moved the answers, from less than an ideal observer would to more. Two
+interventions bore on where the changes take effect. Model stitching implicated the weights
+of the middle layers for negation and of the early layers for authorship, with the caveat
+that stitched hybrids produce effects of their own. Activation patching showed that, at the
+middle of the network, the states at the positions after the text transferred the change
+between checkpoints, whereas the states of the text did not. In a training study, a small
+number of labeled examples shifted the readout in the direction their labels implied. In
+short, where we could test it, post-training changed little in how the models represent the
+text; it changed how the question they are asked reads this representation out, in a
+direction that depended on the judgment. Note that the localization rests on two model
+families and single layers, and that for the deceptive reviews (Appendix C) it was
+inconclusive.
 
 ## Relation to previous work
 
@@ -308,14 +311,16 @@ all contrasts as well, which left five of six decreases significant.
 
 ## Conclusion
 
-Language models that write like humans fail to recognize their own kind of text, not
-because they lack the information but because post-training changes how they read it
-out. The same holds, with a different sign, for judgments that post-training improves:
-In all three judgments we studied, post-training changed little in the representation
-of the text and changed how the question reads it, at the positions of the question and
-through weights in the early or middle layers. To know what a model knows, it is therefore not enough to look at
-its answers; one has to look at how the question is read. A training study showed
-that the training data can set the direction of this readout with little change at the
-text positions. Future studies with larger models may show how general this mechanism is,
-which parts of real post-training data install a misreading, and whether such side effects
-can be prevented without giving up the benefits of post-training.
+Language models can represent what an answer would require and still answer otherwise.
+For negated statements, post-training repaired such a readout; for authorship, it impaired
+the readout on average: Models that write like humans failed to recognize their own kind of
+text, not because they lacked the information but because of how they read it out. In both
+judgments, post-training changed little in the representation of the text where we could
+test it, and the change between checkpoints was transferred by the states at the positions
+after the text and carried by weights in the middle or early layers. To know what a model
+knows, it is therefore not enough to look at its answers; one has to look at how the
+question is read. A training study showed that the training data can set the direction of
+this readout with little change at the text positions. Future studies with larger models
+may show how general this mechanism is, which parts of real post-training data install a
+misreading, and whether such side effects can be prevented without giving up the benefits
+of post-training.
