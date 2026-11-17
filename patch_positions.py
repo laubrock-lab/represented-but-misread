@@ -27,12 +27,22 @@ Usage (cluster)
 Output: outputs/patch/<corpus>/<preset>_<recipient>-from-<donor>_L<k>.csv (one row per text x order x set)
 True/false judgments (prompt and scoring of factuality.py): --corpus truth:<name>
 (--limit = number of pairs); "text" = the statement, output in outputs/patch/truth_<name>/.
+
+Layer sweep
+-----------
+--layers k1 k2 ... caches the donor states for all requested layers in one donor
+pass (CPU, half precision) and loops over layers and position sets with the
+recipient loaded once; one CSV per layer, named and formatted exactly as with
+--layer. --out-root puts the files under outputs/<root>/<corpus>/ instead of
+outputs/patch/<corpus>/. Memory of the cache is reported before the recipient is
+loaded (n_layers x sum of prompt lengths x hidden size x 2 bytes).
 """
 
 from __future__ import annotations
 
 import argparse
 import gc
+import time
 
 import numpy as np
 import pandas as pd
@@ -95,15 +105,31 @@ def main() -> None:
     ap.add_argument("--preset", required=True, choices=list(config.MODEL_PRESETS))
     ap.add_argument("--recipient", required=True)
     ap.add_argument("--donor", required=True)
-    ap.add_argument("--layer", type=int, required=True, help="hidden_states index k (output of decoder layer k)")
+    ap.add_argument("--layer", type=int, help="hidden_states index k (output of decoder layer k)")
+    ap.add_argument("--layers", type=int, nargs="+",
+                    help="several hidden_states indices in one job (one CSV per layer); "
+                         "the donor is run once and its states are cached for all of them")
     ap.add_argument("--sets", nargs="+", default=SETS, choices=SETS)
     ap.add_argument("--max-text-tokens", type=int, default=2048)
     ap.add_argument("--limit", type=int)
     ap.add_argument("--device", default="auto")
     ap.add_argument("--prompt-variant", default="default", choices=list(config.RAW_VARIANTS),
                     help="raw template variant (authorship only); adds a suffix to the output name")
+    ap.add_argument("--out-root", default="patch",
+                    help="write to outputs/<root>/<corpus>/ (default: patch)")
+    ap.add_argument("--self-check", action="store_true",
+                    help="sanity check: donor = recipient, so every set must reproduce the "
+                         "unpatched dv; the maximum |dv - none| is reported per layer")
+    ap.add_argument("--skip-existing", action="store_true",
+                    help="leave layers whose output CSV already exists untouched (for restarts)")
     args = ap.parse_args()
     config.set_prompt_variant(args.prompt_variant)
+
+    layers = args.layers if args.layers else ([args.layer] if args.layer is not None else None)
+    if not layers:
+        ap.error("give --layer or --layers")
+    layers = sorted(dict.fromkeys(layers))
+    donor_name = args.recipient if args.self_check else args.donor
 
     device = pick_device(args.device)
     ids = config.MODEL_PRESETS[args.preset]
@@ -120,9 +146,24 @@ def main() -> None:
     def make_prompt(tok, text, order):
         return F.build_prompt(tok, text, "raw", order) if truth else build_prompt(tok, text, "raw", order, "neutral")
 
-    # 1. donor activations at layer k for every prompt position
-    tok, donor = load_model(ids[args.donor], device, torch.bfloat16)
-    store = {}
+    out_dir = config.OUTPUT_DIR / args.out_root / args.corpus.replace(":", "_")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    pv = "" if args.prompt_variant == "default" else f"_{args.prompt_variant}"
+    nlim = f"_n{args.limit}" if args.limit else ""
+
+    def out_path(k: int):
+        return out_dir / f"{args.preset}_{args.recipient}-from-{donor_name}_L{k}{nlim}{pv}.csv"
+
+    todo = [k for k in layers if not (args.skip_existing and out_path(k).exists())]
+    if not todo:
+        print("nothing to do (all layers present)")
+        return
+    print(f"layers {todo} | sets {args.sets} | {len(texts)} texts x {len(orders)} orders", flush=True)
+
+    # 1. donor activations at every requested layer k, for every prompt position
+    t0 = time.time()
+    tok, donor = load_model(ids[donor_name], device, torch.bfloat16)
+    store, n_cached = {}, 0
     with torch.no_grad():
         for r in texts.itertuples(index=False):
             text = r.text if truth else truncate_text(tok, r.text, args.max_text_tokens)[0]
@@ -131,43 +172,67 @@ def main() -> None:
                 n, pos = prompt_positions(tok, prompt, add, text)
                 ids_t = tok(prompt, add_special_tokens=add, return_tensors="pt")["input_ids"].to(device)
                 hs = donor(input_ids=ids_t, output_hidden_states=True, use_cache=False).hidden_states
-                store[(r.text_id, order)] = (prompt, add, pos, hs[args.layer][0].to("cpu", torch.bfloat16))
+                act = torch.stack([hs[k][0] for k in todo]).to("cpu", torch.bfloat16)
+                store[(r.text_id, order)] = (prompt, add, pos, act)
+                n_cached += act.numel()
     del donor
     gc.collect()
     torch.cuda.empty_cache() if device == "cuda" else None
+    print(f"donor {donor_name} cached: {n_cached * 2 / 2**30:.2f} GiB "
+          f"({len(store)} prompts x {len(todo)} layers) in {time.time() - t0:.0f}s", flush=True)
 
-    # 2. recipient with patched positions
+    # 2. recipient with patched positions, one pass per layer
     tok, model = load_model(ids[args.recipient], device, torch.bfloat16)
-    patcher = Patcher(find_decoder_layers(model)[args.layer - 1])
+    dec = find_decoder_layers(model)
     cands, eow = (F.candidate_seqs(tok) if truth else candidate_ids(tok)), {}
-    rows = []
-    with torch.no_grad():
-        for r in texts.itertuples(index=False):
-            for order in orders:
-                prompt, add, pos, act = store[(r.text_id, order)]
-                for s in args.sets:
-                    idx = torch.tensor(pos[s], dtype=torch.long)
-                    patcher.idx, patcher.val = (idx, act[idx]) if len(idx) else (None, None)
-                    res = (F.score(model, tok, prompt, add, cands, eow, device, False) if truth else
-                           score_one(model, tok, prompt, add, None, cands, eow, device, False))
-                    rows.append(dict(text_id=r.text_id, source_id=r.source_id, is_ai=r.is_ai, order=order,
-                                     set=s, n_pos=len(idx), dv=res["dv"], p_mass=res["p_mass"]))
-    patcher.handle.remove()
-    out_dir = config.OUTPUT_DIR / "patch" / args.corpus.replace(":", "_")
-    out_dir.mkdir(parents=True, exist_ok=True)
-    pv = "" if args.prompt_variant == "default" else f"_{args.prompt_variant}"
-    out = out_dir / f"{args.preset}_{args.recipient}-from-{args.donor}_L{args.layer}{f'_n{args.limit}' if args.limit else ''}{pv}.csv"
-    df = pd.DataFrame(rows)
-    df.to_csv(out, index=False)
-
     from sdt_summary import sdt
-    avg = df.groupby(["set", "text_id", "is_ai"], as_index=False).agg(dv=("dv", "mean"), pm=("p_mass", "mean"))
-    ref = avg[avg.set == "none"].set_index("text_id").dv
-    for s, g in avg.groupby("set"):
-        d = sdt(g.is_ai.to_numpy(), g.dv.to_numpy())["d_auc"] if g.is_ai.nunique() == 2 else np.nan
-        shift = np.abs(g.set_index("text_id").dv - ref.reindex(g.text_id).values).mean()
-        print(f"  {s:5s} d' {d:+.2f}  p_mass {g.pm.mean():.2f}  mean |dv - none| {shift:.3f}")
-    print(f"-> {out}")
+
+    def score(prompt, add):
+        return (F.score(model, tok, prompt, add, cands, eow, device, False) if truth else
+                score_one(model, tok, prompt, add, None, cands, eow, device, False))
+
+    # the unpatched forward pass does not depend on the layer: compute it once and
+    # reuse it for every empty position set ("none", and "question" where the prompt
+    # has no question line). Identical values, 1 / len(sets) less compute per layer.
+    plain: dict[tuple, dict] = {}
+    for li, k in enumerate(todo):
+        t0 = time.time()
+        patcher = Patcher(dec[k - 1])
+        rows = []
+        with torch.no_grad():
+            for r in texts.itertuples(index=False):
+                for order in orders:
+                    prompt, add, pos, act = store[(r.text_id, order)]
+                    for s in args.sets:
+                        idx = torch.tensor(pos[s], dtype=torch.long)
+                        if len(idx):
+                            patcher.idx, patcher.val = idx, act[li][idx]
+                            res = score(prompt, add)
+                        else:
+                            patcher.idx = patcher.val = None
+                            if (r.text_id, order) not in plain:
+                                plain[(r.text_id, order)] = score(prompt, add)
+                            res = plain[(r.text_id, order)]
+                        rows.append(dict(text_id=r.text_id, source_id=r.source_id, is_ai=r.is_ai, order=order,
+                                         set=s, n_pos=len(idx), dv=res["dv"], p_mass=res["p_mass"]))
+        patcher.handle.remove()
+        out = out_path(k)
+        df = pd.DataFrame(rows)
+        df.to_csv(out, index=False)
+
+        print(f"L{k} ({time.time() - t0:.0f}s)", flush=True)
+        avg = df.groupby(["set", "text_id", "is_ai"], as_index=False).agg(dv=("dv", "mean"), pm=("p_mass", "mean"))
+        ref = avg[avg.set == "none"].set_index("text_id").dv
+        worst = 0.0
+        for s, g in avg.groupby("set"):
+            d = sdt(g.is_ai.to_numpy(), g.dv.to_numpy())["d_auc"] if g.is_ai.nunique() == 2 else np.nan
+            diff = np.abs(g.set_index("text_id").dv - ref.reindex(g.text_id).values)
+            worst = max(worst, float(diff.max()))
+            print(f"  {s:5s} d' {d:+.2f}  p_mass {g.pm.mean():.2f}  mean |dv - none| {diff.mean():.3f}")
+        if args.self_check:
+            print(f"  SELF-CHECK L{k}: max |dv - none| over all sets = {worst:.2e} "
+                  f"({'OK' if worst < 1e-3 else 'FAILED'})")
+        print(f"-> {out}", flush=True)
 
 
 if __name__ == "__main__":
