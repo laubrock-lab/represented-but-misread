@@ -35,9 +35,9 @@ can lower accuracy but cannot produce sensitivity below chance. Reversed readout
 discriminative direction have been described for steering vectors (Torop et al., 2026);
 here, the inverse ordering occurred in the graded preferences behind the models'
 unmodified answers, and in two model families the class-mean difference at the answer
-position carried this inverse ordering (Section 3.3). Note, however, that the cues themselves were specific
+position carried this inverse ordering (Appendix D). Note, however, that the cues themselves were specific
 to the corpus: A probe trained on the newspaper segments separated the chats with the
-wrong sign (Section 3.1). A judgment below chance therefore need not reflect an inverted
+wrong sign (Section 3.2). A judgment below chance therefore need not reflect an inverted
 reading of a single authorship representation; it can also reflect a fixed policy whose
 cues are valid for one kind of text and invalid for another. Second, the decline is
 linked to post-training. Interestingly, in the closest related study, post-training had the
@@ -92,7 +92,7 @@ at layer ℓ is equivalent to exchanging the full residual stream at all positio
 that layer, so that our stitching and patching results are two views of one family of
 interventions rather than independent tests. Steering at the answer position does not
 add an independent test either, because it largely restates the difference between the
-classes in the answers (Section 3.3). Two further cautions apply. A probe shows that information can be decoded, not that the
+classes in the answers (Appendix D). Two further cautions apply. A probe shows that information can be decoded, not that the
 model uses it (Hewitt & Liang, 2019; Elazar et al., 2021); this is why we rest the claim
 that post-training changed the readout on the stitching and patching results rather than on the probes.
 Conversely, interventions along a subspace can change the output through a pathway other
@@ -234,7 +234,7 @@ Three implications follow, each of which requires further testing. First, the si
 effects of post-training can be localized, and possibly repaired. A stitched model that
 combined the first eight layers of the Apertus base model with all upper layers of the
 fine-tuned model discriminated better than either parent, although such hybrids also
-produce effects of their own (Section 3.4). Whether such hybrids retain
+produce effects of their own (Section 3.5). Whether such hybrids retain
 the intended effects of post-training, such as instruction following, is an open
 question, and the approach is related to combining fine-tuned weights by interpolation
 or averaging (Wortsman et al., 2022a, 2022b). Second, knowing where a side effect arises

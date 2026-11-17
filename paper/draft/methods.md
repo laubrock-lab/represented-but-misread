@@ -265,7 +265,7 @@ one truth direction also covers negated statements (Marks & Tegmark, 2024). Mode
 stitching and activation patching were carried out as for authorship, for both further
 judgments, but only where there was a change to locate: in models whose answers changed
 substantially with post-training and whose base models placed at least 30% of their
-probability on the two answer words, the criterion used for authorship (Table 2). For the
+probability on the two answer words, the criterion used for authorship (Table 3). For the
 negated statements, these were OLMo 2 and Apertus (base vs. SFT, 300 pairs); the Gemma 3
 base models fell below this criterion (18% and 25%), and the base models of Qwen3 and OLMo 3 already
 judged the negated statements perfectly. For the reviews, these were Gemma 3 4B, which

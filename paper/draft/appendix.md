@@ -112,7 +112,35 @@ post-training, all models treated long, detailed reviews as truthful, a cue with
 validity (r = .03 with the ground truth), and ignored first-person pronouns, the most valid
 single cue (r = −.33).
 
-## C Deceptive reviews: full results
+## C Deceptive reviews
+
+> **Table C1.** Deceptive reviews: sensitivity (d′) of the probes (last prompt position, two
+> thirds of the network depth) and of the answers (plain prompt). SFT: answers after
+> supervised fine-tuning; —: no intermediate checkpoint released.
+>
+> | Judgment | Model | Probe base | Probe final | Answer base | SFT | Final |
+> |:---|:---|---:|---:|---:|---:|---:|
+> | Authenticity | OLMo 2 7B | 2.93 | 2.79 | 0.16 | 0.20 | 0.17 |
+> | (hotel reviews) | Apertus 1.5 8B | 2.62 | 2.49 | 0.14 | 0.32 | 0.23 |
+> | | OLMo 3 7B Think | 2.80 | 2.69 | 0.13 | −0.01 | 0.00 |
+> | | Gemma 3 4B | 2.82 | 2.51 | 0.45 | — | 0.08 |
+> | | Gemma 3 12B | 3.01 | 2.57 | 0.52 | — | 0.86 |
+> | | Qwen3 8B | 2.56 | 2.59 | 0.06 | — | 0.50 |
+
+*Answers.* All models judged the reviews close to chance (d′ between 0.00 and
+0.86), although probes separated truthful from deceptive reviews well (d′ = 2.5–3.0), at
+least as well as a classifier on word frequencies (d′ = 2.44). Post-training changed the
+probes little and the answers by small amounts in a direction that depended on the model:
+Gemma 3 4B lost sensitivity (d′ 0.45 → 0.08), Qwen3 (0.06 → 0.50) and Gemma 3 12B (0.52 →
+0.86) gained, and the others changed little (Table C1). What post-training changed
+consistently was a shared heuristic. The base models judged positive reviews as more
+truthful than negative ones, and review polarity accounted for 41–90% of the variance of
+their judgments; post-training largely removed this heuristic (2–32%), except in OLMo 3
+Think (76%), and all final models showed a strong bias toward "Truthful" (83–92% of the
+answers). The localization and steering analyses were less conclusive than for the other
+two judgments: Patching located the change at the question positions in two of four
+cases, and steering did not explain it (see below). The reviews are thus a case in which
+post-training reshaped the readout without improving it.
 
 *Convergence.* Within each review polarity, the item-level judgments of the five models
 post-trained mainly for conversation became more similar: The mean correlation between
@@ -139,7 +167,81 @@ These results are less conclusive than those for authorship and negated statemen
 effects of post-training were small (|Δd′| ≤ 0.44), their sign differed between models, and
 neither localization nor steering explained them fully.
 
-## D Steering: all cells
+## D Steering at the answer position
+
+The probes and the answers could dissociate either because the answers ignore the
+authorship information or because they use it with the wrong sign. As a check on the
+second possibility, we shifted a model's internal state at the position where the
+answer is produced along the direction that separates AI from human texts (estimated on
+held-out groups; Section 2.7), and measured how the answer changed. The primary test used
+shifts of ±2 within-class standard deviations, which kept 48–77% of the shifted texts
+within the range of the observed texts (±1 SD: 60–94%). We compared the effect with 100
+control directions per cell, each drawn once and applied to all texts: 50 random
+directions within the high-variance subspace of the activations and 50 differences between
+random halves of the texts within each class. The controls took either steps of the same
+length as the authorship direction (norm-matched) or steps of two standard deviations along
+their own direction (scale-matched), which kept them within the range of the texts as
+often as the authorship direction (49–69%). As a positive control, we shifted along the
+direction that the model's own answers follow (the decision direction). In 21 of 25 cells
+(model × corpus × layer, including the truth judgments of Section 3.1 and the review judgments of Appendix C), the
+decision direction moved the answer more than the norm-matched controls (rank-based
+p ≤ .05), so that the test can detect a direction that the answer reads; against the
+scale-matched controls, this was the case in 16 of 25 cells. Where the positive control
+failed, a null result for the authorship direction is not informative.
+
+In six of the 17 authorship cells, the authorship direction moved the answer more than the
+controls (rank-based p ≤ .06 against both control families; with 100 controls, the smallest
+possible p is .01, so that no cell would survive a correction for 17 tests), and in all six
+it moved it the wrong way: Shifting a text toward "AI" made the
+model answer "human" more often. This was the case for the short chats in Gemma 3 12B
+(layer 31: −7.38 nats; rank-based p = .01 against both control families), Gemma 3 4B
+(layer 17: −1.74; p = .04 norm-matched, .06 scale-matched), and Qwen3 (layers 24 and 30:
+−1.18 and −2.06; p ≤ .03), and for the newspaper segments in Qwen3 (−0.43 and −0.85;
+p ≤ .04). In these cells, the authorship direction pointed against the decision direction
+(cosine −0.59 to −0.92), and the answers were clearly below chance (Table 3). Note that
+these are the cells with the most negative d′, and that this is expected: The authorship
+direction is the difference between the class means at the position from which the answer is
+read, so that, if the answer depends approximately linearly on this state, shifting along it
+must reproduce the observed difference between the classes. Across the 25 cells, the effect
+of a shift by one class distance correlated with the observed difference (TODO(steer): r from
+script). The test therefore does not provide evidence that is independent of the answers'
+d′; it shows that the inverse ordering is carried by the class-mean difference at the answer
+position, more than by typical directions. In the
+remaining cells, the authorship direction did not move the answer more than arbitrary
+directions: Gemma 3 4B on the newspaper segments (−1.04 and −2.00 at layers 22 and 28;
+p = .26–.42), Apertus and OLMo 3 on the textbook summaries before and after SFT, and Gemma
+3 12B on the newspaper segments, on which its answers were at chance (+0.03). In some of
+these cells, the positive control did not exceed the scale-matched controls either (Gemma 3
+12B on the newspaper segments, Gemma 3 4B at layer 28, Apertus at layers 21 and 27 and
+OLMo 3 after SFT; Table D1), so that their null results are weaker evidence. In the
+strongest cell (Gemma 3 12B on the chats), the decision direction itself did not clearly
+exceed the norm-matched controls (TODO(steer): p from script), and only 48% of the shifted
+texts stayed within the observed range. The norm-matched controls in the subspace of
+leading components moved the state far outside the observed range in the Gemma 3 and Qwen3
+cells, so that the scale-matched controls are the fairer comparison. In summary, where the
+answers ordered the texts inversely, the class-mean difference at the answer position
+carried this inverse ordering; steering at earlier layers or at the text positions, which
+would be an independent test, was not carried out.
+
+A complementary, descriptive comparison concerns the size of the effects. Shifting a
+text by one class-mean distance along the authorship direction, i.e., from the average
+human text to the average AI text, changed the answer in the same direction as the
+observed difference between AI and human texts in all 20 cells in which this difference
+was clearly different from zero (e.g., Qwen3 on the newspaper segments: −0.50 and −0.66
+nats vs. an observed difference of −0.59). As stated above, this agreement is expected if the answer depends approximately linearly
+on the internal state; it is consistent with the patching results (Section 3.5).
+
+Steering did not, however, reveal what post-training changes for authorship. In the
+Apertus base model, shifting toward "AI" moved the answer in the correct direction,
+increasingly so with depth (+0.08, +0.21, and +0.35 nats at layers 16, 21, and 27), but
+not more than the control directions (p ≥ .15), and after SFT the effect was close to zero
+(−0.04 to +0.04). In OLMo 3 Think, neither the base nor the SFT model used the direction
+(−0.01 and +0.09).[^olmo3] The change of the answers during SFT is therefore localized by
+the stitching and patching analyses (Section 3.5), not by steering.
+
+[^olmo3]: An earlier comparison, in which the SFT model received its chat template and the
+base model the plain prompt, had suggested a reversed use after SFT (−0.27); with the same
+plain prompt for both checkpoints, this was not the case.
 
 > **Table D1.** Steering at the last prompt position (L: layer). Dist.: distance between
 > the class means along the class direction, in within-class SD. In range: share of
@@ -218,3 +320,49 @@ neither localization nor steering explained them fully.
 | Qwen3 8B | base | 1.73 | 0.04 | 0.54 | 0.12 | 1.19 | 0.23 |
 | Qwen3 8B | final | 0.07 | 0.24 | 0.06 | 0.12 | 0.03 | 0.10 |
 | All | | 1.19 | 0.14 | 0.78 | 0.16 | 0.42 | 0.13 |
+
+## G Individual post-training contrasts
+
+Among the individual comparisons, six decreases survived Holm correction within this
+family of 18 tests (all p_Holm ≤ .013): Gemma 3 12B (Δd′ = −0.95 [−1.28, −0.66]),
+Qwen3 (−0.57 [−0.79, −0.36]), Gemma 3 4B (−0.50 [−0.72, −0.29]), Apertus (−0.47
+[−0.71, −0.25]) and OLMo 2 (−0.32 [−0.52, −0.12]) on the textbook summaries, and Qwen3
+on the newspaper segments (−0.65 [−0.93, −0.42]). On the short chats, three decreases of
+similar size (Gemma 3 4B: −0.51; Apertus: −0.47; Gemma 3 12B: −0.45; uncorrected
+p ≤ .008) did not survive Holm correction (p_Holm = .059–.074), because the chat estimates
+were less precise (61 independent originals compared with 119 pairs for the textbook
+summaries); they remained significant under false-discovery-rate control. Two increases
+were significant only without correction or under false-discovery-rate control: OLMo 2
+on the short chats (+0.35 [0.06, 0.63]) and OLMo 3 Think on the textbook summaries, the
+latter in a condition with low answer probability. Note that we defined the family of
+tests post hoc as the comparisons that address our hypothesis; Holm correction across
+all 111 contrasts we computed, including comparisons between adjacent post-training
+stages and across prompt formats, left five of the six decreases significant. Hence,
+post-training lowered the sensitivity of the answers on average, but neither uniformly
+nor in a single direction across models and text types.
+
+## H Localization: further analyses
+
+*Sublayer types.* Both sublayer types contributed. Exchanging only the attention blocks or only the
+feed-forward (MLP) blocks of the first 8 Apertus layers had partial effects in both
+directions (e.g., restoring the base model's blocks under SFT: attention +0.17
+[−0.06, 0.40], MLP +0.18 [0.03, 0.37], both together +0.59). In OLMo 2, the base
+model's MLP blocks of the first 16 layers restored discrimination almost completely
+(−0.09 [−0.29, 0.11]), whereas its attention blocks did so only partly (−0.35
+[−0.55, −0.19]). Within the limits just described, the change thus appears to be
+distributed over the early layers and to involve both attention and feed-forward
+blocks.
+
+*Question placed before the text.* See Section 3.5 for the interpretation.
+
+> **Table H1.** Activation patching at layer 16 with the question placed before the text
+> (textbook summaries): d′ of the recipient after receiving the donor's states at one set of
+> positions; change relative to the unpatched recipient with 95% CI (grouped bootstrap) for
+> the three sets of interest (localization_summary.py; outputs/patch/patch_summary.csv).
+>
+> | Recipient ← donor | Unpatched | Donor | Text | Question (before text) | After text | All positions |
+> |:---|---:|---:|---:|---:|---:|---:|
+> | Apertus base ← SFT | +0.36 | −0.19 | +0.31 (−0.05 [−0.15, 0.05]) | +0.55 (+0.19 [0.06, 0.32]) | +0.13 (−0.23 [−0.46, −0.02]) | −0.17 |
+> | Apertus SFT ← base | −0.19 | +0.36 | −0.07 (+0.12 [0.04, 0.21]) | +0.10 (+0.29 [0.21, 0.38]) | +0.44 (+0.63 [0.43, 0.86]) | +0.50 |
+> | OLMo 2 base ← SFT | +0.09 | −0.42 | +0.06 (−0.04 [−0.13, 0.07]) | −0.08 (−0.18 [−0.30, −0.04]) | −0.16 (−0.25 [−0.39, −0.10]) | −0.43 |
+> | OLMo 2 SFT ← base | −0.42 | +0.09 | −0.40 (+0.01 [−0.06, 0.08]) | −0.33 (+0.09 [−0.03, 0.21]) | −0.17 (+0.24 [0.09, 0.40]) | +0.08 |
