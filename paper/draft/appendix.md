@@ -321,6 +321,33 @@ plain prompt for both checkpoints, this was not the case.
 | Qwen3 8B | final | 0.07 | 0.24 | 0.06 | 0.12 | 0.03 | 0.10 |
 | All | | 1.19 | 0.14 | 0.78 | 0.16 | 0.42 | 0.13 |
 
+> **Table F2.** Use of the stated base rate: mean shift of dv (nats) between a stated share of
+> 20% and 80% AI texts, averaged over three corpora and both answer orders (six cells; range
+> over cells in brackets), its ratio to the shift of the prior log-odds (ln 16 = 2.77), and the
+> mean between-text SD of the shift within a cell. Wording: share named first in the base-rate
+> sentence (base_rate_shift.py; outputs/base_rate_shift_models.csv).
+
+| Model | Checkpoint | Wording | Shift [range] | Ratio to ln 16 | Between-text SD |
+|:---|:---|:---|---:|---:|---:|
+| Apertus 1.5 8B | base | AI first | 0.41 [0.33, 0.47] | 0.15 | 0.14 |
+| Apertus 1.5 8B | final | AI first | 6.25 [3.06, 8.85] | 2.26 | 2.01 |
+| Gemma 3 12B | base | AI first | 0.50 [0.42, 0.55] | 0.18 | 0.11 |
+| Gemma 3 12B | final | AI first | 10.93 [6.48, 14.83] | 3.94 | 2.34 |
+| Gemma 3 4B | base | AI first | 0.18 [0.14, 0.21] | 0.06 | 0.08 |
+| Gemma 3 4B | base | human first | 0.16 [0.12, 0.20] | 0.06 | 0.08 |
+| Gemma 3 4B | final | AI first | 10.65 [7.84, 12.78] | 3.84 | 1.54 |
+| Gemma 3 4B | final | human first | 5.61 [4.08, 8.53] | 2.03 | 1.80 |
+| OLMo 2 7B | base | AI first | 1.00 [0.54, 1.49] | 0.36 | 0.18 |
+| OLMo 2 7B | base | human first | 1.35 [0.70, 2.13] | 0.49 | 0.23 |
+| OLMo 2 7B | final | AI first | 5.39 [4.25, 6.54] | 1.94 | 0.89 |
+| OLMo 2 7B | final | human first | 4.37 [3.75, 4.88] | 1.58 | 0.88 |
+| OLMo 3 7B Think | base | AI first | 1.17 [0.56, 1.85] | 0.42 | 0.24 |
+| OLMo 3 7B Think | base | human first | 1.07 [0.41, 1.89] | 0.38 | 0.21 |
+| OLMo 3 7B Think | final | AI first | 1.21 [0.81, 1.44] | 0.44 | 0.19 |
+| OLMo 3 7B Think | final | human first | 1.48 [1.00, 2.07] | 0.53 | 0.22 |
+| Qwen3 8B | base | AI first | 1.40 [1.06, 1.68] | 0.51 | 0.27 |
+| Qwen3 8B | final | AI first | 3.67 [3.28, 4.43] | 1.32 | 0.46 |
+
 ## G Individual post-training contrasts
 
 Among the individual comparisons, six decreases survived Holm correction within this

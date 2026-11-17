@@ -132,7 +132,9 @@ strongly a model uses the stated base rate, we computed for every text the shift
 the prompts stating 20% and 80% AI texts and compared its mean with the shift of the prior
 log-odds, ln(.8/.2) − ln(.2/.8) = ln 16 = 2.77 nats, by which an ideal observer would shift
 the posterior log-odds of every text (base_rate_shift.py). The base-rate sentence named the
-share of AI texts first; TODO(base-rate order): describe the second wording. Confidence intervals (95%) were obtained by a grouped bootstrap that resampled
+share of AI texts first ("In dieser Studie wurden etwa 20 % der Texte von einer KI generiert
+und etwa 80 % von Menschen geschrieben."); for Gemma 3 4B, OLMo 2 and OLMo 3 Think, the
+manipulation was repeated with the human share named first. Confidence intervals (95%) were obtained by a grouped bootstrap that resampled
 whole source groups (1,000–2,000 resamples). The AUC, and hence d′, as well as hit and
 false-alarm rates are computed within each class and therefore do not depend on the
 unequal numbers of AI and human texts (chats: 239 vs. 61; newspaper segments: 65 vs. 38);

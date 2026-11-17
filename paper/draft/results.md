@@ -243,10 +243,16 @@ of the benchmark), and the shift was nearly uniform across texts (between-text S
 condition 0.08–0.33). After post-training, five of the six models shifted more than the
 benchmark (3.67–10.93 nats, i.e., 1.3–3.9 times the benchmark), and the shift differed
 considerably between texts (SD up to 3.14); OLMo 3 Think was the exception (1.21 nats, as
-in its base model, 1.17). Post-training thus changed the use of a stated base rate from
-underweighting to overweighting (Table F2). Note that these values were obtained with one
-wording of the base-rate sentence, which named the AI share first; TODO(base-rate order):
-add the result for the second wording.
+in its base model, 1.17). These values were obtained with a base-rate sentence that named the share of AI texts
+first. For the three families that fit the available GPUs, we repeated the manipulation
+with the human share named first. The pattern was the same, but the size of the shift
+depended on the wording in the post-trained models: The base models again shifted too
+little (Gemma 3 4B: 0.16; OLMo 2: 1.35; OLMo 3: 1.07 nats), the post-trained models of
+Gemma 3 4B and OLMo 2 again shifted more than the benchmark, but less than with the first
+wording (5.61 vs. 10.65 and 4.37 vs. 5.39 nats), and OLMo 3 Think again stayed below it
+(1.48). Post-training thus changed the use of a stated base rate from underweighting to
+overweighting in five of six model families, by a factor that depended on the model and on
+the wording (Table F2); the second wording was not run for Apertus, Qwen3, and Gemma 3 12B.
 
 ## 3.4 Post-training lowers the sensitivity of authorship judgments
 
