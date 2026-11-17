@@ -107,61 +107,67 @@ natural conditions.
 
 ## The direction of the change depends on the training signal
 
-Post-training impaired the readout of authorship, repaired the readout of negated
-statements in the base models that misread them, and, for the reviews, replaced a shared
-polarity heuristic by a more uniform readout across most models. A common
-account of these outcomes follows from the second lens in Figure 1. Post-training does
-not add information to the representation; it installs a way of reading the
-representation out. Whether this improves or impairs a judgment then depends on whether
-the training signal specifies a valid way of reading the question. For truth judgments,
-it does: The supervised fine-tuning data of both models contained thousands of
-statements to be judged as true or false, and the models learned to take the logic of
-the statement into account, including its negation. For authorship and deception, it
-does not: The data contained no such judgments, and the readout drifted toward what
-post-training made salient. For the reviews, this was a shared heuristic of all models,
-namely that long and detailed reviews are genuine, a cue without validity. For
-authorship, it was an inverse use of the information, which might reflect an outdated
-stereotype of AI text (a speculation that we discuss below). In terms of
-the lens model, post-training changes the weights of the second lens, and these weights
-are valid only to the extent that the training data contain valid examples.
+Post-training repaired the readout of negated statements in the base models that misread
+them, and impaired the readout of authorship on average. A common account of these outcomes
+follows from the second lens in Figure 1. Post-training does not add information to the
+representation; it installs a way of reading the representation out. Whether this improves
+or impairs a judgment then depends on whether the training signal specifies a valid way of
+reading the question. For truth judgments, the supervised fine-tuning data of both models
+with stage-wise checkpoints contained thousands of statements to be judged as true or
+false; for authorship, we found none. In terms of the lens model, post-training changes the
+weights of the second lens, and these weights are valid only to the extent that the
+training data contain valid examples. Two observations qualify this account. First, the
+base models of Qwen3 and OLMo 3 already read negated statements correctly, presumably
+because their pretraining data contained instruction-like material; for them,
+post-training had nothing to repair. Second, the account runs the risk of circularity: If
+the presence of a valid training signal were inferred only from the improvement of a
+judgment, it would explain every outcome and predict none. The inspection of the training
+data provides an independent measurement, but a correlational one that rests on two data
+mixtures and on a pattern search with limited power; it cannot show which examples produced
+the repair (the truth judgments themselves, or, for instance, the many mathematical and
+reasoning tasks that teach a model to read a question precisely).
 
-This account explains why the sign of the change differed between judgments, and, for
-the reviews, between models: Because post-training made the models' judgments more
-similar (within each review polarity), the change was negative for a model whose base version had read the reviews comparatively
-well (Gemma 3 4B) and positive for a model whose base version had not (Qwen3). Two
-observations qualify this account. First, the base models of Qwen3 and OLMo 3 already
-read negated statements correctly, presumably because their pretraining data already
-contained instruction-like material; for them, post-training had nothing to repair and
-left the readout intact or lowered it slightly. Second, OLMo 3 Think, post-trained mainly
-for explicit reasoning, did not join the convergence of the other models on the reviews;
-a training signal aimed at reasoning traces may install a different way of reading the
-question than one aimed at conversation. It also
-qualifies the superficial alignment hypothesis in a second respect. A change that leaves
-the representation of the text largely unchanged is superficial with respect to what the model knows, but not
-with respect to its consequences, which can make a judgment considerably better or worse.
-Note, however, that this account runs the risk of circularity: If the presence of a
-valid training signal were inferred only from the improvement of a judgment, the account
-would explain every outcome and predict none. The inspection of the training data
-provides an independent measurement, and it agrees with the account: The data contained
-thousands of truth judgments but no authorship or deception judgments. This comparison,
-however, is correlational and rests on two data mixtures. It cannot show which examples
-produced the repair of the negated statements (the truth judgments themselves, or, for
-instance, the many mathematical and reasoning tasks that teach a model to read a question
-precisely), and the two mixtures differed in size, languages, the share of mathematical
-tasks, and the kind of their truth judgments. We therefore carried out a training study
-with control conditions (Section 3.7). Adding two thousand correctly labeled authorship
-judgments to otherwise identical fine-tuning data improved the readout of texts whose
-cues resembled those of the training texts and impaired it where they did not; adding
-stereotyped labels shifted the readout in the direction implied by the validity of the
-stereotype, but reliably only where the stereotype was valid; and in all conditions the probes at the text positions changed little while
-the position at which the answer is formed was reorganized. On the chats, the item-level answers after training with valid news labels followed a
-probe for the authorship of news that was fitted in the base model (Section 3.7), which
-turns the post-hoc explanation of the inversion into a tested prediction. The training signal can thus
-set the direction of the readout, as the account assumes. The training study does not
-show, however, that the decline after the official fine-tuning of OLMo 2 has the same
-origin: Our background condition, with a small part of the original data and low-rank
-adapters, did not reproduce this decline, and identifying the parts of real post-training
-data that install a misreading remains a task for future work.
+We therefore manipulated the training signal directly (Section 3.7). Adding two thousand
+correctly labeled authorship judgments to otherwise identical fine-tuning data improved the
+readout of texts whose cues resembled those of the training texts and impaired it where
+they did not, and the probes at the text positions changed little. On the chats, the
+item-level answers followed a probe for the authorship of news that was fitted in the base
+model, which turns the post-hoc explanation of the inversion into a tested prediction:
+Fine-tuning installed a readout along the class direction of the training texts. The
+training signal can thus set the direction of the readout, as the account assumes. The
+training study does not show, however, that the decline after the official fine-tuning of
+OLMo 2 has the same origin: Our background condition, with a small part of the original
+data and low-rank adapters, did not reproduce this decline, and identifying the parts of
+real post-training data that install a misreading remains a task for future work. The
+deceptive reviews (Appendix C) fit the account only loosely: Post-training removed a
+polarity heuristic that the base models shared, without improving the judgments.
+
+## Sensitivity, criterion, and the stated base rate
+
+Signal detection theory was useful here in two ways. First, it separates what a threshold
+can explain from what it cannot. Many of the models' binary answers were constant, which
+by itself would suggest a miscalibrated threshold; the graded preferences behind them,
+however, were ordered inversely in several models, which no placement of the criterion can
+produce. Second, the theory offers a normative benchmark for a manipulation of the response
+bias. An ideal observer who is told the proportion of signal trials shifts the criterion by
+the change in prior log-odds and leaves the evidence for each stimulus untouched. Human
+observers typically adjust less than this (Phillips & Edwards, 1966; Macmillan & Creelman,
+2004), and in some tasks neglect stated base rates in favor of the individual case (Kahneman
+& Tversky, 1973). The base models behaved like conservative observers: Their log-odds
+shifted in the correct direction, uniformly across texts, but by 6–51% of the normative
+amount. After post-training, the log-odds shifted by more than the normative amount in five
+of six model families, and by different amounts for different texts, so that the stated
+share no longer acted as a pure shift of the criterion. Speculatively, a post-trained model
+treats a sentence about the share of AI texts less as prior information to be combined with
+the evidence and more as a cue about the expected answer. Two qualifications apply. The
+post-trained models gave more extreme log-odds in general, to the texts as well as to the
+base rate, and relative to the spread of their own judgments the weight of the base rate
+increased in most, but not in all, models and wordings (Section 3.3). Moreover, the
+benchmark presupposes that the log-odds of the two answer words are read as a posterior,
+which is an idealization for base models that place only about half of their probability on
+these words. Within these limits, the comparison shows that post-training changed not only
+which texts receive more evidence for "AI", but also how the models combine this evidence
+with what the prompt states about the situation, a second aspect of the readout.
 
 ## The question reads the text
 
@@ -191,47 +197,27 @@ answers do not use them.
 
 ## Why would human-oriented post-training impair the detection of AI text?
 
-Why should training that makes a model more helpful and more agreeable to humans make it
-worse at telling human from AI text? Our data do not answer this question conclusively,
-but they constrain the possible answers. The lens analysis of the chat messages showed
-what the post-trained models took as signs of AI authorship: long words, adjectives,
-nouns, and text that is hard to read, i.e., a formal and nominal style. In our corpus,
-this was the wrong way round. The AI messages, written by current models instructed to
-sound like a private group chat, were more verbal and lexically more diverse than the
-students' messages, and the post-trained models took exactly these properties as signs
-of human authorship. Except for Qwen3, whose base model already weighted these
-properties inversely (cross-validated G = −.53, after post-training −.61), the base models used them
-less; post-training installed or strengthened the weighting, and in the two models with
-stage-wise checkpoints it did so during supervised fine-tuning.
-
-One possible explanation, which our data cannot test directly, is an outdated
-stereotype of AI text. The picture of AI writing
+Our data do not answer this question conclusively, but they constrain the possible answers.
+The lens analysis of the chat messages (Appendix B) showed what most post-trained models
+took as signs of AI authorship: long words, adjectives, nouns, and text that is hard to
+read, i.e., a formal and nominal style. In our corpus, this was the wrong way round: The AI
+messages, written by current models instructed to sound like a private group chat, were
+more verbal and lexically more diverse than the students' messages. Except for Qwen3, whose
+base model already weighted these properties inversely (cross-validated G = −.53, after
+post-training −.61), the base models used them less. One possible explanation, which our
+data cannot test directly, is an outdated stereotype of AI text: The picture of AI writing
 as formal, elaborate, and impersonal fits the output of earlier assistant models and is
-widespread in texts about AI, which may well be among the data that shape a model's
-concept of its own kind of text during post-training. Current models that are asked to
-imitate a group chat no longer fit this picture, so that a model that relies on it
-judges informal AI text as human. If this explanation is correct, the error is a moving
-target: As human and AI raters become more familiar with generated text, and as
-generated text changes with each generation of models, the stereotype that post-training
-installs may change as well, and the direction of the error with it. Two alternatives
-are less consistent with our data. Familiarity with the model's own style would predict
-that text in a formal assistant register is judged human, which is the opposite of what
-we observed, and token-level predictability did not account for the below-chance
-judgments (for Gemma 3 4B, controlling for the model's own surprisal of each text left
-them unchanged
-on the short chats and even enlarged it on the newspaper segments; supplementary
-analysis). The idea that post-training narrows the concept of AI text to explicit
-assistant markers is not supported either: Removing the markers that the students had
-identified did not change the models' judgments.
-
-OLMo 2 does not fit this picture. After supervised fine-tuning, it weighted the same
+widespread in texts about AI, and current models that imitate a group chat no longer fit
+it. If this explanation is correct, the error is a moving target that changes with each
+generation of models. Two alternatives are less consistent with our data. Familiarity with
+the model's own style would predict that text in a formal assistant register is judged
+human, which is the opposite of what we observed, and removing the surface markers that the
+students had identified as typical of AI text did not change the models' judgments. OLMo 2
+does not fit the picture either: After supervised fine-tuning, it weighted the same
 properties in the opposite direction and judged the chats slightly better than its base
-model, whereas its judgments of the other two corpora became worse. We can only
-speculate about the reason; its fine-tuning data contain a large number of real user
-messages from chat logs, which might have shaped a more accurate picture of informal
-human writing. Note also that the lens analysis is correlational and that many of the
-text properties are correlated with each other; it shows which properties the answers
-follow, not which ones cause them.
+model. Note also that the lens analysis is correlational and that many of the text
+properties are correlated with each other; it shows which properties the answers follow,
+not which ones cause them.
 
 ## Implications
 
