@@ -84,18 +84,36 @@ toward "AI", and properties typical of AI texts toward "human".
 
 Is signal detection theory an appropriate description of these judgments? Its central
 assumption is that manipulations of the response bias move the criterion but leave the
-sensitivity unchanged. Stating a higher share of AI texts in the prompt had exactly this
-effect: Raising the stated share from 20% to 80% shifted the criterion toward "AI" in 65 of
-72 comparisons (mean |Δc| = 1.19; in the remaining comparisons c did not change, mostly
-because the model gave the same answer to every text), whereas d′ changed by 0.14 on
-average, without a consistent direction. The order of the answer options and the mere
-presence of the base-rate sentence also acted mainly on the criterion (mean |Δc| = 0.78 and
-0.42), but changed d′ somewhat more (0.16 and 0.13, again without a consistent direction;
-Appendix F). Thus, the models' answers separate into a sensitivity and a criterion largely as
-signal detection theory assumes, and the criterion is a property of the model together with
-the prompt rather than of the model alone. The small, non-directional changes of d′ between
-prompt versions are one reason why we average d′ over both answer orders and compare
-checkpoints only on identical prompts.
+sensitivity unchanged. This held approximately. Raising the stated share of AI texts from
+20% to 80% moved the criterion in 48 of 72 comparisons (model × checkpoint × corpus × answer
+order), in all of them toward "AI" and reliably so in 42 (mean |Δc| across all comparisons =
+1.19); in the remaining 24 comparisons, c did not change, because the model gave the same
+answer to nearly every text at either share. The sensitivity was not strictly invariant,
+however: d′ changed by 0.14 on average, without a consistent direction, and the bootstrap
+interval of the change excluded zero in 28 of the 72 comparisons. In the 14 comparisons in
+which no condition was saturated, the criterion shifted reliably in all 14 and d′ in 3 (mean
+|Δd′| = 0.10). The order of the answer options and the mere presence of the base-rate
+sentence also acted mainly on the criterion (mean |Δc| = 0.78 and 0.42), and changed d′ by
+similar amounts (0.16 and 0.13, again without a consistent direction; Appendix F). Thus,
+manipulations of the response bias acted mainly on the criterion where the criterion could
+move, and the criterion is a property of the model together with the prompt rather than of
+the model alone. Because the accompanying changes of d′ were not negligible relative to the
+effects reported below, we average d′ over both answer orders and compare checkpoints only on
+identical prompts.
+
+How strongly did the models use the stated base rate? For an ideal observer, the stated
+share changes the prior odds and nothing else, so that the log-odds of the answer should
+shift by the same amount for every text, ln 16 = 2.77 nats between 20% and 80%. This
+benchmark applies to dv insofar as dv is read as the model's posterior log-odds. The base
+models shifted far less (mean shift of dv per model between 0.18 and 1.40 nats, i.e., 6–51%
+of the benchmark), and the shift was nearly uniform across texts (between-text SD within a
+condition 0.08–0.33). After post-training, five of the six models shifted more than the
+benchmark (3.67–10.93 nats, i.e., 1.3–3.9 times the benchmark), and the shift differed
+considerably between texts (SD up to 3.14); OLMo 3 Think was the exception (1.21 nats, as
+in its base model, 1.17). Post-training thus changed the use of a stated base rate from
+underweighting to overweighting (Table F2). Note that these values were obtained with one
+wording of the base-rate sentence, which named the AI share first; TODO(base-rate order):
+add the result for the second wording.
 
 > **Table 2.** Sensitivity (d′) of the models' answers. Base models were queried with a
 > plain completion prompt ("raw"); post-trained models with the same prompt and with
@@ -132,28 +150,41 @@ summaries, +0.55). To test the effect of post-training without confounding it wi
 prompt format, we compared each final model with its base model on the identical plain
 prompt. Of these 18 comparisons, 14 showed a decrease. Because each model family
 contributes three corpora and each corpus six families, the 18 comparisons are not
-independent. A multilevel random-effects model with random effects for model family,
-corpus, and cell yielded a mean change of Δd′ = −0.33 [−0.53, −0.13] (t(17) = −3.54,
-p = .003). The most conservative test, a t-test over the six family means, gave the same
-estimate (−0.34 [−0.56, −0.11], t(5) = −3.82, p = .012); all six families showed a
-decrease on average, two of them only slightly (OLMo 2: −0.10; OLMo 3 Think: −0.06).
-Heterogeneity between cells was considerable (I² = 82%). Restricted to the nine
+independent. Our primary test therefore treats the model family as the unit: A t-test over
+the six family means yielded a mean change of Δd′ = −0.34 [−0.56, −0.11] (t(5) = −3.82,
+p = .012); all six families showed a decrease on average, two of them only slightly
+(OLMo 2: −0.10; OLMo 3 Think: −0.06). A multilevel random-effects model with random effects
+for model family, corpus, and cell gave the same estimate (−0.33 [−0.53, −0.13]); its
+nominal test (t(17) = −3.54, p = .003) uses residual degrees of freedom and is likely too
+liberal with six families. Heterogeneity between cells was considerable (I² = 83%). Restricted to the nine
 comparisons in which both models placed at least half of their probability on the two
 answer words, the estimate was similar but less precise (−0.31 [−0.64, 0.01], p = .057;
 four families). In the three comparisons in which the
 binary answers varied in both the base and the final model (Gemma 3 12B on the short
 chats and the textbook summaries, Gemma 3 4B on the short chats), post-training lowered
-d′ in all three cases (−0.45 to −0.95). Per corpus, the decrease was reliable for the
-newspaper segments (−0.42 [−0.67, −0.16], p = .002) and the textbook summaries (−0.41
-[−0.70, −0.11], p = .007), but not for the short chats (−0.19 [−0.45, 0.07], p = .15).
+d′ in all three cases (−0.45 to −0.95). Per corpus, with six families each, the decrease
+was reliable for the newspaper segments (−0.42 [−0.75, −0.08], p = .024), but not for the
+textbook summaries (−0.41 [−0.85, 0.04], p = .066) or the short chats (−0.19 [−0.55, 0.16],
+p = .22).
 
-The decline did not hinge on the wording of the prompt. With a
-paraphrased instruction and question, the mean change was −0.23 (13 of 18 comparisons
-negative; t-test over the family means, t(5) = −3.63, p = .015), and the changes of the
-individual cells correlated with those for the original prompt (r = .81). With the
-question placed before the text, the mean change was similar (−0.30; 12 of 18 negative),
-but two families changed direction (OLMo 3 Think: +0.38; Qwen3: +0.04), so that the
-family-level test was not significant (p = .16; r = .63 with the original prompt). The
+Did the decline depend on the wording of the prompt? We repeated all comparisons with a
+paraphrased instruction and question and with the question placed before the text. Across
+the three prompts, the mean change over the six family means (each the mean of nine
+comparisons) was Δd′ = −0.29 [−0.54, −0.03] (t(5) = −2.88, p = .035), with a decrease in
+five of six families and in 39 of the 54 comparisons. A multilevel model with additional
+random effects for the prompt gave the same estimate (−0.29), with variance components near
+zero for prompt and corpus, but it is not informative as a test, because the prompt and the
+corpus have only three levels each (t(2) = −2.81, p = .11). With the paraphrased prompt
+alone, the mean change was −0.23 (13 of 18 comparisons negative; t(5) = −3.63, p = .015),
+and the changes of the individual cells correlated with those for the original prompt
+(r = .81). With the question placed before the text, the mean change was similar (−0.30;
+12 of 18 negative), but two families changed direction (OLMo 3 Think: +0.38; Qwen3: +0.04),
+so that the family-level test was not significant (p = .16; r = .63 with the original
+prompt). Note that the wording moved the individual comparisons considerably: Between the
+original prompt and the question-first prompt, Δd′ of a cell changed by 0.30 on average,
+compared with a mean absolute effect of post-training of 0.43, and only 8 of the 18 cells
+showed a decrease with all three prompts (5 of them reliably each time). The decline is
+therefore a property of the average over models and prompts, not of every single cell. The
 below-chance judgments of the short chats by Gemma 3 and Qwen3 persisted with all three
 prompts.
 
@@ -188,9 +219,13 @@ was already complete after imitation learning.
 Could the post-trained models simply hold a wrong belief about what AI texts look like,
 a belief that a few correctly labeled examples would correct? We tested this by placing
 2, 8, or 16 labeled examples from other sources before each text (four different sets of
-examples; d′ computed per set and averaged; Figure 4B). With 16 examples, d′ rose in 9 of
-11 model conditions, reliably in 8, whereas two examples hardly helped. Base and
-post-trained models gained by similar amounts, so that the gap between them persisted:
+examples; d′ computed per set and averaged; Figure 4B). With 16 examples, d′ rose reliably
+in 8 of 11 model conditions on the short chats and in 4 of 6 on the textbook summaries,
+whereas two examples hardly helped. The gains of base and post-trained models did not differ
+consistently: The difference was reliable in two of five comparisons, with opposite signs
+(OLMo 2 on the chats, where the base model gained more, +0.54 [0.27, 0.83]; Qwen3 on the
+textbook summaries, where the post-trained model gained more, −0.31 [−0.55, −0.09]; Table
+E1). The gap between them persisted:
 After 16 examples, the post-trained model was still less sensitive than its base model in
 all five comparisons (e.g., Gemma 3 4B on the short chats: +0.48 vs. −0.27; Qwen3: +0.15
 vs. −0.17), and the post-trained models of Gemma 3 4B and Qwen3 remained below chance on
@@ -217,11 +252,11 @@ for every model).
 > format): probe sensitivity, base-model answer, and post-trained answer; few-shot
 > curves as an inset.
 
-## 3.3 Steering: in some models, the represented direction drives the answer the wrong way
+## 3.3 Steering at the answer position: a consistency check
 
 The probes and the answers could dissociate either because the answers ignore the
-authorship information or because they use it with the wrong sign. To distinguish these
-possibilities causally, we shifted a model's internal state at the position where the
+authorship information or because they use it with the wrong sign. As a check on the
+second possibility, we shifted a model's internal state at the position where the
 answer is produced along the direction that separates AI from human texts (estimated on
 held-out groups; Section 2.7), and measured how the answer changed. The primary test used
 shifts of ±2 within-class standard deviations, which kept 48–77% of the shifted texts
@@ -239,33 +274,47 @@ p ≤ .05), so that the test can detect a direction that the answer reads; again
 scale-matched controls, this was the case in 16 of 25 cells. Where the positive control
 failed, a null result for the authorship direction is not informative.
 
-In six of the authorship cells, the authorship direction moved the answer more than the
-controls, and in all six it moved it the wrong way: Shifting a text toward "AI" made the
+In six of the 17 authorship cells, the authorship direction moved the answer more than the
+controls (rank-based p ≤ .06 against both control families; with 100 controls, the smallest
+possible p is .01, so that no cell would survive a correction for 17 tests), and in all six
+it moved it the wrong way: Shifting a text toward "AI" made the
 model answer "human" more often. This was the case for the short chats in Gemma 3 12B
 (layer 31: −7.38 nats; rank-based p = .01 against both control families), Gemma 3 4B
 (layer 17: −1.74; p = .04 norm-matched, .06 scale-matched), and Qwen3 (layers 24 and 30:
 −1.18 and −2.06; p ≤ .03), and for the newspaper segments in Qwen3 (−0.43 and −0.85;
 p ≤ .04). In these cells, the authorship direction pointed against the decision direction
-(cosine −0.59 to −0.92), and the answers were clearly below chance (Table 2). In the
+(cosine −0.59 to −0.92), and the answers were clearly below chance (Table 2). Note that
+these are the cells with the most negative d′, and that this is expected: The authorship
+direction is the difference between the class means at the position from which the answer is
+read, so that, if the answer depends approximately linearly on this state, shifting along it
+must reproduce the observed difference between the classes. Across the 25 cells, the effect
+of a shift by one class distance correlated with the observed difference (TODO(steer): r from
+script). The test therefore does not provide evidence that is independent of the answers'
+d′; it shows that the inverse ordering is carried by the class-mean difference at the answer
+position, more than by typical directions. In the
 remaining cells, the authorship direction did not move the answer more than arbitrary
 directions: Gemma 3 4B on the newspaper segments (−1.04 and −2.00 at layers 22 and 28;
 p = .26–.42), Apertus and OLMo 3 on the textbook summaries before and after SFT, and Gemma
 3 12B on the newspaper segments, on which its answers were at chance (+0.03). In some of
 these cells, the positive control did not exceed the scale-matched controls either (Gemma 3
 12B on the newspaper segments, Gemma 3 4B at layer 28, Apertus at layers 21 and 27 and
-OLMo 3 after SFT; Table D1), so that their null results are weaker evidence. The answer thus read the
-represented authorship direction, with the wrong sign, only in some models and corpora; in
-the others, it followed other directions.
+OLMo 3 after SFT; Table D1), so that their null results are weaker evidence. In the
+strongest cell (Gemma 3 12B on the chats), the decision direction itself did not clearly
+exceed the norm-matched controls (TODO(steer): p from script), and only 48% of the shifted
+texts stayed within the observed range. The norm-matched controls in the subspace of
+leading components moved the state far outside the observed range in the Gemma 3 and Qwen3
+cells, so that the scale-matched controls are the fairer comparison. In summary, where the
+answers ordered the texts inversely, the class-mean difference at the answer position
+carried this inverse ordering; steering at earlier layers or at the text positions, which
+would be an independent test, was not carried out.
 
 A complementary, descriptive comparison concerns the size of the effects. Shifting a
 text by one class-mean distance along the authorship direction, i.e., from the average
 human text to the average AI text, changed the answer in the same direction as the
 observed difference between AI and human texts in all 20 cells in which this difference
 was clearly different from zero (e.g., Qwen3 on the newspaper segments: −0.50 and −0.66
-nats vs. an observed difference of −0.59). If the answer depends approximately linearly on
-the internal state, this agreement is expected; it shows that the difference between the
-answers to AI and human texts is carried by the state at the last prompt position, in
-line with the patching results below (Section 3.5).
+nats vs. an observed difference of −0.59). As stated above, this agreement is expected if the answer depends approximately linearly
+on the internal state; it is consistent with the patching results below (Section 3.5).
 
 Steering did not, however, reveal what post-training changes for authorship. In the
 Apertus base model, shifting toward "AI" moved the answer in the correct direction,
@@ -287,13 +336,18 @@ weights, we could combine them: the lower layers from one checkpoint and the upp
 from the other, passing the internal state at the junction on unchanged ("model
 stitching"). This test requires no probe and no statistic derived from the answers; it
 only measures how well the combined model discriminates. Two observations justified the
-procedure. First, the representations of the texts themselves were nearly identical in
+procedure. First, the representations of the texts themselves were highly similar in
 the base and the post-trained checkpoints of the three models with stage-wise checkpoints
 (linear CKA across layers 0.97–0.999 for OLMo 2, Apertus and OLMo 3; textbook summaries),
 whereas the representations at the position where the answer is formed differed
-considerably (0.44–0.99, median 0.65–0.85). Note that this was less so for the other
-families: In Gemma 3, even the text representations changed noticeably (0.42–0.99, median
-0.80–0.83), and the answer position differed strongly (median 0.20–0.31). Second, every stitched model produced fluent
+considerably (0.44–0.99, median 0.65–0.85). Note that linear CKA without bias correction,
+computed here on 238 texts in about 4,000 dimensions, is biased upward, so that values near
+1 are weak evidence of identity; the contrast between the text positions and the answer
+position is the more informative result. Note also that this was less so for the other
+families: In Gemma 3, even the text representations changed noticeably, most at mid-depth
+(0.42–0.99, median 0.80–0.83), and the answer position differed strongly (median
+0.20–0.31), so that for Gemma 3 the claim that the text positions changed little rests on
+the probe transfer alone (Section 3.6). Second, every stitched model produced fluent
 text (perplexity 6.0–6.7 for Apertus, 8.2–9.4 for OLMo 2), and stitching at the very
 bottom or the very top reproduced the respective parent model.
 
@@ -315,23 +369,31 @@ the first 8 SFT layers under base upper layers judged worse than the SFT model i
 the base and .83 for the SFT model), and the first SFT layer alone under base upper
 layers judged better than either parent (+0.73). Were these effects artifacts of
 stitching as such? As a control, we stitched the same checkpoints on a judgment that
-post-training had left unchanged, the truth of statements on diverse facts (counterfact;
+post-training had changed little, the truth of statements on diverse facts (counterfact;
 Apertus: d′ = 1.38 base vs. 1.58 SFT; OLMo 2: 1.77 vs. 1.75). There, all hybrids stayed
 within or close to the range of their parents (largest deviation 0.03 for Apertus and
 0.09 for OLMo 2; one of 14 hybrids per model reliably outside), whereas on the textbook
 summaries 6 of 18 Apertus hybrids and 4 of 18 OLMo 2 hybrids lay reliably outside
-(largest deviation 0.59). The overshoot was therefore specific to the judgment that
-post-training had changed, which suggests that the change involves an interaction between
-the early layers and the layers above them rather than a self-contained module. The
+(largest deviation 0.59; TODO(stitch): update with true-parent reference). Stitching thus
+does not disturb the models' judgments in general. The control does not show, however, that
+the overshoot is specific to the judgment that post-training changed: The control judgment
+was far from chance, with high answer probability, whereas the textbook judgments were close
+to chance, where small perturbations can reorder the texts. A judgment near chance that
+post-training left unchanged would be the appropriate control, which we did not run. The
 stitching results show that the early-layer weights of a checkpoint suffice to carry the
 difference into an otherwise foreign network; they do not by themselves show that the
 difference is computed there.
 
-The early locus replicated on the short chats, on which post-training lowered the
-sensitivity of Apertus (−0.26 to −0.78) and raised that of OLMo 2 (−0.05 to +0.37). The
-first 8 base layers of Apertus restored the base level under SFT upper layers (−0.27),
-and the first 4 base layers of OLMo 2 removed most of its gain (+0.10); on the chats,
-no hybrid lay outside the range of its parents.
+On the short chats, on which post-training lowered the sensitivity of Apertus (−0.26 to
+−0.78) and raised that of OLMo 2 (−0.05 to +0.37), the early locus replicated in one
+direction only. The first 8 base layers of Apertus restored the base level under SFT upper
+layers (−0.27), and the first 4 base layers of OLMo 2 removed most of its gain (+0.10). The
+first 8 SFT layers under base upper layers, however, did not produce the effect of SFT in
+either model (Apertus: −0.31; OLMo 2: −0.07); it appeared only with 16 SFT layers (−0.70
+and +0.27). On the chats, the early base layers were thus sufficient to remove the effect
+of SFT, but the early SFT layers were not sufficient to produce it, in contrast to the
+textbook summaries. No hybrid lay outside the range of its parents on the chats. Note also
+that the effect to be localized is small for OLMo 2 on this corpus.
 
 Both sublayer types contributed. Exchanging only the attention blocks or only the
 feed-forward (MLP) blocks of the first 8 Apertus layers had partial effects in both
@@ -368,26 +430,51 @@ exchanging the text states changed nothing (all changes ≤ 0.04), whereas the s
 the text transferred the difference: The SFT states made the base models judge like the
 SFT models (Apertus: −0.23 → −0.75, SFT −0.73; OLMo 2: −0.07 → +0.34, SFT +0.38), and the
 base states restored the base level in Apertus (−0.73 → −0.27) and partly in OLMo 2 (+0.38
-→ +0.20). Because post-training improved the judgments of OLMo 2 on the chats, the change
-resided at the question positions regardless of its direction. At layer 8, the picture was mixed (Figure S1): in Apertus, the text
+→ +0.20). Within the positions after the text, the tokens of the question itself carried
+little and the answer cue most of the difference (e.g., Apertus base with SFT states at the
+question tokens: −0.46; at all positions after the text: −0.75); the final position alone
+carried between a third and two thirds. Because post-training improved the judgments of OLMo 2 on the chats, the
+change resided at the positions after the text regardless of its direction. At layer 8, the picture was mixed (Figure S1): in Apertus, the text
 positions still had a partial effect, and in OLMo 2 even exchanging all positions
 transferred only part of the difference, consistent with the stitching result that in
-OLMo 2 the change accumulates up to about layer 14. Thus, by the middle of the network
-the difference resides entirely in the question positions.
+OLMo 2 the change accumulates up to about layer 14. Thus, at the middle of the network,
+exchanging the states at the positions after the text (question and answer cue) transferred
+the difference, and exchanging the text states did not.
 
 Note that in our prompt the text precedes the question, so that its states are computed
 before the question is read, and a change that is specific to the judgment can only
 appear at the question positions. We therefore repeated the patching with the question
 placed before the text, so that the text was read with the task known. The decline
-persisted with this prompt (Apertus: +0.36 base vs. −0.19 SFT; OLMo 2: +0.09 vs. −0.42),
-and the text states again carried little of it (changes ≤ 0.12). Most of the difference
-now resided in the few positions after the text ("Antwort:"; e.g., Apertus SFT with the
-base states at these positions: −0.19 → +0.44), and part of it in the question itself.
-Thus, even when the text is read in the light of the question, post-training did not
-change the text states in a way that mattered for the judgment. In summary, post-training changed
-little in how the text was represented, as far as the judgment is concerned, and changed
-how the question takes up this representation, through weights in the early layers and
-processing at the question positions.
+persisted with this prompt (Apertus: +0.36 base vs. −0.19 SFT; OLMo 2: +0.09 vs. −0.42).
+Table 5 shows the change of d′ for each set of positions (layer 16 only). Exchanging the
+text states changed d′ by at most 0.12 (3–22% of the difference between the checkpoints).
+The few positions after the text ("Antwort:") transferred the whole difference in one of
+the four cases (Apertus SFT with base states: −0.19 → +0.44, more than the difference
+itself) and 42–49% in the other three; the question before the text transferred 18–53% in
+three cases and moved the Apertus base model away from the SFT model (+0.36 → +0.55). The
+effects of the single sets did not add up to the effect of exchanging all positions, so
+that the states before, within, and after the text contributed jointly. Note also that a
+missing effect of the text states at layer 16 does not show that they are irrelevant, because
+the later positions have by then read the recipient's own text states in the layers below;
+with the default prompt at layer 8, the text states did have an effect in Apertus. We
+therefore conclude only that, at mid-depth, the difference between the checkpoints was not
+carried by the text states alone, also when the text is read with the question known. In
+summary, exchanging the text states at mid-depth transferred little of the change, whereas
+exchanging the states at the positions that follow the text transferred much or all of it
+with the default prompt; in this sense, post-training changed how the question takes up the
+text.
+
+> **Table 5.** Activation patching at layer 16 with the question placed before the text
+> (textbook summaries): d′ of the recipient after receiving the donor's states at one set of
+> positions; change relative to the unpatched recipient with 95% CI (grouped bootstrap) for
+> the three sets of interest (localization_summary.py; outputs/patch/patch_summary.csv).
+>
+> | Recipient ← donor | Unpatched | Donor | Text | Question (before text) | After text | All positions |
+> |:---|---:|---:|---:|---:|---:|---:|
+> | Apertus base ← SFT | +0.36 | −0.19 | +0.31 (−0.05 [−0.15, 0.05]) | +0.55 (+0.19 [0.06, 0.32]) | +0.13 (−0.23 [−0.46, −0.02]) | −0.17 |
+> | Apertus SFT ← base | −0.19 | +0.36 | −0.07 (+0.12 [0.04, 0.21]) | +0.10 (+0.29 [0.21, 0.38]) | +0.44 (+0.63 [0.43, 0.86]) | +0.50 |
+> | OLMo 2 base ← SFT | +0.09 | −0.42 | +0.06 (−0.04 [−0.13, 0.07]) | −0.08 (−0.18 [−0.30, −0.04]) | −0.16 (−0.25 [−0.39, −0.10]) | −0.43 |
+> | OLMo 2 SFT ← base | −0.42 | +0.09 | −0.40 (+0.01 [−0.06, 0.08]) | −0.33 (+0.09 [−0.03, 0.21]) | −0.17 (+0.24 [0.09, 0.40]) | +0.08 |
 
 > **Figure 5 (placeholder, central figure).** (A) Model stitching for Apertus and
 > OLMo 2 (d′ as a function of the number of layers taken from the other checkpoint, both
@@ -465,7 +552,11 @@ Where does the repair arise? Model stitching located it in the middle of the net
 rather than in the early layers. In OLMo 2, the first 8 base layers combined with all
 upper SFT layers still judged at the level of the SFT model (d′ = 3.76; base 0.63, SFT
 3.20 in this subset of 300 pairs), whereas the first 16 base layers abolished the
-repair (0.38); in Apertus, the repair arose mainly in layers 9 to 12. Activation patching
+repair (0.38). In Apertus, the first 8 base layers under SFT upper layers likewise left
+the repair intact (4.15), the first 12 removed most of it (1.33), and the first 16 all of it
+(−0.94); conversely, the first 8 SFT layers under base upper layers produced part of the
+repair (1.21) and the first 12 all of it (4.15). The repair thus involved layers 9 to 16,
+with a partial contribution of the layers below (outputs/stitch/stitch_neg_cities.csv). Activation patching
 at layer 16 showed the same locus as for authorship: The SFT model's states at the
 question positions repaired the base model completely (OLMo 2: 0.63 → 3.26; Apertus:
 −0.87 → 4.15), and the base model's question states abolished the repair in the SFT
@@ -503,8 +594,10 @@ post-training reshaped the readout without improving it.
 *Representation and readout across checkpoints.* If post-training leaves the
 representation intact and changes how it is read out, a probe trained on the base model
 should work on the post-trained model at the text positions, but less so at the position
-where the answer is formed. This was the case for all models and judgments (Figure S2),
-with qualifications. At the text positions of the authorship corpora, probes transferred
+where the answer is formed. This was the case wherever we could test it (Figure S2), with
+qualifications. The comparison of the two sites exists only for the authorship corpora (all
+six families); for the other judgments, the activations were stored at the last position
+only, for OLMo 2 and Apertus (all three sets) and for Gemma 3 4B and Qwen3 (reviews). At the text positions of the authorship corpora, probes transferred
 between the base and the final checkpoints with little loss: Averaged across models,
 the transfer deficit stayed at or below 0.15 d′ at every depth, and 94% of the single
 model × layer values were at or below 0.10 (largest value 0.54, for OLMo 2 on the

@@ -25,12 +25,13 @@ open-weight base models and their post-trained versions and three corpora of Ger
 texts, linear probes and simple word-frequency classifiers separated AI from human texts
 well, but the models' answers, analyzed with signal detection theory, used this
 information poorly and often ordered the texts inversely. Post-training lowered their
-sensitivity on average (Δd′ = −0.33), mostly during supervised fine-tuning, and in two model
-families steering showed that the represented authorship direction pushed the answer the
-wrong way. Combining layers of base and fine-tuned checkpoints (model
-stitching) implicated the early layers, and exchanging internal states at selected
-prompt positions (activation patching) located the change at the positions of the
-question rather than of the text. The pattern generalized to two judgments with public
+sensitivity on average (Δd′ = −0.34 across model families; −0.29 across three prompt
+wordings), mostly during supervised fine-tuning. Combining layers of base and fine-tuned
+checkpoints (model stitching) implicated the early layers, and exchanging internal states
+at selected prompt positions at mid-depth (activation patching) transferred the change with
+the states at the positions after the text, not with those of the text. Post-training also
+changed the use of a stated base rate from underweighting to overweighting relative to an
+ideal observer. The pattern generalized to two judgments with public
 data. For negated statements, several base models represented truth perfectly but
 answered poorly, and post-training repaired their readout; for deceptive reviews, all
 models answered near chance despite accurate probes. Probes transferred between base and
@@ -38,5 +39,5 @@ post-trained checkpoints at the text positions, but only partially at the answer
 position. In a training study, adding 2,000 correctly labeled examples to otherwise identical
 fine-tuning data shifted the readout strongly in the implied direction, improving it on
 other corpora and inverting it on one, with little change at the text positions. Post-training thus mainly changes
-how the question reads the text, in a direction that depends on whether the training
-data specify a valid readout.
+how the question reads the text, and a small training signal can set the direction of this
+change.

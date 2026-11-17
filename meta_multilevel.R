@@ -17,6 +17,10 @@ pm <- cond |> tidyr::pivot_wider(names_from = variant, values_from = p_mass, nam
 d <- d |> left_join(pm, by = c("corpus", "preset")) |>
   mutate(pm_min = pmin(pm_base, pm_instruct))
 
+i2 <- function(m, v) {  # multilevel I2 with the typical sampling variance (Higgins & Thompson)
+  k <- length(v); w <- 1 / v
+  sum(m$sigma2) / (sum(m$sigma2) + (k - 1) * sum(w) / (sum(w)^2 - sum(w^2)))
+}
 fit <- function(x, label) {
   if (nrow(x) < 3) return(NULL)
   nf <- n_distinct(x$family); nc <- n_distinct(x$corpus)
@@ -27,7 +31,7 @@ fit <- function(x, label) {
   tibble(analysis = label, k = nrow(x), families = nf, est = as.numeric(m$b), lo = m$ci.lb,
          hi = m$ci.ub, t = m$zval, df = m$ddf[[1]], p = m$pval,
          sd_family = sqrt(m$sigma2[1]), sd_corpus = if (nc >= 2 && nf >= 2) sqrt(m$sigma2[2]) else NA,
-         sd_cell = sqrt(tail(m$sigma2, 1)), n_negative = sum(x$diff < 0))
+         sd_cell = sqrt(tail(m$sigma2, 1)), n_negative = sum(x$diff < 0), i2 = i2(m, x$se^2))
 }
 
 fam <- d |> group_by(family) |> summarise(diff = mean(diff), .groups = "drop")

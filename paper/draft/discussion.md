@@ -9,19 +9,17 @@ the texts themselves and in the models' internal representations, but the models
 answers did not use it, and often ordered the texts inversely. Post-training lowered
 the sensitivity of the answers on average (Δd′ = −0.33), with considerable variation
 between models and text types, and in the two models with stage-wise
-checkpoints the change occurred during supervised fine-tuning. Three causal methods
-bore on where this change takes effect. Steering showed that, in two post-trained model
-families (Gemma 3 and Qwen3), the direction that separates AI from human texts pushed the
-answer the wrong way, more than arbitrary directions did; in the other models, the answer
-did not read this direction specifically. Model stitching implicated the weights of the early layers, with the caveat that
+checkpoints the change occurred during supervised fine-tuning. Two interventions
+bore on where this change takes effect. Model stitching implicated the weights of the early layers, with the caveat that
 stitched hybrids produce effects of their own. Activation patching showed that, by the
 middle of the network, the change does not reside in the representation of the text but
 in the processing at the positions of the question that follow the text. The
-same pattern held for two further judgments with public data: For negated statements and
-for deceptive hotel reviews, the information was represented, post-training changed the
-readout far more than the representation of the text, and the change resided at the
-question positions. Its direction, however, differed between the judgments, and so did
-its depth. In short, post-training changed little in how the models represent the text;
+same pattern held most clearly for negated statements, a judgment with public data: The
+information was represented, post-training changed the readout while the probes stayed at
+ceiling, and the states at the positions after the statement transferred the change. For
+deceptive hotel reviews, the information was represented and the answers stayed near
+chance, but the localization was inconclusive. The direction of the change differed between
+the judgments, and so did its depth. In short, post-training changed little in how the models represent the text;
 it changed how the question they are asked reads this representation out, in a direction
 that depended on the judgment.
 
@@ -36,8 +34,8 @@ decision threshold, which has been proposed as the main source of probe–answer
 can lower accuracy but cannot produce sensitivity below chance. Reversed readouts of a
 discriminative direction have been described for steering vectors (Torop et al., 2026);
 here, the inverse ordering occurred in the graded preferences behind the models'
-unmodified answers, and steering showed in two model families that the represented
-direction pushed the answer the wrong way. Note, however, that the cues themselves were specific
+unmodified answers, and in two model families the class-mean difference at the answer
+position carried this inverse ordering (Section 3.3). Note, however, that the cues themselves were specific
 to the corpus: A probe trained on the newspaper segments separated the chats with the
 wrong sign (Section 3.1). A judgment below chance therefore need not reflect an inverted
 reading of a single authorship representation; it can also reflect a fixed policy whose
@@ -87,15 +85,16 @@ evidence that changes in the late layers can depend on altered earlier computati
 processing pathways (Bigoulaeva et al., 2026). This conclusion is tempered by the
 observation that stitched hybrids can judge worse or better than both parents (Section
 3.4), so that stitching shows where the weights that carry the difference reside rather
-than where the difference is computed; a control judgment that post-training had left
-unchanged showed no such overshoot, so that it is specific to the changed judgment rather
-than an artifact of stitching as such. Note also that stitching without an adapter
+than where the difference is computed; a control judgment far from chance showed no such
+overshoot, so that stitching does not disturb the models in general, but whether the
+overshoot is specific to the changed judgment or to judgments near chance remains open. Note also that stitching without an adapter
 at layer ℓ is equivalent to exchanging the full residual stream at all positions at
 that layer, so that our stitching and patching results are two views of one family of
-interventions rather than independent tests; their convergence with steering, which
-does not exchange states between checkpoints, is the stronger argument. Two further cautions apply. A probe shows that information can be decoded, not that the
+interventions rather than independent tests. Steering at the answer position does not
+add an independent test either, because it largely restates the difference between the
+classes in the answers (Section 3.3). Two further cautions apply. A probe shows that information can be decoded, not that the
 model uses it (Hewitt & Liang, 2019; Elazar et al., 2021); this is why we rest the claim
-that the answers misread the representation on the causal tests rather than on the probes.
+that post-training changed the readout on the stitching and patching results rather than on the probes.
 Conversely, interventions along a subspace can change the output through a pathway other
 than the one the subspace was meant to capture (Makelov et al., 2023); our steering
 results therefore show which way the answer pathway reads a direction, and we compared
@@ -196,7 +195,7 @@ this was the wrong way round. The AI messages, written by current models instruc
 sound like a private group chat, were more verbal and lexically more diverse than the
 students' messages, and the post-trained models took exactly these properties as signs
 of human authorship. Except for Qwen3, whose base model already weighted these
-properties inversely (G = −.52, after post-training −.58), the base models used them
+properties inversely (cross-validated G = −.53, after post-training −.61), the base models used them
 less; post-training installed or strengthened the weighting, and in the two models with
 stage-wise checkpoints it did so during supervised fine-tuning.
 

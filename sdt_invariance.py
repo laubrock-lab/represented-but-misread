@@ -34,6 +34,7 @@ PRESETS = ["gemma3-4b", "gemma3-12b", "qwen3-8b", "olmo2-7b", "apertus15-8b", "o
 CORPORA = ["chat_tw25", "journalism_seg", "textbook"]
 PRIORS = {"none": "", "20": "_p20ai", "50": "_p50ai", "80": "_p80ai"}
 N_BOOT = 1000
+TOL = 1e-9  # bounds such as -1e-16 arise when c is identical in all conditions (constant answer)
 
 
 def load(corpus, preset, variant):
@@ -110,7 +111,8 @@ def main() -> None:
                              (not name.startswith("order") and name.endswith(f"({k[0]})"))]
                     test_rows.append(dict(corpus=corpus, preset=preset, variant=variant, contrast=name, measure=m,
                                           est=val, lo=np.quantile(arr, .025), hi=np.quantile(arr, .975),
-                                          excl0=bool(np.quantile(arr, .025) > 0 or np.quantile(arr, .975) < 0),
+                                          excl0=bool(np.quantile(arr, .025) > TOL or np.quantile(arr, .975) < -TOL),
+                                          moved=bool(abs(val) > TOL),
                                           any_saturated=any(((S[k] > 0).mean() <= .02 or (S[k] > 0).mean() >= .98)
                                                             for k in conds)))
     cond = pd.DataFrame(cond_rows)
@@ -120,10 +122,10 @@ def main() -> None:
     kind = tests.contrast.str.replace(r" \((mk|km)\)", "", regex=True)
     summ = tests.assign(kind=kind).groupby(["kind", "measure"]).agg(
         cells=("est", "size"), mean_abs=("est", lambda v: np.abs(v).mean()), mean=("est", "mean"),
-        n_excl0=("excl0", "sum"))
+        n_excl0=("excl0", "sum"), n_moved=("moved", "sum"))
     summ_ns = tests[~tests.any_saturated].assign(kind=kind[~tests.any_saturated]).groupby(["kind", "measure"]).agg(
         cells=("est", "size"), mean_abs=("est", lambda v: np.abs(v).mean()), mean=("est", "mean"),
-        n_excl0=("excl0", "sum"))
+        n_excl0=("excl0", "sum"), n_moved=("moved", "sum"))
     # appendix table: mean absolute full-range effect per model x checkpoint (over corpora and
     # answer orders); base-rate slope scaled to the 20 -> 80% range (x 6)
     t = tests.assign(kind=kind)
