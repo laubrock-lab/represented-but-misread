@@ -114,7 +114,11 @@ its decision threshold, and negative values indicate that the model judges AI te
 less AI-like than human texts. As a measure of response bias, we computed the criterion
 c at the model's natural threshold (dv = 0), with a log-linear correction of hit and
 false-alarm rates (Hautus, 1995); positive values indicate a bias toward answering
-"Mensch". Confidence intervals (95%) were obtained by a grouped bootstrap that resampled
+"Mensch". Because dv is a graded preference, d′ characterizes how the evidence for the
+answer is ordered across texts, in the manner of a confidence-rating ROC, even where the
+binary answer hardly varies; c describes where the order-averaged dv places the threshold
+and is not the criterion of any single prompt, since the binary answers often depended on
+the order of the answer options (Section 3.2). Confidence intervals (95%) were obtained by a grouped bootstrap that resampled
 whole source groups (1,000–2,000 resamples). The AUC, and hence d′, as well as hit and
 false-alarm rates are computed within each class and therefore do not depend on the
 unequal numbers of AI and human texts (chats: 239 vs. 61; newspaper segments: 65 vs. 38);
