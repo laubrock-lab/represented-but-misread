@@ -555,15 +555,20 @@ three baselines: C0; C3, the condition with random labels, which learned the que
 the answer words but no valid mapping; and C4, which practiced an unrelated judgment in the
 same layout (differences in d′ with 95% CIs from a grouped bootstrap). Practicing the
 unrelated judgment left the authorship answers where C0 left them (C4 − C0 between −0.13
-and +0.10 on the three test corpora, all CIs including zero), so that practice with a
-judgment as such did not explain the effects of the authorship labels. Two thousand correctly labeled judgments of news texts sufficed to raise the
+and +0.10 on the three test corpora, all CIs including zero; on the held-out news, C4 was
+higher than C0, +0.34 [0.26, 0.43]), so that practice with a
+judgment as such did not explain the effects of the authorship labels. Note that the C4
+models never answered "KI" in any run, so that their d′ is a ranking of graded preferences
+under a saturated criterion, and that C3 was unstable across seeds (criterion c between
+−1.10 and +2.33). Two thousand correctly labeled judgments of news texts sufficed to raise the
 sensitivity of the answers far above both baselines, not only on held-out news but also
 on texts from other generators and genres: the newspaper segments, written by GPT-5.4
 (C1 − C3: +2.23 [1.56, 3.17]; C1 − C4: +2.37 [1.74, 3.29]), and the textbook summaries
 (+1.36 [1.11, 1.64]; +1.42 [1.15, 1.73]). On the
-held-out news, C1 was near its maximum for both generators and all text lengths
-(d′ = 3.8–4.0 in each subset), so that its success there was not due to recognizing one
-generator or one length. The information had been represented all along; a small amount
+held-out news, C1 was at the maximum for both generators and all text lengths
+(d′ = 3.8–4.0 are the ceilings of the subsets), so that its success there was not due to recognizing one
+generator or one length; the breakdown cannot exclude that the models detect the generation
+procedure that the training and held-out texts share. The information had been represented all along; a small amount
 of valid training made the answer read it. On the short chats, however, the same training
 made the answers worse than chance (−0.58), also relative to random labels (C1 − C3:
 −0.36 [−0.69, −0.06]) and to the unrelated judgment (C1 − C4: −0.62 [−1.01, −0.25]), because the properties that distinguished generated from human
@@ -575,8 +580,10 @@ the chats and newspaper segments (AUC = .40 [.32, .49] and .39 [.28, .49]) but m
 formal in the textbook summaries (.70 [.65, .75]). Relative to random labels, the
 stereotype improved the answers on the textbook summaries (C2 − C3: +0.29 [0.11, 0.49];
 C2 − C4: +0.35 [0.15, 0.57]) and lowered them on the newspaper segments, though not
-reliably (−0.29 [−0.61, 0.07]; −0.15 [−0.57, 0.25]); on the chats, it did not differ from
-random labels (−0.08 [−0.39, 0.24]). Note also that the
+reliably (−0.29 [−0.61, 0.07]; −0.15 [−0.57, 0.25]); on the chats, the result depended on the baseline: The stereotype did not differ from
+random labels (−0.08 [−0.39, 0.24]) and was lower than the unrelated judgment, though not
+reliably (C2 − C4: −0.33 [−0.77, 0.08]), because random labels themselves lowered the answers
+on the chats. Note also that the
 stereotype labels were not independent of other text properties: The more formal half
 contained more short texts, more texts on business and domestic politics than on sports,
 and more texts from Gemma 3 12B than from Qwen3 8B. Random labels lowered the answers
