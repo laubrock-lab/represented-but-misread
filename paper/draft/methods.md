@@ -353,7 +353,10 @@ written by participants who have not consented to publication (TODO: update afte
 consent requests), and the human textbook summaries are protected by copyright.
 Therefore, these texts cannot be shared. The two further judgments (Section 2.8) use
 publicly available data (Marks & Tegmark, 2024; Ott et al., 2011, 2013), so that these
-analyses can be reproduced in full; the same holds for the training data of the training
+analyses can be reproduced in full: `reproduce/negation.sh` reruns the analyses of the negated
+statements (Section 3.1) from the public statement sets, and `reproduce/check_negation.py`
+compares the regenerated values with those reported here (the results for Apertus require
+the developers' fork of the `transformers` library); the same holds for the training data of the training
 study (Section 2.9), whose human texts are public (Block, 2019) and whose AI texts we
 generated and will release. All code, the per-text model outputs without text
 content, and all derived results are available in the project repository (TODO: URL).

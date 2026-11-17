@@ -1,0 +1,64 @@
+id,step,file,filter,column,reference,manuscript,tol,note
+T2_probe_olmo2-7b_base,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=olmo2-7b;variant=base,probe_d,4.536710876,4.54,0.05,"Table 2, OLMo 2 7B, Probe base"
+T2_ans_olmo2-7b_base,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=olmo2-7b;variant=base,ans_d,0.798531114,0.80,0.05,"Table 2, OLMo 2 7B, Answer base"
+T2_ans_olmo2-7b_sft,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=olmo2-7b;variant=sft,ans_d,3.361032072,3.36,0.05,"Table 2, OLMo 2 7B, SFT"
+T2_probe_olmo2-7b_instruct,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=olmo2-7b;variant=instruct,probe_d,4.536710876,4.54,0.05,"Table 2, OLMo 2 7B, Probe final"
+T2_ans_olmo2-7b_instruct,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=olmo2-7b;variant=instruct,ans_d,3.103341177,3.10,0.05,"Table 2, OLMo 2 7B, Final"
+T2_probe_apertus15-8b_base,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=apertus15-8b;variant=base,probe_d,4.536710876,4.54,0.05,"Table 2, Apertus 1.5 8B, Probe base"
+T2_ans_apertus15-8b_base,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=apertus15-8b;variant=base,ans_d,-0.8817121961,-0.88,0.05,"Table 2, Apertus 1.5 8B, Answer base"
+T2_ans_apertus15-8b_sft,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=apertus15-8b;variant=sft,ans_d,4.536710876,4.54,0.05,"Table 2, Apertus 1.5 8B, SFT"
+T2_probe_apertus15-8b_instruct,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=apertus15-8b;variant=instruct,probe_d,4.536710876,4.54,0.05,"Table 2, Apertus 1.5 8B, Probe final"
+T2_ans_apertus15-8b_instruct,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=apertus15-8b;variant=instruct,ans_d,4.536710876,4.54,0.05,"Table 2, Apertus 1.5 8B, Final"
+T2_probe_olmo3-7b-think_base,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=olmo3-7b-think;variant=base,probe_d,4.536710876,4.54,0.05,"Table 2, OLMo 3 7B Think, Probe base"
+T2_ans_olmo3-7b-think_base,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=olmo3-7b-think;variant=base,ans_d,4.536710876,4.54,0.05,"Table 2, OLMo 3 7B Think, Answer base"
+T2_ans_olmo3-7b-think_sft,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=olmo3-7b-think;variant=sft,ans_d,3.76728366,3.77,0.05,"Table 2, OLMo 3 7B Think, SFT"
+T2_probe_olmo3-7b-think_instruct,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=olmo3-7b-think;variant=instruct,probe_d,4.308853957,4.31,0.05,"Table 2, OLMo 3 7B Think, Probe final"
+T2_ans_olmo3-7b-think_instruct,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=olmo3-7b-think;variant=instruct,ans_d,3.797637879,3.80,0.05,"Table 2, OLMo 3 7B Think, Final"
+T2_probe_gemma3-4b_base,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=gemma3-4b;variant=base,probe_d,4.536710876,4.54,0.05,"Table 2, Gemma 3 4B, Probe base"
+T2_ans_gemma3-4b_base,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=gemma3-4b;variant=base,ans_d,0.06084882415,0.06,0.05,"Table 2, Gemma 3 4B, Answer base"
+T2_probe_gemma3-4b_instruct,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=gemma3-4b;variant=instruct,probe_d,4.338706344,4.34,0.05,"Table 2, Gemma 3 4B, Probe final"
+T2_ans_gemma3-4b_instruct,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=gemma3-4b;variant=instruct,ans_d,3.455649925,3.46,0.05,"Table 2, Gemma 3 4B, Final"
+T2_probe_gemma3-12b_base,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=gemma3-12b;variant=base,probe_d,4.536710876,4.54,0.05,"Table 2, Gemma 3 12B, Probe base"
+T2_ans_gemma3-12b_base,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=gemma3-12b;variant=base,ans_d,1.971002416,1.97,0.05,"Table 2, Gemma 3 12B, Answer base"
+T2_probe_gemma3-12b_instruct,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=gemma3-12b;variant=instruct,probe_d,4.536710876,4.54,0.05,"Table 2, Gemma 3 12B, Probe final"
+T2_ans_gemma3-12b_instruct,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=gemma3-12b;variant=instruct,ans_d,4.536710876,4.54,0.05,"Table 2, Gemma 3 12B, Final"
+T2_probe_qwen3-8b_base,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=qwen3-8b;variant=base,probe_d,4.536710876,4.54,0.05,"Table 2, Qwen3 8B, Probe base"
+T2_ans_qwen3-8b_base,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=qwen3-8b;variant=base,ans_d,4.536710876,4.54,0.05,"Table 2, Qwen3 8B, Answer base"
+T2_probe_qwen3-8b_instruct,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=qwen3-8b;variant=instruct,probe_d,4.536710876,4.54,0.05,"Table 2, Qwen3 8B, Probe final"
+T2_ans_qwen3-8b_instruct,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=qwen3-8b;variant=instruct,ans_d,4.536710876,4.54,0.05,"Table 2, Qwen3 8B, Final"
+c_olmo2_base,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=olmo2-7b;variant=base,ans_c,2.57811937,2.6,0.05,"3.1: ""Both base models answered False almost always (criterion c = 2.6 and 3.0)"""
+c_apertus_base,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=apertus15-8b;variant=base,ans_c,3.04303204,3.0,0.05,3.1: criterion c of the Apertus base model
+tr_olmo2_base,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=olmo2-7b;variant=base,transfer_d,-1.279125575,-1.28,0.05,"3.1: cities probe on the negated statements, OLMo 2 base"
+tr_apertus_base,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=apertus15-8b;variant=base,transfer_d,-1.427271239,-1.43,0.05,"3.1: cities probe on the negated statements, Apertus base"
+tr_olmo2_sft,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=olmo2-7b;variant=sft,transfer_d,0.6933197682,0.69,0.05,3.1: same probe after SFT (+0.69)
+tr_apertus_sft,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=apertus15-8b;variant=sft,transfer_d,3.047086864,3.05,0.05,3.1: same probe after SFT (+3.05)
+pmass_gemma4b_base,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=gemma3-4b;variant=base,p_mass,0.1815142549,0.18,0.02,2.8 / Table 2 footnote: Gemma 3 4B base answer mass (18%)
+pmass_gemma12b_base,b,truth_neg_cities/stages.csv,dataset=neg_cities;preset=gemma3-12b;variant=base,p_mass,0.2538222045,0.25,0.02,2.8 / Table 2 footnote: Gemma 3 12B base answer mass (25%)
+st_olmo2_base_sft_8,e,stitch/stitch_neg_cities.csv,preset=olmo2-7b;lower=base;upper=sft;split=8;component=all,d,3.759959469,3.76,0.05,3.1: first 8 base layers + SFT upper layers (OLMo 2)
+st_olmo2_base_sft_16,e,stitch/stitch_neg_cities.csv,preset=olmo2-7b;lower=base;upper=sft;split=16;component=all,d,0.3845839721,0.38,0.05,3.1: first 16 base layers abolish the repair (OLMo 2)
+st_olmo2_parent_base,e,stitch/stitch_neg_cities.csv,preset=olmo2-7b;lower=base;upper=sft;split=8;component=all,d_base,0.631691148,0.63,0.05,3.1: base model on the same 300 pairs
+st_olmo2_parent_sft,e,stitch/stitch_neg_cities.csv,preset=olmo2-7b;lower=base;upper=sft;split=8;component=all,d_sft,3.198129191,3.20,0.05,3.1: SFT model on the same 300 pairs
+st_apertus_base_sft_8,e,stitch/stitch_neg_cities.csv,preset=apertus15-8b;lower=base;upper=sft;split=8;component=all,d,4.150998897,4.15,0.05,3.1: first 8 base layers under SFT upper layers (Apertus)
+st_apertus_base_sft_12,e,stitch/stitch_neg_cities.csv,preset=apertus15-8b;lower=base;upper=sft;split=12;component=all,d,1.325004175,1.33,0.05,3.1: first 12 base layers remove most of the repair (Apertus)
+st_apertus_base_sft_16,e,stitch/stitch_neg_cities.csv,preset=apertus15-8b;lower=base;upper=sft;split=16;component=all,d,-0.9449414146,-0.94,0.05,3.1: first 16 base layers remove all of it (Apertus)
+st_apertus_sft_base_8,e,stitch/stitch_neg_cities.csv,preset=apertus15-8b;lower=sft;upper=base;split=8;component=all,d,1.211413596,1.21,0.05,3.1: first 8 SFT layers under base upper layers (Apertus)
+st_apertus_sft_base_12,e,stitch/stitch_neg_cities.csv,preset=apertus15-8b;lower=sft;upper=base;split=12;component=all,d,4.150998897,4.15,0.05,3.1: first 12 SFT layers produce the full repair (Apertus)
+pa_olmo2_base_none,e,patch/patch_summary.csv,corpus=truth_neg_cities;preset=olmo2-7b;prompt=default;layer=16;recipient=base;donor=sft;set=none,d,0.631691148,0.63,0.05,3.1: unpatched OLMo 2 base
+pa_olmo2_base_post,e,patch/patch_summary.csv,corpus=truth_neg_cities;preset=olmo2-7b;prompt=default;layer=16;recipient=base;donor=sft;set=post,d,3.263982946,3.26,0.05,3.1: SFT states after the statement repair the base model (0.63 -> 3.26)
+pa_olmo2_base_text,e,patch/patch_summary.csv,corpus=truth_neg_cities;preset=olmo2-7b;prompt=default;layer=16;recipient=base;donor=sft;set=text,d,1.513129541,1.51,0.05,3.1: SFT states of the statement itself (0.63 -> 1.51)
+pa_olmo2_sft_none,e,patch/patch_summary.csv,corpus=truth_neg_cities;preset=olmo2-7b;prompt=default;layer=16;recipient=sft;donor=base;set=none,d,3.198129191,3.20,0.05,3.1: unpatched OLMo 2 SFT
+pa_olmo2_sft_post,e,patch/patch_summary.csv,corpus=truth_neg_cities;preset=olmo2-7b;prompt=default;layer=16;recipient=sft;donor=base;set=post,d,1.065909621,1.07,0.05,3.1: base states abolish the repair (3.20 -> 1.07)
+pa_apertus_base_none,e,patch/patch_summary.csv,corpus=truth_neg_cities;preset=apertus15-8b;prompt=default;layer=16;recipient=base;donor=sft;set=none,d,-0.8729777821,-0.87,0.05,3.1: unpatched Apertus base
+pa_apertus_base_post,e,patch/patch_summary.csv,corpus=truth_neg_cities;preset=apertus15-8b;prompt=default;layer=16;recipient=base;donor=sft;set=post,d,4.150998897,4.15,0.05,3.1: SFT states after the statement repair the base model (-0.87 -> 4.15)
+pa_apertus_base_last,e,patch/patch_summary.csv,corpus=truth_neg_cities;preset=apertus15-8b;prompt=default;layer=16;recipient=base;donor=sft;set=last,d,4.150998897,4.15,0.05,3.1: the final position alone carries the full effect (Apertus)
+pa_apertus_sft_none,e,patch/patch_summary.csv,corpus=truth_neg_cities;preset=apertus15-8b;prompt=default;layer=16;recipient=sft;donor=base;set=none,d,4.150998897,4.15,0.05,3.1: unpatched Apertus SFT
+pa_apertus_sft_post,e,patch/patch_summary.csv,corpus=truth_neg_cities;preset=apertus15-8b;prompt=default;layer=16;recipient=sft;donor=base;set=post,d,-1.086376469,-1.09,0.05,3.1: base states abolish the repair (4.15 -> -1.09)
+se_apertus_sft_E2,f,steer_nulls_summary.csv,corpus=truth_neg_cities;cell=apertus15-8b_sft_raw_tf;layer=21,class_E2,0.3584494773,0.36,0.05,"3.1 / Table D1: Apertus SFT, +-2 SD along the truth direction"
+se_apertus_sft_p,f,steer_nulls_summary.csv,corpus=truth_neg_cities;cell=apertus15-8b_sft_raw_tf;layer=21,all_p,0.0198019802,.02,0.02,3.1: p = .02 (100 norm-matched controls)
+se_olmo2_sft_E2,f,steer_nulls_summary.csv,corpus=truth_neg_cities;cell=olmo2-7b_sft_raw_tf;layer=21,class_E2,1.071708783,1.07,0.05,"3.1 / Table D1: OLMo 2 SFT, +-2 SD along the truth direction"
+se_olmo2_sft_p_own,f,steer_nulls_summary.csv,corpus=truth_neg_cities;cell=olmo2-7b_sft_raw_tf;layer=21,own_all_p,0.0396039604,.04,0.02,3.1: p <= .04 (scale-matched controls)
+se_apertus_base_E2,f,steer_nulls_summary.csv,corpus=truth_neg_cities;cell=apertus15-8b_base_raw_tf;layer=21,class_E2,-0.1368943416,-0.14,0.05,3.1 / Table D1: Apertus base
+se_apertus_base_p,f,steer_nulls_summary.csv,corpus=truth_neg_cities;cell=apertus15-8b_base_raw_tf;layer=21,all_p,0.1287128713,.13,0.02,3.1: p = .13 (norm-matched)
+se_apertus_base_p_own,f,steer_nulls_summary.csv,corpus=truth_neg_cities;cell=apertus15-8b_base_raw_tf;layer=21,own_all_p,0.3267326733,.33,0.02,3.1: p = .33 (scale-matched)
+se_olmo2_base_E2,f,steer_nulls_summary.csv,corpus=truth_neg_cities;cell=olmo2-7b_base_raw_tf;layer=21,class_E2,0.09283619039,0.09,0.05,3.1 / Table D1: OLMo 2 base
+se_olmo2_base_p_own,f,steer_nulls_summary.csv,corpus=truth_neg_cities;cell=olmo2-7b_base_raw_tf;layer=21,own_all_p,0.5445544554,.54,0.02,3.1: p >= .54 (scale-matched)
