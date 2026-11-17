@@ -17,8 +17,8 @@ measured with linear probes, and whether two checkpoints represent it in the sam
 with probe transfer. In the second lens (readout), the question reads the representation
 out into an answer by weighting internal features. Only one of these features was
 measured directly: the class direction, i.e., the direction that separates the two
-classes in the representation; its weight and sign in the answer were measured with
-steering. The other features are schematic. Achievement, i.e., the agreement of the
+classes in the representation; its relation to the answer was examined with
+steering at the answer position (Appendix D). The other features are schematic. Achievement, i.e., the agreement of the
 answer with the state of the world, requires both lenses. Post-training changes the
 second lens (orange); model stitching and activation patching locate the change in depth
 and in the prompt. Splitting the judge side of the lens model has precedents in
@@ -49,7 +49,17 @@ Activation patching replaces the internal states of one model (here SFT) at sele
 positions and one layer with those of the other model (here the base model's states at
 the question positions).
 
-**Figure 3 (`fig1_information_vs_answers`).** The authorship information is available but
+**Figure 3 (`fig_negation`).** Negated statements: where supervised fine-tuning repairs the
+readout (300 statement pairs; error bars: 95% grouped-bootstrap confidence intervals). (A)
+Model stitching: sensitivity (d′) of the answers of hybrids that take the first ℓ layers
+from one checkpoint and all layers above from the other; horizontal lines show the
+unstitched base (dotted) and SFT (dashed) checkpoints. (B) Activation patching at layers 8
+and 16: d′ of the recipient checkpoint after its residual stream was replaced by the
+donor's at one set of positions (the statement, the instruction before it, the question
+and answer cue after it, the final position only, or all positions); dotted lines show the
+unpatched recipients.
+
+**Figure 4 (`fig1_information_vs_answers`).** The authorship information is available but
 not used. Sensitivity (d′) for separating AI from human texts in the three corpora.
 Upper rows: classifiers on word and character n-grams and on surface statistics,
 probes on the average input embedding and on the internal activations at two thirds of
@@ -59,7 +69,7 @@ range across models. Lower rows: sensitivity of the models' own answers (raw pro
 one small dot per model, large dot = median. The dashed line marks the maximum
 d′ that can be estimated with the given number of texts.
 
-**Figure 4 (`fig2_answers_and_fewshot`).** Post-training mostly lowers the sensitivity
+**Figure 5 (`fig2_answers_and_fewshot`).** Post-training mostly lowers the sensitivity
 of the answers; with 16 labelled examples, most models improve. (A) Sensitivity of the base
 model (blue) and of the final post-trained model with the identical raw prompt (filled
 orange) and with its chat template (open orange), per model and corpus.
@@ -79,7 +89,7 @@ Qwen3 on the textbook summaries, the post-trained model gained more. On the text
 tested; for OLMo 2 only 0 and 8, because 16 textbook summaries exceed its context window
 of 4,096 tokens.
 
-**Figure 5 (`fig3_stitching_patching`).** Post-training changes how the question reads
+**Figure 6 (`fig3_stitching_patching`).** Post-training changes how the question reads
 the text. (A) Model stitching between base and SFT checkpoints (textbook summaries).
 The x-axis gives the number of lower layers taken from the other checkpoint. Blue: base
 layers below, SFT layers above; orange: SFT layers below, base layers above. Dashed and
@@ -95,10 +105,10 @@ Numbering (13 Nov): Figure 1 = lens model with an internal lens (Introduction); 
 methods schematic (Method); Figures 3–5 = data figures; S1, S2 = supplement.
 
 **Figure S1 (`figS1_patching_layers`).** Activation patching at layers 8 and 16
-(textbook summaries). As Figure 5B, with layer 8 added. At layer 8 the picture is
+(textbook summaries). As Figure 6B, with layer 8 added. At layer 8 the picture is
 mixed: in Apertus, exchanging the states of the text positions still has a partial
 effect; in OLMo 2, even exchanging all positions transfers only part of the difference
-(the change is not yet complete at layer 8; cf. the stitching curve in Figure 5A). At
+(the change is not yet complete at layer 8; cf. the stitching curve in Figure 6A). At
 layer 16, the whole difference between base and SFT model is carried by the question
 positions. Error bars
 are 95% bootstrap confidence intervals.

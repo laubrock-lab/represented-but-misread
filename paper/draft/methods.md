@@ -207,7 +207,9 @@ texts whose projection stayed within the 1st–99th percentile of the observed t
 the effect of a shift by one class-mean distance, extrapolated from the ±1 SD step. To make
 this number of directions feasible, the prompt up to the last position was processed once
 per text and its cached activations were reused for all steering settings, which
-reproduced the scores of the uncached computation (r = .999). Steering was run for 25
+reproduced the scores of the uncached computation in a check on three statements with all
+steering settings (102 scores: r = .999, largest difference 0.06 nats;
+outputs/steer_cache_check.csv). Steering was run for 25
 cells (model × corpus × layer; Table D1 in Appendix D).
 
 *Model stitching.* Model stitching combines parts of different networks (Lenc &

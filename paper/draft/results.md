@@ -67,7 +67,7 @@ in OLMo 3, where answers and probes declined together (answers 1.61 → 1.34; pr
 → 1.64).
 
 Where does the repair arise? We combined the lower layers of one checkpoint with the upper
-layers of the other (model stitching; Section 2.7, Figure 2C). Stitching located the repair in the middle of the network
+layers of the other (model stitching; Section 2.7, Figure 2C; results in Figure 3A). Stitching located the repair in the middle of the network
 rather than in the early layers. In OLMo 2, the first 8 base layers combined with all
 upper SFT layers still judged at the level of the SFT model (d′ = 3.76; base 0.63, SFT
 3.20 in this subset of 300 pairs), whereas the first 16 base layers abolished the
@@ -77,13 +77,16 @@ the repair intact (4.15), the first 12 removed most of it (1.33), and the first 
 repair (1.21) and the first 12 all of it (4.15). The repair thus involved layers 9 to 16,
 with a partial contribution of the layers below (outputs/stitch/stitch_neg_cities.csv). To ask where in the prompt the
 repair acts, we exchanged the internal states between the checkpoints at selected positions
-of the prompt (activation patching; Figure 2D). At layer 16, The SFT model's states at the
+of the prompt (activation patching; Figure 2D). At layer 16, the SFT model's states at the
 question positions repaired the base model completely (OLMo 2: 0.63 → 3.26; Apertus:
 −0.87 → 4.15), and the base model's question states abolished the repair in the SFT
 model (3.20 → 1.07; 4.15 → −1.09). In Apertus, the final position alone carried the
 full effect in one direction (base model with the SFT model's final state: 4.15).
 Exchanging the states of the statement itself had no effect in Apertus and in the SFT
-model of OLMo 2, but a partial one in the OLMo 2 base model (0.63 → 1.51).
+model of OLMo 2, but a partial one in the OLMo 2 base model (0.63 → 1.51). At layer 8,
+the SFT model's states after the statement repaired the base models only partly (Apertus:
+1.61; OLMo 2: 1.07; Figure 3B), in line with the stitching result that the repair is not
+complete at this depth.
 
 Steering at the answer position was consistent with a readout that uses the represented
 truth direction after SFT; as explained in Appendix D, this is a consistency check rather
@@ -138,7 +141,7 @@ before any processing by the network, performed about as well as probes on deep 
 change this picture (word frequencies: d′ = 1.79). A detector that was trained by
 others to recognize AI-edited English text (EditLens; Thai et al., 2025) transferred to
 our German material in a graded manner, reaching an AUC of .99 for the textbook
-summaries, .73 for the newspaper segments, and .57 for the short chats (Figure 3). Thus,
+summaries, .73 for the newspaper segments, and .57 for the short chats (Figure 4). Thus,
 the cues that distinguish AI from human texts are present and readily accessible, both
 in the texts themselves and in the models' representations; they consist largely of
 ordinary lexical and stylistic regularities. In terms of Brunswik's lens model, the
@@ -160,10 +163,6 @@ below chance on another.
 a maximum that depends on the number of texts (d′ = 3.73 for the textbook summaries and
 3.14 for the newspaper segments); for such near-perfect classifiers, we therefore report
 the AUC.
-
-> **Figure 3 (placeholder).** Sensitivity of probes and baselines (word and character
-> n-grams, surface statistics, average input embedding, EditLens) compared with the
-> sensitivity of the models' own answers, per corpus.
 
 Are authorship judgments, too, a case in which the answers fail to use what is
 represented? When the models were asked directly whether a text had been written by a human or
@@ -314,7 +313,7 @@ was already complete after imitation learning.
 Could the post-trained models simply hold a wrong belief about what AI texts look like,
 a belief that a few correctly labeled examples would correct? We tested this by placing
 2, 8, or 16 labeled examples from other sources before each text (four different sets of
-examples; d′ computed per set and averaged; Figure 4B). With 16 examples, d′ rose reliably
+examples; d′ computed per set and averaged; Figure 5B). With 16 examples, d′ rose reliably
 in 8 of 11 model conditions on the short chats and in 4 of 6 on the textbook summaries,
 whereas two examples hardly helped. The gains of base and post-trained models did not differ
 consistently: The difference was reliable in two of five comparisons, with opposite signs
@@ -343,10 +342,6 @@ the models, and style-matched messages that had not been revised according to th
 students' feedback were judged like the revised ones (change in AUC between −.03 and +.04
 for every model).
 
-> **Figure 4 (placeholder).** Summary across all cells (base model × corpus × prompt
-> format): probe sensitivity, base-model answer, and post-trained answer; few-shot
-> curves as an inset.
-
 ## 3.5 Where the change acts: model stitching and activation patching
 
 Where in the network does post-training make the difference? Because the base and the
@@ -371,7 +366,7 @@ text (perplexity 6.0–6.7 for Apertus, 8.2–9.4 for OLMo 2), and stitching at 
 bottom or the very top reproduced the respective parent model.
 
 If post-training changed only the final readout stage, the upper layers should decide
-the outcome. This was not the case (Figure 5A). When the first 8 of 32 layers of
+the outcome. This was not the case (Figure 6A). When the first 8 of 32 layers of
 Apertus came from the base model and all layers above from the SFT model, the combined
 model discriminated at least as well as the base model (d′ = +0.59 [0.41, 0.80]; base
 +0.43). Conversely, the first 8 layers of the SFT model sufficed to abolish the base
@@ -426,7 +421,7 @@ checkpoints selectively at different positions of the prompt ("activation patchi
 at the tokens of the text, at the instruction before the text, at the question after
 the text, or at the final position only.
 
-At layer 16, the pattern was unambiguous and identical for both models (Figure 5B). Exchanging the states of the text tokens changed nothing: Apertus after SFT
+At layer 16, the pattern was unambiguous and identical for both models (Figure 6B). Exchanging the states of the text tokens changed nothing: Apertus after SFT
 remained at chance when it received the base model's text representation (−0.11; SFT
 alone −0.04), and the base model kept its sensitivity when it received the SFT model's
 text representation (+0.43; base alone +0.43). Exchanging only the states of the
@@ -473,11 +468,6 @@ summary, exchanging the text states at mid-depth transferred little of the chang
 exchanging the states at the positions that follow the text transferred much or all of it
 with the default prompt; in this sense, post-training changed how the question takes up the
 text.
-
-> **Figure 5 (placeholder, central figure).** (A) Model stitching for Apertus and
-> OLMo 2 (d′ as a function of the number of layers taken from the other checkpoint, both
-> directions). (B) Activation patching at layer 16 (d′ after exchanging states at
-> text, pre-text, question, and final positions).
 
 ## 3.6 Probes across checkpoints, and what the fine-tuning data contain
 
