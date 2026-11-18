@@ -16,14 +16,19 @@ change occurred during supervised fine-tuning. Post-training also changed how st
 stated base rate moved the answers, from less than an ideal observer would to more. Two
 interventions bore on where the changes take effect. Model stitching implicated the weights
 of the middle layers for negation and of the early layers for authorship, with the caveat
-that stitched hybrids produce effects of their own. Activation patching showed that, at the
+that stitched hybrids produce effects of their own. Activation patching showed that, by the
 middle of the network, the states at the positions after the text transferred the change
-between checkpoints, whereas the states of the text did not. In a training study, a small
+between checkpoints. Where the change arose was less uniform: For negation, a sweep over
+layers located it at the positions after the statement in Apertus, but in the representation
+of the statement itself in OLMo 2. In a training study, a small
 number of labeled examples shifted the readout in the direction their labels implied. In
-short, where we could test it, post-training changed little in how the models represent the
-text; it changed how the question they are asked reads this representation out, in a
-direction that depended on the judgment. Note that the localization rests on two model
-families and single layers, and that for the deceptive reviews (Appendix C) it was
+short, post-training changed how a judgment is read out of information that the models
+represent, in a direction that depended on the judgment. That this change leaves the
+representation of the text untouched and resides in how the question reads it, as our title
+suggests, held for the probes and for one of the two models in which we could trace the
+repair of negation; in the other, the representation of the statement changed as well. Note
+that the localization rests on two model
+families, for authorship on single layers, and that for the deceptive reviews (Appendix C) it was
 inconclusive.
 
 ## Relation to previous work
@@ -181,19 +186,18 @@ early, at the stage of selection, and not only at a late decision stage [@desimo
 weights in the early layers, where the question begins to select information from the
 text, and was fully located in the question positions by the middle of the network.
 
-The layer-by-position sweep adds a further distinction. In OLMo 2, post-training changed
-not only the readout but also the text representation: The SFT model's text states at
-layers 12–14 transferred 82% of the repair, an effect that vanished at layers below 10 and
-above 16. In Apertus, by contrast, the text states contributed at most 23% and their
-replacement caused no disruption in the reverse direction. The post-text readout change
-generalized across architectures; the text-representation change did not. It is plausible
-that the difference reflects the post-training recipes — different training objectives or
-data may distribute the gradient signal differently across positions and layers — or that
-the base models differ in how readily their text representations can be read by the
-post-trained readout, so that one requires an adaptation of both the reader and the text,
-while the other requires only the reader. Cross-model patching, in which the text states of
-one model family are combined with the readout of another through a learned adapter, might
-distinguish these accounts.
+The sweep over layers for the negated statements qualifies this picture. In Apertus, the
+repair arose at the positions after the statement, as the picture of a changed reader
+suggests. In OLMo 2, it arose in the states of the statement itself at layers 10 to 14, and
+the upper layers of the base model read these states correctly; here, supervised fine-tuning
+changed what is read, and the reader of the base model was adequate. Note that in the
+prompt for the truth judgments the question precedes the statement, so that the statement
+is processed with the task known; a change of the statement states under this prompt is
+therefore a change in how the statement is encoded for the task, not necessarily a change in
+how the model represents statements in general. Why the two models differ is open. It is
+conceivable that the difference reflects their post-training data, or the degree to which
+the base model already encodes negation at the statement positions; our data do not
+distinguish these possibilities.
 
 The parallel to human judges is equally instructive. Human readers fail to recognize AI
 text because they rely on cues that are plausible but invalid [@jakesch2023human; see also Rosin and Laubrock, in preparation],
@@ -309,9 +313,9 @@ Language models can represent what an answer would require and still answer othe
 For negated statements, post-training repaired such a readout; for authorship, it impaired
 the readout on average: Models that write like humans failed to recognize their own kind of
 text, not because they lacked the information but because of how they read it out. In both
-judgments, post-training changed little in the representation of the text where we could
-test it, and the change between checkpoints was transferred by the states at the positions
-after the text and carried by weights in the middle or early layers. To know what a model
+judgments, the change between checkpoints was carried by weights in the middle or early
+layers and had reached the positions after the text by the middle of the network; whether
+it arose there or in the representation of the text differed between models. To know what a model
 knows, it is therefore not enough to look at its answers; one has to look at how the
 question is read. A training study showed that the training data can set the direction of
 this readout with little change at the text positions. Future studies with larger models

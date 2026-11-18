@@ -142,7 +142,9 @@ base models did not use this representation, and that supervised fine-tuning rep
 readout. For authorship, the information was readily available, but the answers did not use
 it, and post-training lowered their sensitivity on average. In the two models with
 stage-wise checkpoints, the states at the positions after the text transferred the change
-between checkpoints at mid-depth, whereas the states of the text did not, and the weights
+between checkpoints by mid-depth; for negation, a sweep over layers showed that the change
+arose at these positions in one model and in the representation of the statement itself in
+the other. The weights
 that carried it resided in the middle layers for negation and in the early layers for
 authorship. In the training study, a small number of labeled examples shifted the readout in
 the direction that their labels implied, with little change of the probes at the text

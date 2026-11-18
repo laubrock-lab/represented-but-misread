@@ -28,16 +28,16 @@ poorly or ordered the statements inversely; supervised fine-tuning repaired the 
 judgments of whether German texts from three corpora were written by a human or an AI,
 probes and word-frequency classifiers separated the classes well, but the answers did not,
 and post-training lowered their sensitivity on average (Δd′ = −0.34 across model families;
-−0.29 across three prompt wordings), with considerable variation between models and
-prompts. Post-training also changed the use of a stated base rate from underweighting to
-overweighting relative to an ideal observer. In two models with stage-wise checkpoints,
+−0.29 across three prompt wordings). Post-training also changed the use of a stated base rate from underweighting to
+overweighting relative to an ideal observer. In two models,
 combining layers of base and fine-tuned checkpoints (model stitching) implicated the middle
-layers for negation and the early layers for authorship, and exchanging internal states at
-mid-depth (activation patching) transferred the change with the states at the positions
-after the text, not with those of the text. In a training study with one model, adding
+layers for negation and the early layers for authorship, and exchanging internal states
+(activation patching) showed that by mid-depth the change resided at the positions after
+the text; for negation, it arose there in one model and in the representation of the
+statement in the other. In a training study with one model, adding
 2,000 correctly labeled examples to otherwise identical fine-tuning data shifted the
 answers strongly, improving them on two other corpora and inverting them on a third, where
 the answers followed a probe trained on news (ρ = .68); the probes at the text positions
-changed little. Post-training thus changed how the
-question reads the text, for better or worse, and a small training signal can set the
+changed little. Post-training thus changed how a
+judgment is read out of what a model represents, for better or worse, and a small training signal can set the
 direction of this change.

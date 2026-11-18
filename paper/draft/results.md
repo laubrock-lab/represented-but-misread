@@ -77,44 +77,47 @@ the repair intact (4.15), the first 12 removed most of it (1.33), and the first 
 repair (1.21) and the first 12 all of it (4.15). The repair thus involved layers 9 to 16,
 with a partial contribution of the layers below (outputs/stitch/stitch_neg_cities.csv). To ask where in the prompt the
 repair acts, we exchanged the internal states between the checkpoints at selected positions
-of the prompt (activation patching; Figure 2D). At layer 16, the SFT model's states at the
-question positions repaired the base model completely (OLMo 2: 0.63 → 3.26; Apertus:
-−0.87 → 4.15), and the base model's question states abolished the repair in the SFT
-model (3.20 → 1.07; 4.15 → −1.09). In Apertus, the final position alone carried the
-full effect in one direction (base model with the SFT model's final state: 4.15).
-Exchanging the states of the statement itself had no effect in Apertus and in the SFT
-model of OLMo 2, but a partial one in the OLMo 2 base model (0.63 → 1.51). At layer 8,
-the SFT model's states after the statement repaired the base models only partly (Apertus:
-1.61; OLMo 2: 1.07; Figure 3B), in line with the stitching result that the repair is not
-complete at this depth.
+of the prompt (activation patching; Figure 2D). Note that in the prompt for the truth
+judgments the question precedes the statement, so that the statement is read with the task
+known, and the positions after the statement contain only the answer cue ("Answer:"). At
+layer 16, the SFT model's states at the positions after the statement repaired the base
+model completely (OLMo 2: 0.63 → 3.26; Apertus: −0.87 → 4.15), and the base model's states
+at these positions abolished the repair in the SFT model (3.20 → 1.07; 4.15 → −1.09). In
+Apertus, the final position alone carried the full effect in one direction (base model with
+the SFT model's final state: 4.15). Exchanging the states of the statement itself had no
+effect in Apertus and in the SFT model of OLMo 2, but a partial one in the OLMo 2 base
+model (0.63 → 1.51). At layer 8, the SFT model's states after the statement repaired the
+base models only partly (Apertus: 1.61; OLMo 2: 1.07; Figure 3B), in line with the
+stitching result that the repair is not complete at this depth. Exchanging the states of
+the instruction and question before the statement had no effect at either layer.
 
-A patching sweep across all layers of OLMo 2 (layers 2 to 32, 100 statement pairs;
-outputs/patch_sweep/patch_sweep_summary.csv) confirmed and extended this localization.
-Transfer of the repair through the positions after the statement began at layer 10
-(transfer fraction 0.36) and was essentially complete at layer 16 (0.97), consistent with
-the stitching zone. The statement states showed a different profile: negligible transfer at
-layers 2 to 8, a peak at layer 12 where the SFT model's statement representation alone
-transferred 82% of the repair (d′ = 2.59; base unpatched 0.34), then a decline to 33% at
-layer 16 and zero from layer 20. The reverse direction confirmed this pattern: replacing the
-SFT model's statement states with the base model's at layer 12 reduced d′ from 3.09 to
-1.38. The inverted-U of the statement states thus traces the window during which the positions
-after the statement extract information from the text: before layer 10, the extraction has
-not begun; at layers 10 to 14, the SFT model's text representation is in a format that the
-downstream readout can use, even though a linear probe decodes truth at ceiling from both
-checkpoints; by layer 16, the extraction is complete and the text states no longer matter.
-Post-training changed not only the reader but also what is being read, and the change is
-confined to the layers where the reading takes place. The final position alone carried the
-full effect only from layer 20 onward (transfer 0.89).
-
-The same sweep in Apertus 1.5 replicated the post-text localization: Transfer through the
-post-text states began at layer 6 (0.46), reached ceiling at layer 10 (0.96), and remained
-there through layer 32 — an earlier onset than in OLMo 2 but the same qualitative pattern.
-In the reverse direction, replacing the SFT model's post-text states with the base model's
-disrupted d′ progressively from layer 10 onward. The text-state inverted-U, however, was
-weaker: a peak of 0.20–0.23 at layers 12–14, compared with 0.82 at layer 12 in OLMo 2, and
-no disruption at all when the SFT model's text states were replaced with the base model's
-(transfer ≈ 0.00 at every layer). The readout change thus generalized across architectures;
-the additional change in the text representation did not.
+Patching at two layers cannot show where the repair first appears. We therefore repeated
+the patching at 12 layers between 2 and 32, with 100 statement pairs (Figure 3C;
+outputs/patch_sweep/patch_sweep_summary.csv; on this subset, d′ = 0.34 for the OLMo 2 base
+model and 3.09 for its SFT model, and −0.86 and 3.64, the maximum for 100 pairs, for
+Apertus). We express each effect as the share of the difference between the two
+checkpoints that the patch transferred. The two models differed. In OLMo 2, the repair
+appeared first at the statement positions: The SFT model's statement states alone
+transferred 22% of the repair at layer 10, 82% at layer 12 (d′ = 2.59), and 67% at layer
+14, although all layers above and all other positions were those of the base model. The
+share then fell to 33% at layer 16 and to zero from layer 20 onward. The positions after
+the statement showed the complementary course (36% at layer 10, 37% at layer 12, 52% at
+layer 14, 97% at layer 16), and the final position alone carried the repair only from layer
+20 onward (89%). The reverse direction gave the same picture: The base model's statement
+states lowered the SFT model from 3.09 to 1.38 at layer 12 and to 1.75 at layer 14, and had
+little effect at layer 16 (2.92) and none above. In OLMo 2, supervised fine-tuning thus changed how the
+statement itself is represented at mid-depth, in a way that the upper layers of the base
+model could read correctly; the information then passed to the answer cue and to the final
+position. In Apertus, in contrast, the SFT model's statement states transferred at most
+23% (layers 12 and 14), whereas its states after the statement transferred 46% at layer 6
+and 96% at layer 10. In the reverse direction, the base model's states after the statement
+lowered the Apertus SFT model progressively from layer 10 onward, and its statement states
+did not lower it at any layer; note that the Apertus SFT model was at the maximum d′, so
+that a small disruption would not be visible. Hence, the two models agree in that the
+repair has reached the positions after the statement by the middle of the network, but
+they differ in where it arises: at the statement positions in OLMo 2, and at the answer cue
+in Apertus. TODO(gemma, sfirst): sweeps for Gemma 3 and with the statement placed before
+the question.
 
 Steering at the answer position was consistent with a readout that uses the represented
 truth direction after SFT; as explained in Appendix D, this is a consistency check rather
@@ -129,10 +132,13 @@ too, exceeded only the norm-matched controls. Supervised fine-tuning thus aligne
 the represented truth direction; whether the Apertus base model used this direction with
 the wrong sign, as its negative sensitivity would suggest, could not be established.
 
-In summary, the truth of negated statements was represented at ceiling before and after
-post-training, the answers of several base models did not use this representation, and
-supervised fine-tuning repaired the readout, through weights in the middle layers and
-states at the positions after the statement. Note that the localization rests on the two
+In summary, the truth of negated statements could be decoded at ceiling from the last
+prompt position before and after post-training, the answers of several base models did not
+use this information, and supervised fine-tuning repaired the answers, through weights in
+the middle layers. Where the repair arose differed between the two models that we could
+localize: In Apertus, it arose at the positions after the statement, i.e., in how the
+answer cue takes up the statement; in OLMo 2, it arose in the representation of the
+statement itself at mid-depth. Note that the localization rests on the two
 models with stage-wise checkpoints whose base models misread negation; the Gemma 3 base
 models showed the same change of the answers, but with low answer probability, and two
 base models had nothing to repair.
@@ -568,8 +574,11 @@ for which the training data contain examples, where the base model read it wrong
 impaired or merely reshaped the judgments for which we found none; it cannot establish this.
 
 In summary, for authorship as for negated statements, the information was represented,
-post-training changed the readout far more than the representation of the text, and the
-states at the positions after the text transferred the change at mid-depth. The direction
+the probes at the text positions changed little, and the
+states at the positions after the text transferred the change at layer 16. Note that for
+authorship this localization rests on two layers; the sweep for the negated statements
+(Section 3.1) shows that a contribution of the text states can be confined to a few layers
+below 16. TODO(authorship sweep). The direction
 of the change, however, differed between the two judgments.
 
 ## 3.7 The training signal sets the direction of the readout
