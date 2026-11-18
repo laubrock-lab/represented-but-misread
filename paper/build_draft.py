@@ -3,9 +3,8 @@ submission version).
 
 Order: title (option 1 of abstract.md), abstract, introduction, methods, results,
 discussion, appendix (appendix.md; terminology tables, lens analyses, full review
-results, steering and few-shot tables), figures (images + captions from figures.md), references (ALL entries of
-references/references.bib -- the drafts use plain-text citations, so the list is not
-filtered to the cited works).
+results, steering and few-shot tables), figures (images + captions from figures.md),
+references (cited works only, via pandoc-citeproc).
 
 Usage:  bash paper/build_draft.sh   (calls this script, then pandoc)
 """
@@ -45,7 +44,7 @@ author: "Jochen Laubrock et al."
 abstract: |
 {chr(10).join('  ' + l for l in abstract.splitlines())}
 bibliography: references/references.bib
-nocite: "@*"
+csl: references/apa.csl
 header-includes: |
   \\usepackage{{caption}}
   \\captionsetup[figure]{{labelformat=empty}}
@@ -54,7 +53,7 @@ link-citations: true
 
 """
 out = (header + body + "\n\n# Figures\n\n" + "\n".join(figs)
-       + "\n\n# References (all entries of references.bib)\n\n::: {#refs}\n:::\n")
+       + "\n\n# References\n\n::: {#refs}\n:::\n")
 (P / "build").mkdir(exist_ok=True)
 (P / "build" / "draft.md").write_text(out, encoding="utf-8")
 print(f"title: {title}\nfigures: {len(figs)}\n-> {P / 'build' / 'draft.md'}")

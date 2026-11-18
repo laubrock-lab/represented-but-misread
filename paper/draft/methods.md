@@ -102,7 +102,7 @@ the answer.
 The decision variable was the difference in log probability between the two answers,
 dv = log P("KI") − log P("Mensch"). Each answer probability summed over its spellings
 with and without a leading space and included the probability that the word ends after
-the answer tokens (Pimentel & Meister, 2024). To remove position effects, every text was
+the answer tokens [@pimentel2024compute]. To remove position effects, every text was
 judged with both orders of the answer options ("Mensch oder KI", "KI oder Mensch"), and
 dv was averaged over the two orders. As a manipulation check, we recorded the answer
 probability, i.e., the summed probability of the two answers; conditions in which a
@@ -116,7 +116,7 @@ the area under the ROC curve of dv. This measure does not depend on where the mo
 its decision threshold, and negative values indicate that the model judges AI texts as
 less AI-like than human texts. As a measure of response bias, we computed the criterion
 c at the model's natural threshold (dv = 0), with a log-linear correction of hit and
-false-alarm rates (Hautus, 1995); positive values indicate a bias toward answering
+false-alarm rates [@hautus1995corrections]; positive values indicate a bias toward answering
 "Mensch". Because dv is a graded preference, d′ characterizes how the evidence for the
 answer is ordered across texts, in the manner of a confidence-rating ROC, even where the
 binary answer hardly varies; c describes where the order-averaged dv places the threshold
@@ -170,7 +170,7 @@ on character n-grams (2–4) and on word n-grams (1–2), both with TF-IDF weigh
 surface statistics (e.g., text length, word and sentence length, type-token ratio,
 punctuation), and a probe on the average input embedding of the text tokens (i.e.,
 before any processing by the network). As an externally trained reference, we applied
-EditLens (Thai et al., 2025), a detector based on Llama 3.2 3B that was trained on
+EditLens [@thai2026editlens], a detector based on Llama 3.2 3B that was trained on
 English texts to estimate the extent of AI editing; we re-implemented its published
 inference procedure and ran it locally.
 
@@ -214,13 +214,12 @@ steering settings (102 scores: r = .999, largest difference 0.06 nats;
 outputs/steer_cache_check.csv). Steering was run for 25
 cells (model × corpus × layer; Table D1 in Appendix D).
 
-*Model stitching.* Model stitching combines parts of different networks (Lenc &
-Vedaldi, 2015; Bansal et al., 2021). For the models with stage-wise checkpoints, we combined the
+*Model stitching.* Model stitching combines parts of different networks [@lenc2015equivariance; @bansal2021stitching]. For the models with stage-wise checkpoints, we combined the
 embedding and the first ℓ layers of one checkpoint with the remaining layers, final
 normalization and output layer of another, passing the residual stream at the junction
 on unchanged. Stitching without an adapter is justified because both checkpoints derive
 from the same pretrained weights; we verified this by linear centered kernel alignment
-(CKA; Kornblith et al., 2019) between the activations of base and post-trained checkpoints
+[CKA; @kornblith2019similarity] between the activations of base and post-trained checkpoints
 (cka.py), by the perplexity of
 each stitched model on 40 texts, and by checking that stitching at ℓ = 0 and ℓ = L
 reproduced the parent models. As a control task, we stitched the same checkpoints on
@@ -230,9 +229,7 @@ and patching was repeated with a prompt that placed the question before the text
 feed-forward blocks (each with its normalization) of the first ℓ layers.
 
 *Activation patching.* Activation patching replaces internal states of a model with
-those obtained under different conditions (Vig et al., 2020; Meng et al., 2023;
-Heimersheim & Nanda, 2024); here, the states came from a different checkpoint (cf.
-Prakash et al., 2024). Stitching without an adapter at layer ℓ is the special case in
+those obtained under different conditions [@vig2020causal; @meng2022rome; @heimersheim2024patching]; here, the states came from a different checkpoint [cf. @prakash2024finetuning]. Stitching without an adapter at layer ℓ is the special case in
 which the full residual stream is exchanged at all positions. To separate the
 representation of the text from the processing of the question, we ran the donor checkpoint over every prompt, stored its residual stream
 after layer k at all prompt positions, and then ran the recipient checkpoint with its
@@ -246,7 +243,7 @@ To test whether the results generalize beyond authorship, we applied the same an
 to two further judgments on publicly available data, for which the correct answer is
 known as well.
 
-*Truth judgments.* We used three statement sets from Marks and Tegmark (2024), each
+*Truth judgments.* We used three statement sets from @marks2024geometry, each
 consisting of 748 matched pairs of a true and a false statement that differ in a single
 fact: simple geographic statements ("The city of Bokaro is in India."), the same
 statements negated ("The city of Bokaro is not in China."), and statements on diverse
@@ -257,11 +254,11 @@ answers, computed and averaged over both answer orders as for authorship. In the
 format, the system prompt was "You evaluate statements." The pair formed the unit of
 resampling and cross-validation.
 
-*Deceptive reviews.* The Deceptive Opinion Spam Corpus (Ott et al., 2011, 2013) contains
+*Deceptive reviews.* The Deceptive Opinion Spam Corpus [@ott2011finding; @ott2013negative] contains
 1,600 reviews of 20 hotels in Chicago, half of them written by guests (truthful) and half
 by crowd workers who had never stayed at the hotel (deceptive), each in a positive and a
 negative version. Human readers judge these reviews close to chance, whereas classifiers
-on word frequencies separate them well (Ott et al., 2011). The prompt defined both
+on word frequencies separate them well [@ott2011finding]. The prompt defined both
 classes ("A truthful review was written by a real guest about an actual stay; a
 deceptive review was written by someone who has never stayed at the hotel."), and the
 models answered with "Truthful" or "Deceptive"; the system prompt in the chat format was
@@ -274,7 +271,7 @@ models for Gemma 3 4B, Gemma 3 12B and Qwen3 8B. Probes were logistic regression
 activations at the last prompt position at two thirds of the network depth, evaluated
 out of fold. For the negated statements, we additionally applied a probe trained on the
 simple geographic statements of the same checkpoint (transfer probe), which tests whether
-one truth direction also covers negated statements (Marks & Tegmark, 2024). Model
+one truth direction also covers negated statements [@marks2024geometry]. Model
 stitching and activation patching were carried out as for authorship, for both further
 judgments, but only where there was a change to locate: in models whose answers changed
 substantially with post-training and whose base models placed at least 30% of their
@@ -302,8 +299,7 @@ judgments with the lens model equation, using interpretable text properties as c
 (Appendix B).
 
 *Supervised fine-tuning data.* To examine whether the supervised fine-tuning data contain
-valid examples of the three judgments, we searched the SFT mixtures of OLMo 2 (Tülu 3;
-Lambert et al., 2024; all 939,344 conversations) and of Apertus 1.5 (the first 373,520
+valid examples of the three judgments, we searched the SFT mixtures of OLMo 2 [Tülu 3; @lambert2024tulu3; all 939,344 conversations] and of Apertus 1.5 (the first 373,520
 of 3,707,851 conversations, which had been shuffled before publication and thus form a
 random sample) with regular expressions for requests to judge the authorship of a text,
 to judge the authenticity of reviews or statements, and to judge statements as true or
@@ -316,7 +312,7 @@ To test causally whether the training signal sets the direction of the readout, 
 fine-tuned the OLMo 2 7B base model under four conditions that differed only in a small
 set of authorship judgments. Every run contained the same 20,000 conversations, sampled
 proportionally from all parts of the model's original supervised fine-tuning mixture
-(Tülu 3; Lambert et al., 2024). The conditions added 1,994 authorship judgments in the
+[Tülu 3; @lambert2024tulu3]. The conditions added 1,994 authorship judgments in the
 format of our experiments (plain prompt, random answer order) with correct labels (C1),
 with labels that followed a formality stereotype (C2), or with random labels (C3), or no
 judgments at all (C0). A further condition (C4) added the same texts with an unrelated
@@ -324,15 +320,15 @@ judgment in the same layout (whether the text is about politics, business, or so
 answers "Ja"/"Nein"; labels from the newspaper section), so that it practiced a binary
 judgment of a text without the authorship question. The judged texts were German news articles that are disjoint from
 our test corpora: human articles from the online edition of the Austrian daily DER
-STANDARD (10kGNAD; Block, 2019; derived from Schabus et al., 2017), shortened to 25, 80,
+STANDARD [10kGNAD; @block2019gnad; derived from @schabus2017onemillion], shortened to 25, 80,
 or 150 words, and AI articles that Qwen3 8B and Gemma 3 12B (instruction-tuned versions)
 wrote on the same topics and sections, shortened to the same lengths; each topic
 contributed either its human or its AI text. For C2, the more formal half of each true
 class, according to a score combining mean word length, the share of long words, and the
 share of capitalized nouns, was labeled "KI", so that the labels were independent of the
 true authorship (50% agreement) and followed the stereotype alone. Fine-tuning used
-low-rank adapters (LoRA; Hu et al., 2022; rank 16, all attention and feed-forward
-projections, learning rate 10^−4^, one epoch, three seeds per condition), with the loss on
+low-rank adapters [LoRA; @hu2022lora; rank 16, all attention and feed-forward
+projections, learning rate 10^−4^, one epoch, three seeds per condition], with the loss on
 the assistant turns of the conversations and on the answer word of the judgments. We
 evaluated the final adapters on our three authorship corpora and on 400 held-out news
 items (plain prompt, both answer orders), and we analyzed their representations with
@@ -354,12 +350,12 @@ The newspaper texts are unpublished and confidential, the human chat messages we
 written by participants who have not consented to publication (TODO: update after
 consent requests), and the human textbook summaries are protected by copyright.
 Therefore, these texts cannot be shared. The two further judgments (Section 2.8) use
-publicly available data (Marks & Tegmark, 2024; Ott et al., 2011, 2013), so that these
+publicly available data [@marks2024geometry; @ott2011finding; @ott2013negative], so that these
 analyses can be reproduced in full: `reproduce/negation.sh` reruns the analyses of the negated
 statements (Section 3.1) from the public statement sets, and `reproduce/check_negation.py`
 compares the regenerated values with those reported here (the results for Apertus require
 the developers' fork of the `transformers` library); the same holds for the training data of the training
-study (Section 2.9), whose human texts are public (Block, 2019) and whose AI texts we
+study (Section 2.9), whose human texts are public [@block2019gnad] and whose AI texts we
 generated and will release. All code, the per-text model outputs without text
 content, and all derived results are available in the project repository (TODO: URL).
 

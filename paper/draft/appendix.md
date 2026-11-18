@@ -73,7 +73,7 @@ them.**
 
 *Method.* For each judge, i.e., the answers of a checkpoint or the out-of-fold scores of
 a probe on its representation, we computed the components of the lens model equation
-(Tucker, 1964; Karelaia & Hogarth, 2008) from linear regressions of the ground truth and
+[@tucker1964lme; @karelaia2008lens] from linear regressions of the ground truth and
 of the judgments on a set of interpretable cues: the environmental predictability R~e~,
 the consistency of the judge R~s~, the matching index G (the correlation of the two
 predictions), the unmodeled agreement C, and the achievement r~a~, which decomposes as
@@ -81,8 +81,7 @@ r~a~ = G R~e~ R~s~ + C √(1 − R_e²) √(1 − R_s²). Because the regression
 sample, we also report cross-validated R~e~, R~s~ and G (10-fold, grouped by source). For
 the short chats, the cues were 34 text properties (word and sentence length, lexical
 diversity, part-of-speech shares, readability, punctuation, and properties that the
-students had named as typical of AI text); for the reviews, 15 cues motivated by Ott et
-al. (2011), such as the rates of first-person pronouns, of references to family and to the
+students had named as typical of AI text); for the reviews, 15 cues motivated by @ott2011finding, such as the rates of first-person pronouns, of references to family and to the
 hotel or city, of spatial details and of emotion words, and the length of the review and
 of its words and sentences, all centered within the positive and the negative reviews.
 

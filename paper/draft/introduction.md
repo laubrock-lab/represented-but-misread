@@ -5,12 +5,12 @@ What does post-training change in a language model? After pretraining on large t
 corpora, language models are turned into assistants by supervised fine-tuning on example
 dialogues and by optimization for human or AI preferences. An influential view holds that
 these stages add little knowledge: A model learns what it knows during pretraining, and
-post-training mainly teaches it in which format and style to respond. Zhou et al. (2023)
+post-training mainly teaches it in which format and style to respond. @zhou2023lima
 formulated this as the superficial alignment hypothesis, and several findings are
 consistent with it, among them that a few well-chosen examples or a suitable prompt can
-produce much of the behavior of a fully post-trained model (Lin et al., 2023), and that
+produce much of the behavior of a fully post-trained model [@lin2023urial], and that
 instructions change how a model expresses information more than how it encodes it
-(Waldis et al., 2026). If this view is correct, post-training should leave a model's
+[@waldis2026instructions]. If this view is correct, post-training should leave a model's
 internal representations largely intact while changing how they are read out into an
 answer. This distinction matters beyond its theoretical interest: A model whose answers
 no longer reflect what it represents knows something but says something else, which is
@@ -30,23 +30,20 @@ which rules out memorization. Humans make the same judgment, which connects the 
 to a long tradition of research on human judgment. The judgment is also of practical
 relevance, because AI-generated text has become hard to tell
 apart from human writing in education, journalism, and science, and human readers
-perform close to chance (Clark et al., 2021; Köbis & Mossink, 2021; Jakesch et al.,
-2023; Porter & Machery, 2024; Jones & Bergen, 2025). Human judgments rely on plausible
+perform close to chance [@clark2021human; @kobis2021angelou; @jakesch2023human; @porter2024poetry; @jones2025turing]. Human judgments rely on plausible
 but invalid heuristics, such as taking references to personal experience or first-person
-pronouns as signs of human authorship (Jakesch et al., 2023), and only readers who
+pronouns as signs of human authorship [@jakesch2023human], and only readers who
 frequently use language models for their own writing appear to detect AI-generated text
-reliably (Russell et al., 2025). Because the texts of such a test case cannot always be
+reliably [@russell2025frequent]. Because the texts of such a test case cannot always be
 shared, we complement authorship with a second judgment on public data that meets the same
-requirements: whether a statement is true, for statements with and without negation (Marks
-& Tegmark, 2024).
+requirements: whether a statement is true, for statements with and without negation [@marks2024geometry].
 
 One might expect language models to do better. They produce such texts themselves, and
 the regularities that distinguish their output from human writing are, in principle,
 available to them. However, language models asked directly whether a text was written
 by a human or by an AI are weak and biased judges: Their errors lean in one direction,
-and the direction differs between models and model generations (Bhattacharjee & Liu,
-2024; Yuan et al., 2026). When GPT-3.5 and GPT-4 judged transcripts of Turing-test
-conversations, their accuracy was even below chance (Rathi et al., 2024). In pilot work
+and the direction differs between models and model generations [@bhattacharjee2024fighting; @yuan2026crossgen]. When GPT-3.5 and GPT-4 judged transcripts of Turing-test
+conversations, their accuracy was even below chance [@rathi2024gpt4]. In pilot work
 with the German texts used here, a commercial model (GPT-5.4-mini) likewise judged below
 chance (AUC = .20–.34; TODO Jochen: confirm the details of the lab course pilot). Why would a model that writes like an AI fail to recognize
 AI-written text, and why would the training that makes it a helpful assistant make it
@@ -55,12 +52,12 @@ worse at this?
 Two classic frameworks from psychology are helpful in asking this question precisely.
 Signal detection theory separates the sensitivity of a judge, i.e., the ability to
 distinguish signal from noise, from the criterion, i.e., the tendency to give one answer
-rather than the other (Macmillan & Creelman, 2004). A bias toward answering "human" only
+rather than the other [@macmillan2005detection]. A bias toward answering "human" only
 shifts the criterion for all texts alike; it cannot make the evidence for "AI" stronger
 for human than for AI texts. Sensitivity below chance therefore indicates that the
 evidence on which the judgment is based is ordered inversely. Brunswik's lens model adds the distinction between the
 validity of the cues that a stimulus offers and the way in which a judge utilizes them
-(Brunswik, 1956; Karelaia & Hogarth, 2008). Poor judgments can result from a lack of
+[@brunswik1956perception; @karelaia2008lens]. Poor judgments can result from a lack of
 valid cues or from valid cues that are not used, or used in the wrong way. For human
 judges, the utilization of cues can only be inferred from their judgments. For language
 models, it can be examined directly, because their internal representations are
@@ -69,7 +66,7 @@ series (Figure 1): In a first lens, the cues of the text are encoded in the mode
 internal representation; in a second lens, the question reads this representation out
 into an answer. Splitting the judge side of the lens model in this way has precedents in
 research on personality judgment, which distinguishes the detection of cues from their
-utilization (Funder, 1995), and in neuroscience, which distinguishes the information that
+utilization [@funder1995accuracy], and in neuroscience, which distinguishes the information that
 a neural population encodes from the information that is read out for behavior (Panzeri
 et al., 2017). Because the two fields often use different words for the same idea, and
 sometimes the same word for different ideas, Appendix A lists the correspondences between
@@ -77,53 +74,49 @@ their terms.
 
 This possibility has been used to show that language models often represent more than
 they say. Simple linear classifiers ("probes") trained on a model's internal activations
-can recover properties such as the truth of a statement (Burns et al., 2024; Liu et al.,
-2023; Marks & Tegmark, 2024) or the correctness of the model's own answers (Orgad et al.,
+can recover properties such as the truth of a statement [@burns2023discovering; @hu2023prompting; @marks2024geometry] or the correctness of the model's own answers (Orgad et al.,
 2025) better than the model's answers do, and prompting a model for a judgment can
-underestimate what it knows (Hu & Levy, 2023). The same dissociation has been reported
+underestimate what it knows [@hu2023prompting]. The same dissociation has been reported
 for authorship: Models encode whether they wrote a text themselves although they fail
-to report it (Zhou et al., 2026), and a direction in the residual stream that tracks
-self-authorship can be used to steer what a model claims to have written (Ackerman &
-Panickssery, 2025; see also Panickssery et al., 2024). Interpretability research at the
+to report it [@zhou2025cosur], and a direction in the residual stream that tracks
+self-authorship can be used to steer what a model claims to have written [@ackerman2025inspection; see also @panickssery2024evaluators]. Interpretability research at the
 scale of frontier models has made the same distinction between the presence of a
-feature and the behavior it supports (Templeton et al., 2024), and has identified a
+feature and the behavior it supports [@templeton2024scaling], and has identified a
 small subspace of representations that a model is able to verbalize, whose content is
-shaped by post-training (Gurnee et al., 2026). Why represented information fails to
+shaped by post-training [@gurnee2026verbalizable]. Why represented information fails to
 reach the answer is less clear. One recent account attributes such gaps to a
-miscalibrated decision threshold (Villuri et al., 2026), i.e., to the criterion in
+miscalibrated decision threshold [@villuri2026probes], i.e., to the criterion in
 terms of signal detection theory, which cannot explain sensitivity below chance.
 Another line of work shows that steering along a direction that discriminates a concept
-can promote the opposite behavior (Torop et al., 2026), which suggests that the readout
+can promote the opposite behavior [@torop2026inverted], which suggests that the readout
 of represented information can itself be reversed.
 
 What post-training does to this relation has been studied mainly by comparing base and
 post-trained models. Representations learned during pretraining largely transfer to the
-post-trained model (Kissane et al., 2024), fine-tuning tends to enhance existing
-mechanisms rather than to create new ones (Prakash et al., 2024). Model diffing, i.e.,
+post-trained model [@kissane2024saetransfer], fine-tuning tends to enhance existing
+mechanisms rather than to create new ones [@prakash2024finetuning]. Model diffing, i.e.,
 the systematic comparison of the internal representations of a base model and its
 post-trained version, has been carried out with crosscoders, sparse dictionaries of
 features that are learned from both models at once and reveal which features are shared
-and which are specific to one of them (Lindsey et al., 2024). It suggests that much of
-what chat fine-tuning adds is concentrated at the tokens of the chat template (Minder et
-al., 2026; see also Leong et al., 2025), i.e., the special tokens that mark the beginning
+and which are specific to one of them [@lindsey2024crosscoders]. It suggests that much of
+what chat fine-tuning adds is concentrated at the tokens of the chat template [@minder2025crosscoders; see also @leong2025template], i.e., the special tokens that mark the beginning
 and the end of the user's and the assistant's turns and that, in a prompt, lie between
 the user's text and the answer. Likewise, exchanging the key-value cache, i.e., the
 stored internal states of earlier positions that later positions read, between
 fine-tuned and base models transfers fine-tuned behaviors mainly through system-prompt
-and template positions (Loos & Eberle, 2026), and crossing the lower and upper layers of base and post-trained models has shown
-that changes in the late layers can depend on altered earlier computation (Zhou, 2026a).
+and template positions [@loos2026kvpatching], and crossing the lower and upper layers of base and post-trained models has shown
+that changes in the late layers can depend on altered earlier computation [@zhou2026convergence].
 The representation of whether a model is being evaluated, tracked across the published
 checkpoints of one model, is already present in the base model and amplified
-during supervised fine-tuning (Heidari et al., 2026). To our knowledge, however, these
+during supervised fine-tuning [@heidari2026evalawareness]. To our knowledge, however, these
 approaches have not been combined to ask, for a judgment with known ground truth, whether
 post-training changes the representation of a property or the way in which the answer
 reads it out, and where in the network this happens. Models whose developers
 released checkpoints after every stage of post-training make this possible. Combining
 the lower layers of one checkpoint with the upper layers of another, a technique known
-as model stitching (Lenc & Vedaldi, 2015; Bansal et al., 2021), locates a change in
+as model stitching [@lenc2015equivariance; @bansal2021stitching], locates a change in
 depth; exchanging internal states between checkpoints at selected positions of the
-prompt, an application of activation patching (Vig et al., 2020; Meng et al., 2023;
-Heimersheim & Nanda, 2024), locates it in the prompt.
+prompt, an application of activation patching [@vig2020causal; @meng2022rome; @heimersheim2024patching], locates it in the prompt.
 
 Here we use two judgments with known ground truth as test cases for representation versus
 readout under post-training: whether a statement is true, and whether a text was written by

@@ -29,13 +29,13 @@ inconclusive.
 ## Relation to previous work
 
 Our findings are consistent with the growing evidence that language models represent
-more than they say (Burns et al., 2024; Liu et al., 2023; Orgad et al., 2025), including
-for authorship (Zhou et al., 2026; Ackerman & Panickssery, 2025). They add three points.
+more than they say [@burns2023discovering; @hu2023prompting; @orgad2025know], including
+for authorship [@zhou2025cosur; @ackerman2025inspection]. They add three points.
 First, the dissociation is not only a gap but frequently an inverse ordering. A miscalibrated
 decision threshold, which has been proposed as the main source of probe–answer gaps
-(Villuri et al., 2026), shifts the criterion in terms of signal detection theory; it
+[@villuri2026probes], shifts the criterion in terms of signal detection theory; it
 can lower accuracy but cannot produce sensitivity below chance. Reversed readouts of a
-discriminative direction have been described for steering vectors (Torop et al., 2026);
+discriminative direction have been described for steering vectors [@torop2026inverted];
 here, the inverse ordering occurred in the graded preferences behind the models'
 unmodified answers, and in two model families the class-mean difference at the answer
 position carried this inverse ordering (Appendix D). Note, however, that the cues themselves were specific
@@ -45,17 +45,15 @@ reading of a single authorship representation; it can also reflect a fixed polic
 cues are valid for one kind of text and invalid for another. Second, the decline is
 linked to post-training. Interestingly, in the closest related study, post-training had the
 opposite effect: It created rather than abolished the ability of a model to recognize
-its own texts (Ackerman & Panickssery, 2025). Recognizing one's own output and judging
+its own texts [@ackerman2025inspection]. Recognizing one's own output and judging
 whether an arbitrary text was written by an AI are different tasks, and it is
 conceivable that post-training sharpens the first while it distorts the second. Third,
 our results bear on the superficial alignment hypothesis, according to which a model's
 knowledge is acquired during pretraining, whereas post-training mainly teaches it which
-formats to use (Zhou et al., 2023). This hypothesis has been supported by behavioral
-evidence (Lin et al., 2023) and by comparisons of representations between base and
-post-trained models (Kissane et al., 2024; Lee et al., 2024; Prakash et al., 2024;
-Waldis et al., 2026), and it has been qualified by the observation that post-training
-gains continue to grow with the amount of fine-tuning data (Raghavendra et al., 2024;
-see also Vergara-Browne et al., 2026). To our knowledge, it has not yet been tested with
+formats to use [@zhou2023lima]. This hypothesis has been supported by behavioral
+evidence [@lin2023urial] and by comparisons of representations between base and
+post-trained models [@kissane2024saetransfer; @lee2024dpo; @prakash2024finetuning; @waldis2026instructions], and it has been qualified by the observation that post-training
+gains continue to grow with the amount of fine-tuning data [@raghavendra2024revisiting; see also @vergarabrowne2026sah]. To our knowledge, it has not yet been tested with
 causal interventions across checkpoints. Our
 patching results provide causal evidence for it in one respect: The representation of
 the text was interchangeable between base and post-trained checkpoints as far as the
@@ -69,23 +67,22 @@ processing or the output format; it involved weights in the early layers and alt
 how the question takes up the text, and it had substantive
 consequences for the quality of the judgment. This is consistent with the observation
 that a property tracked across the stages of post-training is shaped mainly during
-supervised fine-tuning (Heidari et al., 2026).
+supervised fine-tuning [@heidari2026evalawareness].
 
 Our localization agrees with previous comparisons of base and post-trained models in
 one respect and departs from them in another. That the effect of post-training resided
 in the positions of the question rather than in those of the text agrees with model
 diffing and cache patching, in which much of what fine-tuning adds was concentrated at
-chat-template and system-prompt tokens (Leong et al., 2025; Loos & Eberle, 2026; Minder
-et al., 2026). Because our prompts used no chat template, our results suggest that the
+chat-template and system-prompt tokens [@leong2025template; @loos2026kvpatching; @minder2025crosscoders]. Because our prompts used no chat template, our results suggest that the
 relevant positions are those at which the task is posed, whether in template tokens or
 in a question phrased in natural language. In contrast, the stitching results, which
 implicated the early layers for authorship and the middle layers for negated statements,
 depart from the common picture that fine-tuning mainly alters the upper layers
-(Merchant et al., 2020; Zhao et al., 2026; Zhou, 2026b). It is compatible, however, with
+[@merchant2020bert; @zhao2026layerwise; @zhou2026fearcaut]. It is compatible, however, with
 evidence that changes in the late layers can depend on altered earlier computation
-(Zhou, 2026a), that post-training retunes routing mechanisms formed in pretraining
-(Gupta et al., 2026), and that task representations formed early select later
-processing pathways (Bigoulaeva et al., 2026). This conclusion is tempered by the
+[@zhou2026convergence], that post-training retunes routing mechanisms formed in pretraining
+[@gupta2026cuerouting], and that task representations formed early select later
+processing pathways [@bigoulaeva2026instruction]. This conclusion is tempered by the
 observation that stitched hybrids can judge worse or better than both parents (Section
 3.4), so that stitching shows where the weights that carry the difference reside rather
 than where the difference is computed; a control judgment far from chance showed no such
@@ -96,10 +93,10 @@ that layer, so that our stitching and patching results are two views of one fami
 interventions rather than independent tests. Steering at the answer position does not
 add an independent test either, because it largely restates the difference between the
 classes in the answers (Appendix D). Two further cautions apply. A probe shows that information can be decoded, not that the
-model uses it (Hewitt & Liang, 2019; Elazar et al., 2021); this is why we rest the claim
+model uses it [@hewitt2019control; @elazar2021amnesic]; this is why we rest the claim
 that post-training changed the readout on the stitching and patching results rather than on the probes.
 Conversely, interventions along a subspace can change the output through a pathway other
-than the one the subspace was meant to capture (Makelov et al., 2023); our steering
+than the one the subspace was meant to capture [@makelov2023subspace]; our steering
 results therefore show which way the answer pathway reads a direction, and we compared
 them with control directions drawn from the same high-variance subspace and with the
 decision direction, but they do not prove that the model uses this direction under
@@ -151,9 +148,7 @@ however, were ordered inversely in several models, which no placement of the cri
 produce. Second, the theory offers a normative benchmark for a manipulation of the response
 bias. An ideal observer who is told the proportion of signal trials shifts the criterion by
 the change in prior log-odds and leaves the evidence for each stimulus untouched. Human
-observers typically adjust less than this (Phillips & Edwards, 1966; Macmillan & Creelman,
-2004), and in some tasks neglect stated base rates in favor of the individual case (Kahneman
-& Tversky, 1973). The base models behaved like conservative observers: Their log-odds
+observers typically adjust less than this [@phillips1966conservatism; @macmillan2005detection], and in some tasks neglect stated base rates in favor of the individual case [@kahneman1973prediction]. The base models behaved like conservative observers: Their log-odds
 shifted in the correct direction, uniformly across texts, but by 6–51% of the normative
 amount. After post-training, the log-odds shifted by more than the normative amount in five
 of six model families, and by different amounts for different texts, so that the stated
@@ -182,8 +177,7 @@ psychological description of such a change is a different construal of the quest
 post-training may understand "written by a human" differently than its base model did,
 much as a task set determines which features of a stimulus an observer selects and how
 they are mapped onto a response. In accounts of biased competition, a task set acts
-early, at the stage of selection, and not only at a late decision stage (Desimone &
-Duncan, 1995). It is instructive to see that the effect of post-training, too, involved
+early, at the stage of selection, and not only at a late decision stage [@desimone1995biased]. It is instructive to see that the effect of post-training, too, involved
 weights in the early layers, where the question begins to select information from the
 text, and was fully located in the question positions by the middle of the network.
 
@@ -202,10 +196,9 @@ one model family are combined with the readout of another through a learned adap
 distinguish these accounts.
 
 The parallel to human judges is equally instructive. Human readers fail to recognize AI
-text because they rely on cues that are plausible but invalid (Jakesch et al., 2023;
-Rosin & Laubrock, in preparation),
+text because they rely on cues that are plausible but invalid [@jakesch2023human; see also Rosin and Laubrock, in preparation],
 which in terms of the lens model is a failure of cue utilization rather than of cue
-availability (Brunswik, 1956; Karelaia & Hogarth, 2008). The models in our study fail in
+availability [@brunswik1956perception; @karelaia2008lens]. The models in our study fail in
 a similar way: Valid cues are present in the texts and in the representations, and the
 answers do not use them.
 
@@ -242,32 +235,31 @@ fine-tuned model discriminated better than either parent, although such hybrids 
 produce effects of their own (Section 3.5). Whether such hybrids retain
 the intended effects of post-training, such as instruction following, is an open
 question, and the approach is related to combining fine-tuned weights by interpolation
-or averaging (Wortsman et al., 2022a, 2022b). Second, knowing where a side effect arises
+or averaging [@wortsman2022wiseft; @wortsman2022soups]. Second, knowing where a side effect arises
 makes it possible to protect the affected components during fine-tuning or to correct
 them with small, targeted interventions instead of broader training; in our training
 study, two thousand examples sufficed to change the readout in either direction. That such
 interventions are practical has been shown, albeit with the opposite intention, for the
 refusal behavior that post-training installs: Refusal is mediated by a single direction
-in the residual stream, and removing this direction abolishes it (Arditi et al., 2024),
+in the residual stream, and removing this direction abolishes it [@arditi2024refusal],
 and tools that optimize such edits automatically remove refusals while changing the
-model's other outputs only minimally (Weidmann, 2025). Note, however, that the same ease
+model's other outputs only minimally [@weidmann2025heretic]. Note, however, that the same ease
 of editing that makes targeted corrections possible also shows how fragile safety-related
 post-training can be. Third, and in our
 view most important, post-training can change how a question is read while the
 knowledge that the answer would require remains in the model. The answer then no longer
 reflects what the model represents. In the terms of memory research, the information is
-available but not accessible (Tulving & Pearlstone, 1966); in the terms of the second
+available but not accessible [@tulving1966availability]; in the terms of the second
 lens in Figure 1, the readout weights the internal cues as if their validity were
 different from what it is, and post-training can make this misweighting worse. Whether
 language models can access their own internal states at all is the question of
-introspection, for which they show some, but limited and unreliable, abilities (Kadavath
-et al., 2022; Binder et al., 2024; Lindsey, 2025; Gurnee et al., 2026). Our case is a
+introspection, for which they show some, but limited and unreliable, abilities [@kadavath2022know; @binder2024looking; @lindsey2025introspection; @gurnee2026verbalizable]. Our case is a
 concrete and measurable instance of a model that represents something but says something
 else, and it suggests that comparing the
 representation at the question positions with the answer might be a useful tool for
 auditing models, in the spirit of distinguishing the presence of a feature from the
-behavior it supports (Templeton et al., 2024) and of examining which representations a
-model can verbalize (Gurnee et al., 2026). From the perspective of self-regulation, in
+behavior it supports [@templeton2024scaling] and of examining which representations a
+model can verbalize [@gurnee2026verbalizable]. From the perspective of self-regulation, in
 which post-training is often seen as a top-down control of the dispositions acquired in
 pretraining, our results add a cautionary note: A top-down task set can bias perception
 and not only correct a decision.

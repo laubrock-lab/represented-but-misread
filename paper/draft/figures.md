@@ -22,9 +22,9 @@ steering at the answer position (Appendix D). The other features are schematic. 
 answer with the state of the world, requires both lenses. Post-training changes the
 second lens (orange); model stitching and activation patching locate the change in depth
 and in the prompt. Splitting the judge side of the lens model has precedents in
-personality judgment (detection vs. utilization of cues; Funder, 1995) and in
-neuroscience (information encoded in a neural population vs. read out for behavior;
-Panzeri et al., 2017). Note: for the authorship corpora, probes were fitted both on the
+personality judgment [detection vs. utilization of cues; @funder1995accuracy] and in
+neuroscience [information encoded in a neural population vs. read out for behavior;
+@panzeri2017cracking]. Note: for the authorship corpora, probes were fitted both on the
 text positions and on the last prompt position; for the truth and review sets, only on
 the last prompt position.
 
