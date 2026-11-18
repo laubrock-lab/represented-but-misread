@@ -1,6 +1,5 @@
 # Appendix
 
-
 ## A Terminology across disciplines
 
 This study combines concepts from the psychology of judgment with methods from machine
@@ -164,7 +163,16 @@ the control directions (Table D1).
 
 These results are less conclusive than those for authorship and negated statements: The
 effects of post-training were small (|Δd′| ≤ 0.44), their sign differed between models, and
-neither localization nor steering explained them fully.
+neither localization nor steering explained them fully. We can only speculate about the
+reason. Although judging whether a review is genuine resembles judging whether a text was
+written by an AI on the surface, the two differ in what the models bring to them: The cues
+that separate truthful from deceptive reviews are subtle and specific to this corpus (human
+readers, too, judge these reviews near chance [@ott2011finding]), the models' answers were
+near chance before and after post-training, and we found no examples of this judgment in
+the fine-tuning data. It is conceivable that post-training is largely irrelevant to a
+judgment for which neither the base model nor the training data provide a usable mapping
+from the represented information to the answer; what it changed here was a general
+heuristic (review polarity) and the response bias, not the use of the valid cues.
 
 ## D Steering at the answer position
 

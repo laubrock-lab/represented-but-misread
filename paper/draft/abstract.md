@@ -1,6 +1,5 @@
 # Title and abstract (draft, 17 Nov 2026; authorship first, negated statements as the reproducible case, training study last)
 
-
 ## Title options
 
 1. Post-training changes how the question reads the text: Representation and readout

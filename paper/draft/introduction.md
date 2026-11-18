@@ -1,13 +1,14 @@
 # 1 Introduction
 
-
 What does post-training change in a language model? After pretraining on large text
-corpora, language models are turned into assistants by supervised fine-tuning on example
-dialogues and by optimization for human or AI preferences. An influential view holds that
+corpora, language models are turned into assistants in several stages of post-training: supervised
+fine-tuning (SFT), in which the model learns to imitate example dialogues, and stages that
+optimize it for human or AI preferences, e.g., direct preference optimization (DPO), in
+which it learns to prefer the better of two candidate answers. An influential view holds that
 these stages add little knowledge: A model learns what it knows during pretraining, and
 post-training mainly teaches it in which format and style to respond. @zhou2023lima
 formulated this as the superficial alignment hypothesis, and several findings are
-consistent with it, among them that a few well-chosen examples or a suitable prompt can
+consistent with it, among them that a few well-chosen examples or a suitable prompt to a base model can
 produce much of the behavior of a fully post-trained model [@lin2023urial], and that
 instructions change how a model expresses information more than how it encodes it
 [@waldis2026instructions]. If this view is correct, post-training should leave a model's
@@ -44,8 +45,9 @@ available to them. However, language models asked directly whether a text was wr
 by a human or by an AI are weak and biased judges: Their errors lean in one direction,
 and the direction differs between models and model generations [@bhattacharjee2024fighting; @yuan2026crossgen]. When GPT-3.5 and GPT-4 judged transcripts of Turing-test
 conversations, their accuracy was even below chance [@rathi2024gpt4]. In pilot work
-with the German texts used here, a commercial model (GPT-5.4-mini) likewise judged below
-chance (AUC = .20–.34; TODO Jochen: confirm the details of the lab course pilot). Why would a model that writes like an AI fail to recognize
+with the German chat messages used here, a commercial model (GPT-5.4-mini) likewise judged
+below chance with each of five prompt versions (AUC = .20–.34), whereas a larger model
+(Claude Opus 4.6) judged above chance (.69–.90). Why would a model that writes like an AI fail to recognize
 AI-written text, and why would the training that makes it a helpful assistant make it
 worse at this?
 
@@ -71,6 +73,19 @@ a neural population encodes from the information that is read out for behavior (
 et al., 2017). Because the two fields often use different words for the same idea, and
 sometimes the same word for different ideas, Appendix A lists the correspondences between
 their terms.
+
+A brief description of how a language model processes a prompt may be helpful for readers
+from psychology. The prompt is split into a sequence of tokens (words or parts of words),
+and in each of its layers the model computes an internal state for every position of this
+sequence. Through the attention mechanism, the state at a position can draw on the states
+at all earlier positions, but not on later ones. The answer is generated from the state at
+the last position after the final layer. In a prompt that presents a text and then asks a
+question about it, information about the text can therefore reach the answer only through
+the positions that follow the text, i.e., those of the question and of the cue for the
+answer (Figure 2A). We refer to these parts of the prompt as the text positions, the
+question positions, and the last position. All analyses and interventions reported below
+are carried out on these internal states of an artificial neural network, i.e., of a
+computer program whose every state can be recorded, replaced, and restored.
 
 This possibility has been used to show that language models often represent more than
 they say. Simple linear classifiers ("probes") trained on a model's internal activations
@@ -106,7 +121,7 @@ stored internal states of earlier positions that later positions read, between
 fine-tuned and base models transfers fine-tuned behaviors mainly through system-prompt
 and template positions [@loos2026kvpatching], and crossing the lower and upper layers of base and post-trained models has shown
 that changes in the late layers can depend on altered earlier computation [@zhou2026convergence].
-The representation of whether a model is being evaluated, tracked across the published
+For example, the representation of whether a model is being evaluated, tracked across the published
 checkpoints of one model, is already present in the base model and amplified
 during supervised fine-tuning [@heidari2026evalawareness]. To our knowledge, however, these
 approaches have not been combined to ask, for a judgment with known ground truth, whether

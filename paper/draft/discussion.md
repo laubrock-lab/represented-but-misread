@@ -1,6 +1,5 @@
 # 4 Discussion
 
-
 In the present study we used authorship judgments as a test case for the question of
 whether post-training changes what a language model represents or how it reads this
 representation out. Across six open-weight base models and three corpora of German texts,
@@ -154,12 +153,16 @@ Signal detection theory was useful here in two ways. First, it separates what a 
 can explain from what it cannot. Many of the models' binary answers were constant, which
 by itself would suggest a miscalibrated threshold; the graded preferences behind them,
 however, were ordered inversely in several models, which no placement of the criterion can
-produce. Second, the theory offers a normative benchmark for a manipulation of the response
-bias. An ideal observer who is told the proportion of signal trials shifts the criterion by
-the change in prior log-odds and leaves the evidence for each stimulus untouched. Human
+produce. Second, the theory offers a reference point for a manipulation of the response
+bias. An ideal observer in a stationary environment who is told the proportion of signal
+trials shifts the criterion by the change in prior log-odds and leaves the evidence for each
+stimulus untouched. This is a reference and not a norm for every situation: Where the
+environment changes, weighting a stated base rate less, or sampling answers in proportion to
+their probability, can be adequate. The qualitative prediction, that the answers should move
+with the stated odds, holds in either case. Human
 observers typically adjust less than this [@phillips1966conservatism; @macmillan2005detection], and in some tasks neglect stated base rates in favor of the individual case [@kahneman1973prediction]. The base models behaved like conservative observers: Their log-odds
-shifted in the correct direction, uniformly across texts, but by 6–51% of the normative
-amount. After post-training, the log-odds shifted by more than the normative amount in five
+shifted in the correct direction, uniformly across texts, but by 6–51% of the reference
+amount. After post-training, the log-odds shifted by more than the reference amount in five
 of six model families, and by different amounts for different texts, so that the stated
 share no longer acted as a pure shift of the criterion. Speculatively, a post-trained model
 treats a sentence about the share of AI texts less as prior information to be combined with
@@ -283,8 +286,11 @@ The
 information that the models failed to use was largely lexical and stylistic, as shown by
 simple n-gram classifiers, so our results concern the readout of ordinary cues rather
 than of any deep representation of authorship. The stitching and patching analyses were
-restricted to two models per judgment, to two corpora for authorship, and to the plain
-prompt format, because base models cannot be queried with a chat template. The two
+restricted to two models per judgment, because stage-wise checkpoints with a clear change
+were available for these two only, to two corpora for authorship, and to the plain
+prompt format, because base models cannot be queried with a chat template; the patching
+across layers was run for one authorship corpus and with 100 statement pairs, which was what
+the available computing time allowed. The two
 further judgments were studied with four to six models, steering for them with two
 models each and on 300 items, and the effects of post-training on the reviews were
 small; steering did not explain them. Steering itself is limited in two ways: It tests
@@ -294,9 +300,12 @@ during SFT for authorship, which rests on stitching and patching. The training
 study used one base model, low-rank adapters, and training texts from other generators
 and of another genre than the test corpora, and its background condition did not
 reproduce the effect of the original fine-tuning; the stereotype labels were moreover
-correlated with text length, topic, and generator. The three causal methods were applied
-to partly different combinations of models and corpora; only Apertus on the textbook
-summaries was examined with steering, stitching, and patching alike. The newspaper
+correlated with text length, topic, and generator, a confound that we noticed only after
+the training runs and that a stratified assignment of the labels would avoid. The
+interventions were applied to partly different combinations of models and corpora, because
+the analyses were added step by step and not all could be repeated for every combination;
+only Apertus on the textbook summaries was examined with steering, stitching, and patching
+alike. The newspaper
 segments stem from only 14 articles, so that bootstrap intervals that resample articles
 are likely too narrow for this corpus. All judgments used German prompts; a paraphrased
 prompt reproduced the decline, a prompt with the question before the text reproduced it on

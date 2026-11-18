@@ -79,8 +79,10 @@ Qwen3 on the textbook summaries, the post-trained model gained more. On the text
 tested; for OLMo 2 only 0 and 8, because 16 textbook summaries exceed its context window
 of 4,096 tokens.
 
-**Figure 5 (`fig3_stitching_patching`).** Post-training changes how the question reads
-the text. (A) Model stitching between base and SFT checkpoints (textbook summaries).
+**Figure 5 (`fig3_stitching_patching`).** Authorship: model stitching and activation
+patching at layer 16. (A) Model stitching between base and SFT checkpoints (textbook
+summaries; the numbers of layers that were tested differ between the two directions and
+between the models).
 The x-axis gives the number of lower layers taken from the other checkpoint. Blue: base
 layers below, SFT layers above; orange: SFT layers below, base layers above. Dashed and
 dotted lines mark the sensitivity of the unmodified base and SFT models; bands are 95%
@@ -113,9 +115,6 @@ unpatched recipients. Note that in the truth prompt the question precedes the st
 so that the positions after the statement contain only the answer instruction and cue. (C) The same
 exchange at 12 layers (100 statement pairs): share of the difference between the two
 checkpoints that the exchange transferred (values below 0 and above 1 are clipped).
-
-Numbering (13 Nov): Figure 1 = lens model with an internal lens (Introduction); Figure 2 =
-methods schematic (Method); Figures 3–5 = data figures; S1, S2 = supplement.
 
 **Figure S1 (`figS1_patching_layers`).** Activation patching at layers 8 and 16
 (textbook summaries). As Figure 5B, with layer 8 added. At layer 8 the picture is
