@@ -97,9 +97,14 @@ layers 2 to 8, a peak at layer 12 where the SFT model's statement representation
 transferred 82% of the repair (d′ = 2.59; base unpatched 0.34), then a decline to 33% at
 layer 16 and zero from layer 20. The reverse direction confirmed this pattern: replacing the
 SFT model's statement states with the base model's at layer 12 reduced d′ from 3.09 to
-1.38. At mid-depth, post-training thus changed the text representation itself; by layer 16,
-the relevant information had moved to the positions after the statement. The final position
-alone carried the full effect only from layer 20 onward (transfer 0.89).
+1.38. The inverted-U of the statement states thus traces the window during which the positions
+after the statement extract information from the text: before layer 10, the extraction has
+not begun; at layers 10 to 14, the SFT model's text representation is in a format that the
+downstream readout can use, even though a linear probe decodes truth at ceiling from both
+checkpoints; by layer 16, the extraction is complete and the text states no longer matter.
+Post-training changed not only the reader but also what is being read, and the change is
+confined to the layers where the reading takes place. The final position alone carried the
+full effect only from layer 20 onward (transfer 0.89).
 
 Steering at the answer position was consistent with a readout that uses the represented
 truth direction after SFT; as explained in Appendix D, this is a consistency check rather
