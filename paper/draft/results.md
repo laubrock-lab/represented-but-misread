@@ -1,152 +1,21 @@
 # 3 Results
 
 
-We report results for two kinds of judgment with known ground truth. The first, whether a
-statement is true, uses public data, shows large effects, and can be reproduced in full
-(Section 3.1). The second, whether a text was written by a human or by an AI, is a case in
-which post-training impaired the answers (Sections 3.2–3.6), and a training study tests
-what sets the direction of the change (Section 3.7). A third judgment, whether a hotel
-review is genuine, gave less conclusive results and is reported in Appendix C. Unless stated
-otherwise, sensitivity is expressed as d′ estimated from the area under the ROC curve,
-with 95% confidence intervals from a grouped bootstrap.
+We first report the authorship judgments, for which we used our own corpora: whether the
+information is available and whether the answers use it (Section 3.1), how post-training
+changed the answers (Section 3.2), how the models used a stated base rate (Section 3.3),
+and where in the network the change acts (Sections 3.4 and 3.5). Because these corpora
+cannot be shared, Section 3.6 reports a judgment on public data that can be reproduced in
+full, the truth of negated statements, for which post-training changed the answers in the
+opposite direction. Section 3.7 reports a training study that tests what sets the direction
+of the change. A further judgment, whether a hotel review is genuine, gave less conclusive
+results and is reported in Appendix C. Unless stated otherwise, sensitivity is expressed as
+d′ estimated from the area under the ROC curve, with 95% confidence intervals from a grouped
+bootstrap.
 
-## 3.1 Negated statements: represented, misread by base models, repaired by post-training
+## 3.1 Authorship: the information is available, but the answers do not use it
 
-Does a model's answer use what the model represents? We first address this question with
-truth judgments on public statement sets (Section 2.8), for which we compared linear
-probes on the internal activations with the models' answers before and after post-training.
-Table 2 summarizes the results.
-
-> **Table 2.** Truth judgments: sensitivity (d′) of the probes (last prompt position, two
-> thirds of the network depth) and of the answers (plain prompt) for statements on diverse
-> facts (counterfact) and for negated geographic statements. SFT: answers after supervised
-> fine-tuning; —: no intermediate checkpoint released. The maximum d′ (AUC = 1) is 4.54 for
-> the 748 statement pairs.
->
-> | Judgment | Model | Probe base | Probe final | Answer base | SFT | Final |
-> |:---|:---|---:|---:|---:|---:|---:|
-> | Truth | OLMo 2 7B | 2.15 | 2.05 | 1.79 | 1.77 | 1.84 |
-> | (diverse facts) | Apertus 1.5 8B | 1.95 | 2.09 | 1.41 | 1.64 | 1.68 |
-> | | OLMo 3 7B Think | 1.89 | 1.64 | 1.61 | 1.35 | 1.34 |
-> | | Gemma 3 4B | 1.82 | 1.93 | 0.81ᵃ | — | 1.46 |
-> | | Gemma 3 12B | 2.24 | 2.26 | 1.64ᵃ | — | 1.97 |
-> | | Qwen3 8B | 2.28 | 2.15 | 1.94 | — | 1.77 |
-> | Truth | OLMo 2 7B | 4.54 | 4.54 | 0.80 | 3.36 | 3.10 |
-> | (negated statements) | Apertus 1.5 8B | 4.54 | 4.54 | −0.88 | 4.54 | 4.54 |
-> | | OLMo 3 7B Think | 4.54 | 4.31 | 4.54 | 3.77 | 3.80 |
-> | | Gemma 3 4B | 4.54 | 4.34 | 0.06ᵃ | — | 3.46 |
-> | | Gemma 3 12B | 4.54 | 4.54 | 1.97ᵃ | — | 4.54 |
-> | | Qwen3 8B | 4.54 | 4.54 | 4.54 | — | 4.54 |
->
-> ᵃ The Gemma 3 base models placed only 18–32% of their probability on the two answer
-> words; interpret with caution.
-
-For simple geographic statements, all checkpoints judged at ceiling,
-so that this set served only as a check. For the negated statements, however, two base
-models showed a clear dissociation between representation and answer: Probes decoded
-the truth of every statement (AUC = 1), but the answers of the OLMo 2 base model used
-this information only weakly (d′ = 0.80), and those of the Apertus base model ordered
-the statements inversely (d′ = −0.88). Both base models answered "False" almost always
-(criterion c = 2.6 and 3.0). Supervised fine-tuning repaired the readout (OLMo 2:
-d′ = 3.36; Apertus: 4.54), whereas the probes remained at ceiling. The Gemma 3 models
-showed the same pattern between their base and final versions (Gemma 3 4B: 0.06 → 3.46;
-Gemma 3 12B: 1.97 → 4.54), although their base models rarely answered with the two
-answer words. The base models of Qwen3 and OLMo 3, in contrast, already judged the
-negated statements perfectly; post-training left this unchanged in Qwen3 and lowered it
-slightly in OLMo 3 (d′ = 3.80 after post-training, with a slightly lower probe, 4.31).
-Thus, post-training repaired the readout of negation where the base model read it
-wrongly, but did not improve it further where the base model read it correctly. A probe trained on the
-simple statements of the same checkpoint suggests what the base models' answers followed:
-Applied to the negated statements, it separated them with the wrong sign (OLMo 2:
-d′ = −1.28; Apertus: −1.43), i.e., the general truth direction of the base models
-encoded whether city and country belong together and ignored the negation; whether the
-answers followed this direction item by item was not tested. After SFT, the
-same probe separated the negated statements in the correct direction (+0.69; +3.05). For
-the statements on diverse facts, post-training changed the answers only slightly, except
-in OLMo 3, where answers and probes declined together (answers 1.61 → 1.34; probes 1.89
-→ 1.64).
-
-Where does the repair arise? We combined the lower layers of one checkpoint with the upper
-layers of the other (model stitching; Section 2.7, Figure 2C; results in Figure 3A). Stitching located the repair in the middle of the network
-rather than in the early layers. In OLMo 2, the first 8 base layers combined with all
-upper SFT layers still judged at the level of the SFT model (d′ = 3.76; base 0.63, SFT
-3.20 in this subset of 300 pairs), whereas the first 16 base layers abolished the
-repair (0.38). In Apertus, the first 8 base layers under SFT upper layers likewise left
-the repair intact (4.15), the first 12 removed most of it (1.33), and the first 16 all of it
-(−0.94); conversely, the first 8 SFT layers under base upper layers produced part of the
-repair (1.21) and the first 12 all of it (4.15). The repair thus involved layers 9 to 16,
-with a partial contribution of the layers below (outputs/stitch/stitch_neg_cities.csv). To ask where in the prompt the
-repair acts, we exchanged the internal states between the checkpoints at selected positions
-of the prompt (activation patching; Figure 2D). Note that in the prompt for the truth
-judgments the question precedes the statement, so that the statement is read with the task
-known, and the positions after the statement contain no question, only the instruction to answer
-with one word and the answer cue ("Answer:"). At
-layer 16, the SFT model's states at the positions after the statement repaired the base
-model completely (OLMo 2: 0.63 → 3.26; Apertus: −0.87 → 4.15), and the base model's states
-at these positions abolished the repair in the SFT model (3.20 → 1.07; 4.15 → −1.09). In
-Apertus, the final position alone carried the full effect in one direction (base model with
-the SFT model's final state: 4.15). Exchanging the states of the statement itself had no
-effect in Apertus and in the SFT model of OLMo 2, but a partial one in the OLMo 2 base
-model (0.63 → 1.51). At layer 8, the SFT model's states after the statement repaired the
-base models only partly (Apertus: 1.61; OLMo 2: 1.07; Figure 3B), in line with the
-stitching result that the repair is not complete at this depth. Exchanging the states of
-the instruction and question before the statement had no effect at either layer.
-
-Patching at two layers cannot show where the repair first appears. We therefore repeated
-the patching at 12 layers between 2 and 32, with 100 statement pairs (Figure 3C;
-outputs/patch_sweep/patch_sweep_summary.csv; on this subset, d′ = 0.34 for the OLMo 2 base
-model and 3.09 for its SFT model, and −0.86 and 3.64, the maximum for 100 pairs, for
-Apertus). We express each effect as the share of the difference between the two
-checkpoints that the patch transferred. The two models differed. In OLMo 2, the repair
-appeared first at the statement positions: The SFT model's statement states alone
-transferred 22% of the repair at layer 10, 82% at layer 12 (d′ = 2.59), and 67% at layer
-14, although all layers above and all other positions were those of the base model. The
-share then fell to 33% at layer 16 and to zero from layer 20 onward. The positions after
-the statement showed the complementary course (36% at layer 10, 37% at layer 12, 52% at
-layer 14, 97% at layer 16), and the final position alone carried the repair only from layer
-20 onward (89%). The reverse direction gave the same picture: The base model's statement
-states lowered the SFT model from 3.09 to 1.38 at layer 12 and to 1.75 at layer 14, and had
-little effect at layer 16 (2.92) and none above. In OLMo 2, supervised fine-tuning thus changed how the
-statement itself is represented at mid-depth, in a way that the upper layers of the base
-model could read correctly; the information then passed to the answer cue and to the final
-position. In Apertus, in contrast, the SFT model's statement states transferred at most
-23% (layers 12 and 14), whereas its states after the statement transferred 46% at layer 6
-and 96% at layer 10. In the reverse direction, the base model's states after the statement
-lowered the Apertus SFT model progressively from layer 10 onward, and its statement states
-did not lower it at any layer; note that the Apertus SFT model was at the maximum d′, so
-that a small disruption would not be visible. Hence, the two models agree in that the
-repair has reached the positions after the statement by the middle of the network, but
-they differ in where it arises: at the statement positions in OLMo 2, and at the answer cue
-in Apertus. TODO(gemma, sfirst): sweeps for Gemma 3 and with the statement placed before
-the question.
-
-Steering at the answer position was consistent with a readout that uses the represented
-truth direction after SFT; as explained in Appendix D, this is a consistency check rather
-than an independent test. Shifting
-the internal state at the answer position along the direction that separates true from
-false negated statements (±2 SD, layer 21; Appendix D) moved the answers of both SFT
-models toward the correct answer, more than the control directions (Apertus: +0.36 nats,
-p = .02; OLMo 2: +1.07, p ≤ .04), and in these models the truth direction coincided with
-the decision direction (cosine ≈ 1.0). In the base models, it did not (Apertus: −0.14,
-p = .13–.33; OLMo 2: +0.09, p ≥ .54), although in both base models the positive control,
-too, exceeded only the norm-matched controls. Supervised fine-tuning thus aligned the answer with
-the represented truth direction; whether the Apertus base model used this direction with
-the wrong sign, as its negative sensitivity would suggest, could not be established.
-
-In summary, the truth of negated statements could be decoded at ceiling from the last
-prompt position before and after post-training, the answers of several base models did not
-use this information, and supervised fine-tuning repaired the answers, through weights in
-the middle layers. Where the repair arose differed between the two models that we could
-localize: In Apertus, it arose at the positions after the statement, i.e., in how the
-answer cue takes up the statement; in OLMo 2, it arose in the representation of the
-statement itself at mid-depth. Note that the localization rests on the two
-models with stage-wise checkpoints whose base models misread negation; the Gemma 3 base
-models showed the same change of the answers, but with low answer probability, and two
-base models had nothing to repair.
-
-## 3.2 Authorship: the information is available, but the answers do not use it
-
-Our main test case is a judgment that post-training did not repair. We used three corpora
+We used three corpora
 of German texts that each pair human-written texts
 with AI-generated counterparts: short chat messages truncated to 25 words (300 texts
 from 61 human originals), segments of local newspaper articles (103 segments from 14
@@ -176,7 +45,7 @@ before any processing by the network, performed about as well as probes on deep 
 change this picture (word frequencies: d′ = 1.79). A detector that was trained by
 others to recognize AI-edited English text [EditLens; @thai2026editlens] transferred to
 our German material in a graded manner, reaching an AUC of .99 for the textbook
-summaries, .73 for the newspaper segments, and .57 for the short chats (Figure 4). Thus,
+summaries, .73 for the newspaper segments, and .57 for the short chats (Figure 3). Thus,
 the cues that distinguish AI from human texts are present and readily accessible, both
 in the texts themselves and in the models' representations; they consist largely of
 ordinary lexical and stylistic regularities. In terms of Brunswik's lens model, the
@@ -199,9 +68,8 @@ a maximum that depends on the number of texts (d′ = 3.73 for the textbook summ
 3.14 for the newspaper segments); for such near-perfect classifiers, we therefore report
 the AUC.
 
-Are authorship judgments, too, a case in which the answers fail to use what is
-represented? When the models were asked directly whether a text had been written by a human or
-by an AI, their answers did not reflect this information. Table 3 summarizes the
+When the models were asked directly whether a text had been written by a human or
+by an AI, their answers did not reflect this information. Table 2 summarizes the
 order-averaged sensitivity of the answers for the pretrained base models and for the
 final post-trained models. Many cells are close to chance, and a considerable number are
 clearly below it: Qwen3-8B after post-training judged the newspaper segments with
@@ -209,7 +77,7 @@ d′ = −1.01 (raw prompt) and −1.30 (chat prompt), and Gemma 3 12B judged th
 with d′ = −0.81 and −1.09. Note that these values were computed from the graded
 preference of the model, i.e., the log-odds of "AI" versus "human" for each text, which
 plays the role of a confidence rating in a rating-scale ROC analysis. The binary answer
-itself often did not vary: In 23 of the 36 conditions with the plain prompt (Table 3,
+itself often did not vary: In 23 of the 36 conditions with the plain prompt (Table 2,
 base and final models), the model gave the same answer to more than 95% of the texts,
 and in several base models the share of "AI" answers depended strongly on the order in
 which the two options were named (e.g., OLMo 2 on the short chats: 89% vs. 0%). A
@@ -220,7 +88,7 @@ an inverse ordering cannot result from a response bias, which only shifts the
 preference for all texts alike; properties typical of human texts pushed the answer
 toward "AI", and properties typical of AI texts toward "human".
 
-> **Table 3.** Sensitivity (d′) of the models' answers. Base models were queried with a
+> **Table 2.** Sensitivity (d′) of the models' answers. Base models were queried with a
 > plain completion prompt ("raw"); post-trained models with the same prompt and with
 > their chat template ("chat"). Conditions in which a model placed less than 30% of its
 > probability on the two answer words are omitted (—).
@@ -248,60 +116,7 @@ toward "AI", and properties typical of AI texts toward "human".
 >
 > ᵃ Answer probability ≈ .30; interpret with caution.
 
-## 3.3 Criterion, sensitivity, and the use of a stated base rate
-
-Is signal detection theory an appropriate description of these judgments? Its central
-assumption is that manipulations of the response bias move the criterion but leave the
-sensitivity unchanged. This held approximately. Raising the stated share of AI texts from
-20% to 80% moved the criterion in 48 of 72 comparisons (model × checkpoint × corpus × answer
-order), in all of them toward "AI" and reliably so in 42 (mean |Δc| across all comparisons =
-1.19); in the remaining 24 comparisons, c did not change, because the model gave the same
-answer to nearly every text at either share. The sensitivity was not strictly invariant,
-however: d′ changed by 0.14 on average, without a consistent direction, and the bootstrap
-interval of the change excluded zero in 28 of the 72 comparisons. In the 14 comparisons in
-which no condition was saturated, the criterion shifted reliably in all 14 and d′ in 3 (mean
-|Δd′| = 0.10). The order of the answer options and the mere presence of the base-rate
-sentence also acted mainly on the criterion (mean |Δc| = 0.78 and 0.42), and changed d′ by
-similar amounts (0.16 and 0.13, again without a consistent direction; Appendix F). Thus,
-manipulations of the response bias acted mainly on the criterion where the criterion could
-move, and the criterion is a property of the model together with the prompt rather than of
-the model alone. Because the accompanying changes of d′ were not negligible relative to the
-effects reported below, we average d′ over both answer orders and compare checkpoints only on
-identical prompts.
-
-How strongly did the models use the stated base rate? For an ideal observer, the stated
-share changes the prior odds and nothing else, so that the log-odds of the answer should
-shift by the same amount for every text, ln 16 = 2.77 nats between 20% and 80%. This
-benchmark applies to dv insofar as dv is read as the model's posterior log-odds. The base
-models shifted far less (mean shift of dv per model between 0.18 and 1.40 nats, i.e., 6–51%
-of the benchmark), and the shift was nearly uniform across texts (between-text SD within a
-condition 0.08–0.33). After post-training, five of the six models shifted more than the
-benchmark (3.67–10.93 nats, i.e., 1.3–3.9 times the benchmark), and the shift differed
-considerably between texts (SD up to 3.14); OLMo 3 Think was the exception (1.21 nats, as
-in its base model, 1.17). These values were obtained with a base-rate sentence that named the share of AI texts
-first. For the three families that fit the available GPUs, we repeated the manipulation
-with the human share named first. The pattern was the same, but the size of the shift
-depended on the wording in the post-trained models: The base models again shifted too
-little (Gemma 3 4B: 0.16; OLMo 2: 1.35; OLMo 3: 1.07 nats), the post-trained models of
-Gemma 3 4B and OLMo 2 again shifted more than the benchmark, but less than with the first
-wording (5.61 vs. 10.65 and 4.37 vs. 5.39 nats), and OLMo 3 Think again stayed below it
-(1.48). Post-training thus changed the use of a stated base rate from underweighting to
-overweighting in five of six model families, by a factor that depended on the model and on
-the wording (Table F2); the second wording was not run for Apertus, Qwen3, and Gemma 3 12B.
-
-Note that a shift in nats also depends on the overall scale of a model's log-odds, and this
-scale differed between checkpoints: Across texts of the same class, dv varied far more in
-the post-trained models (within-class SD per model 0.61–2.89 nats) than in the base models
-(0.21–0.53). Relative to this spread, i.e., to the differences that the models make between
-texts, the stated base rate already moved the base models considerably (by 0.9–3.3 SD per
-model) and the post-trained models somewhat more (2.0–5.3 SD); the relative shift increased
-with post-training in five families and decreased in OLMo 3 Think (3.3 to 2.0 SD), and with
-the second wording it increased only in Gemma 3 4B (0.8 to 4.2 SD), not in OLMo 2 (2.5 to
-2.4 SD; base_rate_scale.py). Thus, the post-trained models gave more extreme log-odds in
-general, to the base rate as well as to the texts; that the base rate gained weight relative
-to the texts holds for most, but not all, models and wordings.
-
-## 3.4 Post-training lowers the sensitivity of authorship judgments
+## 3.2 Post-training lowers the sensitivity of authorship judgments
 
 Base models were not uniformly better, but several of them discriminated clearly above
 chance where their post-trained counterparts did not (e.g., Gemma 3 12B on the textbook
@@ -366,7 +181,7 @@ was already complete after imitation learning.
 Could the post-trained models simply hold a wrong belief about what AI texts look like,
 a belief that a few correctly labeled examples would correct? We tested this by placing
 2, 8, or 16 labeled examples from other sources before each text (four different sets of
-examples; d′ computed per set and averaged; Figure 5B). With 16 examples, d′ rose reliably
+examples; d′ computed per set and averaged; Figure 4B). With 16 examples, d′ rose reliably
 in 8 of 11 model conditions on the short chats and in 4 of 6 on the textbook summaries,
 whereas two examples hardly helped. The gains of base and post-trained models did not differ
 consistently: The difference was reliable in two of five comparisons, with opposite signs
@@ -395,7 +210,60 @@ the models, and style-matched messages that had not been revised according to th
 students' feedback were judged like the revised ones (change in AUC between −.03 and +.04
 for every model).
 
-## 3.5 Where the change acts: model stitching and activation patching
+## 3.3 Criterion, sensitivity, and the use of a stated base rate
+
+Is signal detection theory an appropriate description of these judgments? Its central
+assumption is that manipulations of the response bias move the criterion but leave the
+sensitivity unchanged. This held approximately. Raising the stated share of AI texts from
+20% to 80% moved the criterion in 48 of 72 comparisons (model × checkpoint × corpus × answer
+order), in all of them toward "AI" and reliably so in 42 (mean |Δc| across all comparisons =
+1.19); in the remaining 24 comparisons, c did not change, because the model gave the same
+answer to nearly every text at either share. The sensitivity was not strictly invariant,
+however: d′ changed by 0.14 on average, without a consistent direction, and the bootstrap
+interval of the change excluded zero in 28 of the 72 comparisons. In the 14 comparisons in
+which no condition was saturated, the criterion shifted reliably in all 14 and d′ in 3 (mean
+|Δd′| = 0.10). The order of the answer options and the mere presence of the base-rate
+sentence also acted mainly on the criterion (mean |Δc| = 0.78 and 0.42), and changed d′ by
+similar amounts (0.16 and 0.13, again without a consistent direction; Appendix F). Thus,
+manipulations of the response bias acted mainly on the criterion where the criterion could
+move, and the criterion is a property of the model together with the prompt rather than of
+the model alone. Because the accompanying changes of d′ were not negligible relative to the
+effects reported below, we average d′ over both answer orders and compare checkpoints only on
+identical prompts.
+
+How strongly did the models use the stated base rate? For an ideal observer, the stated
+share changes the prior odds and nothing else, so that the log-odds of the answer should
+shift by the same amount for every text, ln 16 = 2.77 nats between 20% and 80%. This
+benchmark applies to dv insofar as dv is read as the model's posterior log-odds. The base
+models shifted far less (mean shift of dv per model between 0.18 and 1.40 nats, i.e., 6–51%
+of the benchmark), and the shift was nearly uniform across texts (between-text SD within a
+condition 0.08–0.33). After post-training, five of the six models shifted more than the
+benchmark (3.67–10.93 nats, i.e., 1.3–3.9 times the benchmark), and the shift differed
+considerably between texts (SD up to 3.14); OLMo 3 Think was the exception (1.21 nats, as
+in its base model, 1.17). These values were obtained with a base-rate sentence that named the share of AI texts
+first. For the three families that fit the available GPUs, we repeated the manipulation
+with the human share named first. The pattern was the same, but the size of the shift
+depended on the wording in the post-trained models: The base models again shifted too
+little (Gemma 3 4B: 0.16; OLMo 2: 1.35; OLMo 3: 1.07 nats), the post-trained models of
+Gemma 3 4B and OLMo 2 again shifted more than the benchmark, but less than with the first
+wording (5.61 vs. 10.65 and 4.37 vs. 5.39 nats), and OLMo 3 Think again stayed below it
+(1.48). Post-training thus changed the use of a stated base rate from underweighting to
+overweighting in five of six model families, by a factor that depended on the model and on
+the wording (Table F2); the second wording was not run for Apertus, Qwen3, and Gemma 3 12B.
+
+Note that a shift in nats also depends on the overall scale of a model's log-odds, and this
+scale differed between checkpoints: Across texts of the same class, dv varied far more in
+the post-trained models (within-class SD per model 0.61–2.89 nats) than in the base models
+(0.21–0.53). Relative to this spread, i.e., to the differences that the models make between
+texts, the stated base rate already moved the base models considerably (by 0.9–3.3 SD per
+model) and the post-trained models somewhat more (2.0–5.3 SD); the relative shift increased
+with post-training in five families and decreased in OLMo 3 Think (3.3 to 2.0 SD), and with
+the second wording it increased only in Gemma 3 4B (0.8 to 4.2 SD), not in OLMo 2 (2.5 to
+2.4 SD; base_rate_scale.py). Thus, the post-trained models gave more extreme log-odds in
+general, to the base rate as well as to the texts; that the base rate gained weight relative
+to the texts holds for most, but not all, models and wordings.
+
+## 3.4 Where the change acts: model stitching and activation patching
 
 Where in the network does post-training make the difference? Because the base and the
 post-trained checkpoints of a model share the same architecture and start from the same
@@ -414,12 +282,12 @@ position is the more informative result. Note also that this was less so for the
 families: In Gemma 3, even the text representations changed noticeably, most at mid-depth
 (0.42–0.99, median 0.80–0.83), and the answer position differed strongly (median
 0.20–0.31), so that for Gemma 3 the claim that the text positions changed little rests on
-the probe transfer alone (Section 3.6). Second, every stitched model produced fluent
+the probe transfer alone (Section 3.5). Second, every stitched model produced fluent
 text (perplexity 6.0–6.7 for Apertus, 8.2–9.4 for OLMo 2), and stitching at the very
 bottom or the very top reproduced the respective parent model.
 
 If post-training changed only the final readout stage, the upper layers should decide
-the outcome. This was not the case (Figure 6A). When the first 8 of 32 layers of
+the outcome. This was not the case (Figure 5A). When the first 8 of 32 layers of
 Apertus came from the base model and all layers above from the SFT model, the combined
 model discriminated at least as well as the base model (d′ = +0.59 [0.41, 0.80]; base
 +0.43). Conversely, the first 8 layers of the SFT model sufficed to abolish the base
@@ -475,7 +343,7 @@ checkpoints selectively at different positions of the prompt ("activation patchi
 at the tokens of the text, at the instruction before the text, at the question after
 the text, or at the final position only.
 
-At layer 16, the pattern was unambiguous and identical for both models (Figure 6B). Exchanging the states of the text tokens changed nothing: Apertus after SFT
+At layer 16, the pattern was unambiguous and identical for both models (Figure 5B). Exchanging the states of the text tokens changed nothing: Apertus after SFT
 remained at chance when it received the base model's text representation (−0.11; SFT
 alone −0.04), and the base model kept its sensitivity when it received the SFT model's
 text representation (+0.43; base alone +0.43). Exchanging only the states of the
@@ -523,7 +391,7 @@ exchanging the states at the positions that follow the text transferred much or 
 with the default prompt; in this sense, post-training changed how the question takes up the
 text.
 
-## 3.6 Probes across checkpoints, and what the fine-tuning data contain
+## 3.5 Probes across checkpoints
 
 If post-training leaves the
 representation intact and changes how it is read out, a probe trained on the base model
@@ -555,6 +423,158 @@ newspaper segments +0.43), and in OLMo 2 there was no decline
 essentially unchanged where the test is informative, and both reorganized and, in some
 models, degraded the information available at the answer position.
 
+In summary, for authorship the information was represented, the probes at the text
+positions changed little with post-training, and the states at the positions after the text
+transferred the change between checkpoints at layer 16. Note that this localization rests
+on two layers; TODO(authorship sweep).
+
+## 3.6 A reproducible case with the opposite direction: negated statements
+
+The authorship corpora cannot be shared. Is the dissociation between representation and
+answer, and its modification by post-training, specific to them? We repeated the central
+analyses with truth judgments on public statement sets (Section 2.8), which can be
+reproduced in full (`reproduce/negation.sh`). Here, post-training acted in the opposite
+direction: It repaired answers that the base models gave poorly.
+Table 3 summarizes the results.
+
+> **Table 3.** Truth judgments: sensitivity (d′) of the probes (last prompt position, two
+> thirds of the network depth) and of the answers (plain prompt) for statements on diverse
+> facts (counterfact) and for negated geographic statements. SFT: answers after supervised
+> fine-tuning; —: no intermediate checkpoint released. The maximum d′ (AUC = 1) is 4.54 for
+> the 748 statement pairs.
+>
+> | Judgment | Model | Probe base | Probe final | Answer base | Answer SFT | Answer final |
+> |:---|:---|---:|---:|---:|---:|---:|
+> | Truth | OLMo 2 7B | 2.15 | 2.05 | 1.79 | 1.77 | 1.84 |
+> | (diverse facts) | Apertus 1.5 8B | 1.95 | 2.09 | 1.41 | 1.64 | 1.68 |
+> | | OLMo 3 7B Think | 1.89 | 1.64 | 1.61 | 1.35 | 1.34 |
+> | | Gemma 3 4B | 1.82 | 1.93 | 0.81ᵃ | — | 1.46 |
+> | | Gemma 3 12B | 2.24 | 2.26 | 1.64ᵃ | — | 1.97 |
+> | | Qwen3 8B | 2.28 | 2.15 | 1.94 | — | 1.77 |
+> | Truth | OLMo 2 7B | 4.54 | 4.54 | 0.80 | 3.36 | 3.10 |
+> | (negated statements) | Apertus 1.5 8B | 4.54 | 4.54 | −0.88 | 4.54 | 4.54 |
+> | | OLMo 3 7B Think | 4.54 | 4.31 | 4.54 | 3.77 | 3.80 |
+> | | Gemma 3 4B | 4.54 | 4.34 | 0.06ᵃ | — | 3.46 |
+> | | Gemma 3 12B | 4.54 | 4.54 | 1.97ᵃ | — | 4.54 |
+> | | Qwen3 8B | 4.54 | 4.54 | 4.54 | — | 4.54 |
+>
+> ᵃ The Gemma 3 base models placed only 18–32% of their probability on the two answer
+> words; interpret with caution.
+
+For simple geographic statements, all checkpoints judged at ceiling,
+so that this set served only as a check. For the negated statements, however, two base
+models showed a clear dissociation between representation and answer: Probes decoded
+the truth of every statement (AUC = 1), but the answers of the OLMo 2 base model used
+this information only weakly (d′ = 0.80), and those of the Apertus base model ordered
+the statements inversely (d′ = −0.88). Both base models answered "False" almost always
+(criterion c = 2.6 and 3.0). Supervised fine-tuning repaired the readout (OLMo 2:
+d′ = 3.36; Apertus: 4.54), whereas the probes remained at ceiling. The Gemma 3 models
+showed the same pattern between their base and final versions (Gemma 3 4B: 0.06 → 3.46;
+Gemma 3 12B: 1.97 → 4.54), although their base models rarely answered with the two
+answer words. The base models of Qwen3 and OLMo 3, in contrast, already judged the
+negated statements perfectly; post-training left this unchanged in Qwen3 and lowered it
+slightly in OLMo 3 (d′ = 3.80 after post-training, with a slightly lower probe, 4.31).
+Thus, post-training repaired the readout of negation where the base model read it
+wrongly, but did not improve it further where the base model read it correctly. A probe trained on the
+simple statements of the same checkpoint suggests what the base models' answers followed:
+Applied to the negated statements, it separated them with the wrong sign (OLMo 2:
+d′ = −1.28; Apertus: −1.43), i.e., the general truth direction of the base models
+encoded whether city and country belong together and ignored the negation; whether the
+answers followed this direction item by item was not tested. After SFT, the
+same probe separated the negated statements in the correct direction (+0.69; +3.05). For
+the statements on diverse facts, post-training changed the answers only slightly, except
+in OLMo 3, where answers and probes declined together (answers 1.61 → 1.34; probes 1.89
+→ 1.64).
+
+Why did post-training change the answers for the negated statements but hardly for the
+statements on diverse facts? The two sets differ in what limits the answers. The statements
+on diverse facts are affirmative, and judging them requires only that the fact is known:
+The probes were far from their maximum, and the answers of the base models were already
+close to the probes (e.g., OLMo 2: d′ = 1.79 for the answers vs. 2.15 for the probe), so
+that there was little represented information that the answers failed to use. The negated
+statements require that the fact is combined with the negation. The probes show that this
+combination is available at the last prompt position of every model, but the answers of
+several base models did not reflect it. Post-training thus changed the answers where they
+fell short of what was represented, not where they were limited by what the model knows.
+
+Where does the repair arise? We combined the lower layers of one checkpoint with the upper
+layers of the other (model stitching; Section 2.7, Figure 2C; results in Figure 6A). Stitching located the repair in the middle of the network
+rather than in the early layers. In OLMo 2, the first 8 base layers combined with all
+upper SFT layers still judged at the level of the SFT model (d′ = 3.76; base 0.63, SFT
+3.20 in this subset of 300 pairs), whereas the first 16 base layers abolished the
+repair (0.38). In Apertus, the first 8 base layers under SFT upper layers likewise left
+the repair intact (4.15), the first 12 removed most of it (1.33), and the first 16 all of it
+(−0.94); conversely, the first 8 SFT layers under base upper layers produced part of the
+repair (1.21) and the first 12 all of it (4.15). The repair thus involved layers 9 to 16,
+with a partial contribution of the layers below (outputs/stitch/stitch_neg_cities.csv). To ask where in the prompt the
+repair acts, we exchanged the internal states between the checkpoints at selected positions
+of the prompt (activation patching; Figure 2D). Note that in the prompt for the truth
+judgments the question precedes the statement, so that the statement is read with the task
+known, and the positions after the statement contain no question, only the instruction to answer
+with one word and the answer cue ("Answer:"). At
+layer 16, the SFT model's states at the positions after the statement repaired the base
+model completely (OLMo 2: 0.63 → 3.26; Apertus: −0.87 → 4.15), and the base model's states
+at these positions abolished the repair in the SFT model (3.20 → 1.07; 4.15 → −1.09). In
+Apertus, the final position alone carried the full effect in one direction (base model with
+the SFT model's final state: 4.15). Exchanging the states of the statement itself had no
+effect in Apertus and in the SFT model of OLMo 2, but a partial one in the OLMo 2 base
+model (0.63 → 1.51). At layer 8, the SFT model's states after the statement repaired the
+base models only partly (Apertus: 1.61; OLMo 2: 1.07; Figure 6B), in line with the
+stitching result that the repair is not complete at this depth. Exchanging the states of
+the instruction and question before the statement had no effect at either layer.
+
+Patching at two layers cannot show where the repair first appears. We therefore repeated
+the patching at 12 layers between 2 and 32, with 100 statement pairs (Figure 6C;
+outputs/patch_sweep/patch_sweep_summary.csv; on this subset, d′ = 0.34 for the OLMo 2 base
+model and 3.09 for its SFT model, and −0.86 and 3.64, the maximum for 100 pairs, for
+Apertus). We express each effect as the share of the difference between the two
+checkpoints that the patch transferred. The two models differed. In OLMo 2, the repair
+appeared first at the statement positions: The SFT model's statement states alone
+transferred 22% of the repair at layer 10, 82% at layer 12 (d′ = 2.59), and 67% at layer
+14, although all layers above and all other positions were those of the base model. The
+share then fell to 33% at layer 16 and to zero from layer 20 onward. The positions after
+the statement showed the complementary course (36% at layer 10, 37% at layer 12, 52% at
+layer 14, 97% at layer 16), and the final position alone carried the repair only from layer
+20 onward (89%). The reverse direction gave the same picture: The base model's statement
+states lowered the SFT model from 3.09 to 1.38 at layer 12 and to 1.75 at layer 14, and had
+little effect at layer 16 (2.92) and none above. In OLMo 2, supervised fine-tuning thus changed how the
+statement itself is represented at mid-depth, in a way that the upper layers of the base
+model could read correctly; the information then passed to the answer cue and to the final
+position. In Apertus, in contrast, the SFT model's statement states transferred at most
+23% (layers 12 and 14), whereas its states after the statement transferred 46% at layer 6
+and 96% at layer 10. In the reverse direction, the base model's states after the statement
+lowered the Apertus SFT model progressively from layer 10 onward, and its statement states
+did not lower it at any layer; note that the Apertus SFT model was at the maximum d′, so
+that a small disruption would not be visible. Hence, the two models agree in that the
+repair has reached the positions after the statement by the middle of the network, but
+they differ in where it arises: at the statement positions in OLMo 2, and at the answer cue
+in Apertus. TODO(gemma, sfirst): sweeps for Gemma 3 and with the statement placed before
+the question.
+
+Steering at the answer position was consistent with a readout that uses the represented
+truth direction after SFT; as explained in Appendix D, this is a consistency check rather
+than an independent test. Shifting
+the internal state at the answer position along the direction that separates true from
+false negated statements (±2 SD, layer 21; Appendix D) moved the answers of both SFT
+models toward the correct answer, more than the control directions (Apertus: +0.36 nats,
+p = .02; OLMo 2: +1.07, p ≤ .04), and in these models the truth direction coincided with
+the decision direction (cosine ≈ 1.0). In the base models, it did not (Apertus: −0.14,
+p = .13–.33; OLMo 2: +0.09, p ≥ .54), although in both base models the positive control,
+too, exceeded only the norm-matched controls. Supervised fine-tuning thus aligned the answer with
+the represented truth direction; whether the Apertus base model used this direction with
+the wrong sign, as its negative sensitivity would suggest, could not be established.
+
+In summary, the truth of negated statements could be decoded at ceiling from the last
+prompt position before and after post-training, the answers of several base models did not
+use this information, and supervised fine-tuning repaired the answers, through weights in
+the middle layers. Where the repair arose differed between the two models that we could
+localize: In Apertus, it arose at the positions after the statement, i.e., in how the
+answer cue takes up the statement; in OLMo 2, it arose in the representation of the
+statement itself at mid-depth. Note that the localization rests on the two
+models with stage-wise checkpoints whose base models misread negation; the Gemma 3 base
+models showed the same change of the answers, but with low answer probability, and two
+base models had nothing to repair.
+
 What do the training data teach? The direction of the change differed between the
 judgments: Post-training impaired the readout of authorship, repaired that of negated
 statements, and reshaped that of the reviews. To examine whether this corresponds to
@@ -576,14 +596,6 @@ expressions can miss requests that are phrased differently, and that the German 
 so small that their search has little power. The census is thus consistent with the idea that post-training improved the one judgment
 for which the training data contain examples, where the base model read it wrongly, and
 impaired or merely reshaped the judgments for which we found none; it cannot establish this.
-
-In summary, for authorship as for negated statements, the information was represented,
-the probes at the text positions changed little, and the
-states at the positions after the text transferred the change at layer 16. Note that for
-authorship this localization rests on two layers; the sweep for the negated statements
-(Section 3.1) shows that a contribution of the text states can be confined to a few layers
-below 16. TODO(authorship sweep). The direction
-of the change, however, differed between the two judgments.
 
 ## 3.7 The training signal sets the direction of the readout
 
@@ -676,7 +688,7 @@ barely changing the answers, shows that what mattered for the answers was which 
 was learned, not how much the answer position changed. The chats illustrate this most
 clearly: After training with valid news labels, the model represented the authorship of
 the chats as well as before (probe d′ = 1.32) but judged them below chance (−0.58),
-consistent with the reversed transfer of news-trained probes to the chats (Section 3.2).
+consistent with the reversed transfer of news-trained probes to the chats (Section 3.1).
 The dissociation that we observed after the original post-training was thus reproduced
 experimentally, by training data whose cues were valid for one genre and misleading for
 another.

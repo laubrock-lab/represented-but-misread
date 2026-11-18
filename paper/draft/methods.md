@@ -56,8 +56,8 @@ version; Rosin & Laubrock, in preparation). The 238 texts form 119
 matched pairs. The human summaries are copyrighted and were processed only on
 university machines.
 
-The truth judgments, which we report first (Section 3.1), used public statement sets and
-are described in Section 2.8.
+Because these corpora cannot be shared, we repeated the central analyses with truth
+judgments on public statement sets (Sections 2.8 and 3.6), which can be reproduced in full.
 
 ## 2.2 Models
 
@@ -122,7 +122,7 @@ false-alarm rates [@hautus1995corrections]; positive values indicate a bias towa
 answer is ordered across texts, in the manner of a confidence-rating ROC, even where the
 binary answer hardly varies; c describes where the order-averaged dv places the threshold
 and is not the criterion of any single prompt, since the binary answers often depended on
-the order of the answer options (Section 3.2). To test whether signal detection theory describes the models'
+the order of the answer options (Section 3.1). To test whether signal detection theory describes the models'
 judgments, we manipulated the response bias in two ways that should leave the sensitivity
 unchanged: the order of the two answer options, and a sentence stating the share of AI texts
 in the study (20, 50, or 80%), added to the plain prompt. For each single prompt condition,
@@ -283,7 +283,7 @@ one truth direction also covers negated statements [@marks2024geometry]. Model
 stitching and activation patching were carried out as for authorship, for both further
 judgments, but only where there was a change to locate: in models whose answers changed
 substantially with post-training and whose base models placed at least 30% of their
-probability on the two answer words, the criterion used for authorship (Table 3). For the
+probability on the two answer words, the criterion used for authorship (Table 2). For the
 negated statements, these were OLMo 2 and Apertus (base vs. SFT, 300 pairs); the Gemma 3
 base models fell below this criterion (18% and 25%), and the base models of Qwen3 and OLMo 3 already
 judged the negated statements perfectly. For the reviews, these were Gemma 3 4B, which
@@ -360,7 +360,7 @@ consent requests), and the human textbook summaries are protected by copyright.
 Therefore, these texts cannot be shared. The two further judgments (Section 2.8) use
 publicly available data [@marks2024geometry; @ott2011finding; @ott2013negative], so that these
 analyses can be reproduced in full: `reproduce/negation.sh` reruns the analyses of the negated
-statements (Section 3.1) from the public statement sets, and `reproduce/check_negation.py`
+statements (Section 3.6) from the public statement sets, and `reproduce/check_negation.py`
 compares the regenerated values with those reported here (the results for Apertus require
 the developers' fork of the `transformers` library); the same holds for the training data of the training
 study (Section 2.9), whose human texts are public [@block2019gnad] and whose AI texts we

@@ -1,4 +1,4 @@
-# Title and abstract (draft, 17 Nov 2026; negation first, authorship second, training study third)
+# Title and abstract (draft, 17 Nov 2026; authorship first, negated statements as the reproducible case, training study last)
 
 
 ## Title options
@@ -21,23 +21,21 @@ models".)
 Does post-training change what a language model represents, or how this representation
 is read out into an answer? We compared linear probes with the models' own answers,
 analyzed with signal detection theory, in six open-weight base models and their
-post-trained versions. For negated statements from a public set, probes decoded truth
-perfectly in every model, but the answers of several base models used this information
-poorly or ordered the statements inversely; supervised fine-tuning repaired the readout
-(e.g., d′ from −0.88 to the maximum of 4.54) while the probes stayed at ceiling. For
-judgments of whether German texts from three corpora were written by a human or an AI,
-probes and word-frequency classifiers separated the classes well, but the answers did not,
-and post-training lowered their sensitivity on average (Δd′ = −0.34 across model families;
-−0.29 across three prompt wordings). Post-training also changed the use of a stated base rate from underweighting to
-overweighting relative to an ideal observer. In two models,
-combining layers of base and fine-tuned checkpoints (model stitching) implicated the middle
-layers for negation and the early layers for authorship, and exchanging internal states
-(activation patching) showed that by mid-depth the change resided at the positions after
-the text; for negation, it arose there in one model and in the representation of the
-statement in the other. In a training study with one model, adding
-2,000 correctly labeled examples to otherwise identical fine-tuning data shifted the
-answers strongly, improving them on two other corpora and inverting them on a third, where
-the answers followed a probe trained on news (ρ = .68); the probes at the text positions
-changed little. Post-training thus changed how a
-judgment is read out of what a model represents, for better or worse, and a small training signal can set the
-direction of this change.
+post-trained versions. For judgments of whether German texts were written by a human or an
+AI, probes and word-frequency classifiers separated the classes well in three corpora, but
+the answers did not, and often ordered the texts inversely. Post-training lowered the
+sensitivity of the answers on average (Δd′ = −0.34 across model families; −0.29 across three
+prompt wordings). It also changed the use of a stated base rate: Base models shifted their
+answers less than an ideal observer would, most post-trained models more. In two models with
+stage-wise checkpoints, the change occurred during supervised fine-tuning, model stitching
+implicated the early layers, and exchanging internal states at mid-depth transferred the
+change with the states at the positions after the text. Because our corpora cannot be
+shared, we add a case that can be reproduced from public data, the truth of negated
+statements. Here, post-training acted in the opposite direction: Probes decoded truth
+perfectly in every model, the answers of several base models did not use it, and fine-tuning
+repaired them, at the positions after the statement in one model and in the representation
+of the statement in another. In a training study, adding 2,000 correctly labeled authorship
+judgments to otherwise identical fine-tuning data improved the answers on two other corpora
+and inverted them on a third, where they followed a probe trained on news. Post-training
+thus changed how a judgment is read out of what a model represents, for better or worse,
+and a small training signal can set the direction of this change.

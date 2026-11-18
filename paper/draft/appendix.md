@@ -182,7 +182,7 @@ length as the authorship direction (norm-matched) or steps of two standard devia
 their own direction (scale-matched), which kept them within the range of the texts as
 often as the authorship direction (49–69%). As a positive control, we shifted along the
 direction that the model's own answers follow (the decision direction). In 21 of 25 cells
-(model × corpus × layer, including the truth judgments of Section 3.1 and the review judgments of Appendix C), the
+(model × corpus × layer, including the truth judgments of Section 3.6 and the review judgments of Appendix C), the
 decision direction moved the answer more than the norm-matched controls (rank-based
 p ≤ .05), so that the test can detect a direction that the answer reads; against the
 scale-matched controls, this was the case in 16 of 25 cells. Where the positive control
@@ -197,7 +197,7 @@ model answer "human" more often. This was the case for the short chats in Gemma 
 (layer 17: −1.74; p = .04 norm-matched, .06 scale-matched), and Qwen3 (layers 24 and 30:
 −1.18 and −2.06; p ≤ .03), and for the newspaper segments in Qwen3 (−0.43 and −0.85;
 p ≤ .04). In these cells, the authorship direction pointed against the decision direction
-(cosine −0.59 to −0.92), and the answers were clearly below chance (Table 3). Note that
+(cosine −0.59 to −0.92), and the answers were clearly below chance (Table 2). Note that
 these are the cells with the most negative d′, and that this is expected: The authorship
 direction is the difference between the class means at the position from which the answer is
 read, so that, if the answer depends approximately linearly on this state, shifting along it
@@ -228,7 +228,7 @@ human text to the average AI text, changed the answer in the same direction as t
 observed difference between AI and human texts in all 16 cells in which the bootstrap
 interval of this difference excluded zero, and in 23 of the 25 cells overall (e.g., Qwen3 on the newspaper segments: −0.50 and −0.66
 nats vs. an observed difference of −0.59). As stated above, this agreement is expected if the answer depends approximately linearly
-on the internal state; it is consistent with the patching results (Section 3.5).
+on the internal state; it is consistent with the patching results (Section 3.4).
 
 Steering did not, however, reveal what post-training changes for authorship. In the
 Apertus base model, shifting toward "AI" moved the answer in the correct direction,
@@ -236,7 +236,7 @@ increasingly so with depth (+0.08, +0.21, and +0.35 nats at layers 16, 21, and 2
 not more than the control directions (p ≥ .15), and after SFT the effect was close to zero
 (−0.04 to +0.04). In OLMo 3 Think, neither the base nor the SFT model used the direction
 (−0.01 and +0.09).[^olmo3] The change of the answers during SFT is therefore localized by
-the stitching and patching analyses (Section 3.5), not by steering.
+the stitching and patching analyses (Section 3.4), not by steering.
 
 [^olmo3]: An earlier comparison, in which the SFT model received its chat template and the
 base model the plain prompt, had suggested a reversed use after SFT (−0.27); with the same
@@ -379,7 +379,7 @@ model's MLP blocks of the first 16 layers restored discrimination almost complet
 distributed over the early layers and to involve both attention and feed-forward
 blocks.
 
-*Question placed before the text.* See Section 3.5 for the interpretation.
+*Question placed before the text.* See Section 3.4 for the interpretation.
 
 > **Table H1.** Activation patching at layer 16 with the question placed before the text
 > (textbook summaries): d′ of the recipient after receiving the donor's states at one set of

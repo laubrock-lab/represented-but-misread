@@ -1,35 +1,34 @@
 # 4 Discussion
 
 
-In the present study we used two judgments with known ground truth to ask whether
-post-training changes what a language model represents or how it reads this representation
-out. For negated statements, the truth was represented at ceiling in all six model
-families, but the answers of several base models used it poorly or ordered the statements
-inversely, and supervised fine-tuning repaired the readout while the probes stayed at
-ceiling. For authorship, the information that distinguishes AI from human texts was readily
-available in three corpora of German texts, both in the texts themselves and in the models'
-internal representations, but the answers did not use it, and often ordered the texts
-inversely. Post-training lowered the sensitivity of these answers on average (Δd′ = −0.34
-across families; −0.29 across three prompt wordings), with considerable variation between
-models, text types, and prompts, and in the two models with stage-wise checkpoints the
-change occurred during supervised fine-tuning. Post-training also changed how strongly a
-stated base rate moved the answers, from less than an ideal observer would to more. Two
-interventions bore on where the changes take effect. Model stitching implicated the weights
-of the middle layers for negation and of the early layers for authorship, with the caveat
-that stitched hybrids produce effects of their own. Activation patching showed that, by the
-middle of the network, the states at the positions after the text transferred the change
-between checkpoints. Where the change arose was less uniform: For negation, a sweep over
-layers located it at the positions after the statement in Apertus, but in the representation
-of the statement itself in OLMo 2. In a training study, a small
-number of labeled examples shifted the readout in the direction their labels implied. In
-short, post-training changed how a judgment is read out of information that the models
-represent, in a direction that depended on the judgment. That this change leaves the
-representation of the text untouched and resides in how the question reads it, as our title
-suggests, held for the probes and for one of the two models in which we could trace the
-repair of negation; in the other, the representation of the statement changed as well. Note
-that the localization rests on two model
-families, for authorship on single layers, and that for the deceptive reviews (Appendix C) it was
-inconclusive.
+In the present study we used authorship judgments as a test case for the question of
+whether post-training changes what a language model represents or how it reads this
+representation out. Across six open-weight base models and three corpora of German texts,
+the information that distinguishes AI from human texts was readily available, both in the
+texts themselves and in the models' internal representations, but the answers did not use
+it, and often ordered the texts inversely. Post-training lowered the sensitivity of these
+answers on average (Δd′ = −0.34 across families; −0.29 across three prompt wordings), with
+considerable variation between models, text types, and prompts, and in the two models with
+stage-wise checkpoints the change occurred during supervised fine-tuning. Post-training
+also changed how strongly a stated base rate moved the answers, from less than an ideal
+observer would to more. Model stitching implicated the weights of the early layers, with the
+caveat that stitched hybrids produce effects of their own, and activation patching showed
+that, by the middle of the network, the states at the positions after the text transferred
+the change between checkpoints. A judgment on public data, the truth of negated statements,
+showed the complementary case: The truth could be decoded at ceiling in all six model
+families, the answers of several base models did not use it, and supervised fine-tuning
+repaired the answers while the probes stayed at ceiling. A sweep over layers located this
+repair at the positions after the statement in Apertus, but in the representation of the
+statement itself in OLMo 2. In a training study, a small number of labeled examples shifted
+the readout in the direction their labels implied, and the item-level answers followed the
+class direction of the training texts. In short, post-training changed how a judgment is
+read out of information that the models represent, in a direction that depended on the
+judgment. That this change leaves the representation of the text untouched and resides in
+how the question reads it, as our title suggests, held for the probes at the text positions
+and for one of the two models in which we could trace the repair of negation; in the other,
+the representation of the statement changed as well. Note that the localization rests on
+two model families, for authorship on single layers, and that for the deceptive reviews
+(Appendix C) it was inconclusive.
 
 ## Relation to previous work
 
@@ -45,7 +44,7 @@ here, the inverse ordering occurred in the graded preferences behind the models'
 unmodified answers, and in two model families the class-mean difference at the answer
 position carried this inverse ordering (Appendix D). Note, however, that the cues themselves were specific
 to the corpus: A probe trained on the newspaper segments separated the chats with the
-wrong sign (Section 3.2). A judgment below chance therefore need not reflect an inverted
+wrong sign (Section 3.1). A judgment below chance therefore need not reflect an inverted
 reading of a single authorship representation; it can also reflect a fixed policy whose
 cues are valid for one kind of text and invalid for another. Second, the decline is
 linked to post-training. Interestingly, in the closest related study, post-training had the
@@ -109,8 +108,10 @@ natural conditions.
 
 ## The direction of the change depends on the training signal
 
-Post-training repaired the readout of negated statements in the base models that misread
-them, and impaired the readout of authorship on average. A common account of these outcomes
+Post-training impaired the readout of authorship on average, and repaired the readout of
+negated statements in the base models that misread them, whereas it hardly changed the
+judgments of statements on diverse facts, for which the answers of the base models were
+already close to what could be decoded. A common account of these outcomes
 follows from the second lens in Figure 1. Post-training does not add information to the
 representation; it installs a way of reading the representation out. Whether this improves
 or impairs a judgment then depends on whether the training signal specifies a valid way of
@@ -236,7 +237,7 @@ Three implications follow, each of which requires further testing. First, the si
 effects of post-training can be localized, and possibly repaired. A stitched model that
 combined the first eight layers of the Apertus base model with all upper layers of the
 fine-tuned model discriminated better than either parent, although such hybrids also
-produce effects of their own (Section 3.5). Whether such hybrids retain
+produce effects of their own (Section 3.4). Whether such hybrids retain
 the intended effects of post-training, such as instruction following, is an open
 question, and the approach is related to combining fine-tuned weights by interpolation
 or averaging [@wortsman2022wiseft; @wortsman2022soups]. Second, knowing where a side effect arises
@@ -310,8 +311,8 @@ all contrasts as well, which left five of six decreases significant.
 ## Conclusion
 
 Language models can represent what an answer would require and still answer otherwise.
-For negated statements, post-training repaired such a readout; for authorship, it impaired
-the readout on average: Models that write like humans failed to recognize their own kind of
+For authorship, post-training impaired such a readout on average, and for negated
+statements it repaired one: Models that write like humans failed to recognize their own kind of
 text, not because they lacked the information but because of how they read it out. In both
 judgments, the change between checkpoints was carried by weights in the middle or early
 layers and had reached the positions after the text by the middle of the network; whether

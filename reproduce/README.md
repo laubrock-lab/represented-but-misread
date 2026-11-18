@@ -1,7 +1,7 @@
-# Reproducing Section 3.1 (negated statements)
+# Reproducing Section 3.6 (negated statements)
 
 One entry point, `reproduce/negation.sh`, regenerates the negated-statements analysis of
-Section 3.1 from public data: the statement sets of Marks and Tegmark (2024) and the
+Section 3.6 from public data: the statement sets of Marks and Tegmark (2024) and the
 open-weight checkpoints listed in Methods Table 1. Nothing in this pipeline touches the
 three authorship corpora, which are confidential (see "What cannot be reproduced
 publicly").
@@ -52,7 +52,7 @@ Steps f and g are optional and off by default:
   in a fresh output tree it writes a `steer_nulls_summary.csv` that contains the
   negated-statement cells only — the other rows of Appendix Table D1 come from the
   authorship and review cells, which are not part of this pipeline.
-* **g (probe transfer)** is not quoted in Section 3.1 (it is used in Section 3.6). The
+* **g (probe transfer)** is not quoted in Section 3.6 (it is used in Section 3.5). The
   paper's `outputs/checkpoint_transfer_truth.csv` was produced for all three
   further-judgment sets in one call; the step here restricts it to the negated statements
   and writes a differently named file, so that the paper's file is not overwritten with a
@@ -66,19 +66,19 @@ in that file and in the output of `check_negation.py`.
 
 | Manuscript | Step | File | Column | Reference ids |
 |---|---|---|---|---|
-| Table 2, negated statements, "Probe base"/"Probe final" (6 models) | b | `truth_neg_cities/stages.csv` | `probe_d` | `T2_probe_*` |
-| Table 2, negated statements, "Answer base"/"SFT"/"Final" (6 models) | b | `truth_neg_cities/stages.csv` | `ans_d` | `T2_ans_*` |
+| Table 3, negated statements, "Probe base"/"Probe final" (6 models) | b | `truth_neg_cities/stages.csv` | `probe_d` | `T2_probe_*` |
+| Table 3, negated statements, "Answer base"/"SFT"/"Final" (6 models) | b | `truth_neg_cities/stages.csv` | `ans_d` | `T2_ans_*` |
 | 3.1 "criterion c = 2.6 and 3.0" | b | `truth_neg_cities/stages.csv` | `ans_c` | `c_olmo2_base`, `c_apertus_base` |
 | 3.1 transfer probe (−1.28, −1.43, +0.69, +3.05) | b | `truth_neg_cities/stages.csv` | `transfer_d` | `tr_*` |
-| Table 2 footnote a (18%, 25%) | b | `truth_neg_cities/stages.csv` | `p_mass` | `pmass_*` |
+| Table 3 footnote a (18%, 25%) | b | `truth_neg_cities/stages.csv` | `p_mass` | `pmass_*` |
 | 3.1 stitching (OLMo 2: 3.76, 0.38; parents 0.63, 3.20; Apertus: 4.15, 1.33, −0.94, 1.21, 4.15) | e | `stitch/stitch_neg_cities.csv` | `d`, `d_base`, `d_sft` | `st_*` |
 | 3.1 patching at layer 16 (0.63 → 3.26, 1.51; 3.20 → 1.07; −0.87 → 4.15; 4.15 → −1.09; Apertus `last` 4.15) | e | `patch/patch_summary.csv` | `d` | `pa_*` |
 | 3.1 / Table D1 steering (+0.36, +1.07, −0.14, +0.09 and their p-values) | f | `steer_nulls_summary.csv` | `class_E2`, `all_p`, `own_all_p` | `se_*` |
-| Table 2, diverse facts (counterfact) rows | a + b with `--with-counterfact` | `truth_counterfact/stages.csv` | `probe_d`, `ans_d` | not in the reference file |
+| Table 3, diverse facts (counterfact) rows | a + b with `--with-counterfact` | `truth_counterfact/stages.csv` | `probe_d`, `ans_d` | not in the reference file |
 | 3.1 "answers 1.61 → 1.34; probes 1.89 → 1.64" (OLMo 3, diverse facts) | a + b with `--with-counterfact` | `truth_counterfact/stages.csv` | `ans_d`, `probe_d` | not in the reference file |
 | 3.1 "TODO(sweep): layer-by-position patching for OLMo 2" | `--sweep` | `outputs/patch_sweep/` | — | open in the manuscript |
 
-Two statements of Section 3.1 are **not** backed by a value in the current outputs:
+Two statements of Section 3.6 are **not** backed by a value in the current outputs:
 
 * "in these models the truth direction coincided with the decision direction (cosine ≈
   1.0)". `steer_nulls_analysis.py` gained the columns `cos_class_decision` /
@@ -111,7 +111,7 @@ from, all 63 rows pass and all 63 match the printed numbers.
 
 A smoke test (`--limit`) produces different numbers by construction — it checks that the
 pipeline runs, not that it reproduces the paper. The 12-pair Gemma 3 4B run above gives
-`FAIL 5, MISSING 58`: the five Gemma 3 4B cells of Table 2 exist but differ (with 12
+`FAIL 5, MISSING 58`: the five Gemma 3 4B cells of Table 3 exist but differ (with 12
 pairs the d′ ceiling is 2.45 instead of 4.54), and everything else belongs to models the
 run did not touch.
 
@@ -212,11 +212,11 @@ Hugging Face identifiers, as in Methods Table 1 and `config.MODEL_PRESETS`:
 | `qwen3-8b` | `Qwen/Qwen3-8B-Base` | `Qwen/Qwen3-8B` |
 
 `negation.sh --preset olmo2-7b` (the default) scores `base`, `sft` and `instruct` in step
-a — the three columns of Table 2 — and uses `base` and `sft` for stitching and patching,
+a — the three columns of Table 3 — and uses `base` and `sft` for stitching and patching,
 as in `slurm/truth_localize_submit.sh`. `--variants "base sft dpo instruct"` adds the
 intermediate DPO stage, which fills the remaining rows of
 `outputs/truth_neg_cities/stages.csv` and `outputs/truth_stages_contrasts.csv` (the
-stage-by-stage comparisons; Table 2 reports only base, SFT and the final model);
+stage-by-stage comparisons; Table 3 reports only base, SFT and the final model);
 `--post` chooses a different post-trained checkpoint for steps c and d. The Gemma 3 weights are gated: accept the
 licence on the model page and run `hf auth login` once.
 
@@ -224,7 +224,7 @@ licence on the model page and run `hf auth login` once.
 `transformers`; the paper's runs used the developers' fork, which the SLURM scripts put on
 `PYTHONPATH` (`PYTHONPATH=/work/$USER/tf_apertus` in `slurm/factuality_stages.sh`,
 `slurm/stitch.sh`, `slurm/patch.sh`, `slurm/steer_nulls.sh`). `negation.sh` prints a
-reminder and otherwise runs the identical commands. Everything in Table 2 and Section 3.1
+reminder and otherwise runs the identical commands. Everything in Table 3 and Section 3.6
 for Apertus therefore requires that fork; the OLMo 2, OLMo 3, Qwen3 and Gemma 3 rows do
 not.
 
@@ -266,7 +266,7 @@ downloads the CSVs from the original repository instead of this one redistributi
 
 ## What cannot be reproduced publicly
 
-The three authorship corpora of Sections 3.2–3.6 cannot be shared, as Methods 2.11
+The three authorship corpora of Sections 3.1–3.5 cannot be shared, as Methods 2.11
 states: the newspaper texts are unpublished and confidential, the human chat messages
 come from participants who have not consented to publication, and the human textbook
 summaries are protected by copyright. They live in `data/` (git-ignored) and are
@@ -274,9 +274,9 @@ processed only on university machines. Nothing in this pipeline reads them: step
 `truth/*_statements.py` and the public CSVs above, and the corpus argument is always
 `truth:neg_cities` or `truth:cities`.
 
-The consequence for Section 3.1 is none — it is the section the manuscript describes as
+The consequence for Section 3.6 is none — it is the section the manuscript describes as
 reproducible in full. What a public rerun cannot reproduce are the authorship results of
-Sections 3.2–3.6 (and the lens-model analyses of Appendix B that use those texts). The
+Sections 3.1–3.5 (and the lens-model analyses of Appendix B that use those texts). The
 per-text model outputs without text content and all derived results are to be released
 with the repository (Methods 2.11), so the authorship analyses can be re-derived from the
 stored judgments, but not re-run from the texts.
@@ -294,7 +294,7 @@ stored judgments, but not re-run from the texts.
 * `patch_positions.py` has gained a seventh position set since the paper's runs: the
   files in `outputs/patch/truth_neg_cities/` contain `none, text, pre, post, last, all`,
   a rerun with today's default adds `question` (the question line only, wherever it
-  stands). The values Section 3.1 quotes come from `post` and are unaffected, but the
+  stands). The values Section 3.6 quotes come from `post` and are unaffected, but the
   regenerated CSVs have more rows than the stored ones. On the truth prompts that set is
   empty — the position finder looks for the German "Frage:" of the authorship prompt — so
   it reproduces `none` exactly and carries no information here. Add
