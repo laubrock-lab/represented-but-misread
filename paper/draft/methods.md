@@ -40,7 +40,7 @@ revision.
 *Newspaper segments.* Articles written by a local journalist for a local newspaper,
 which to our knowledge were not available in digital form and are therefore unlikely to
 have been part of any model's training data, were paired with generated articles. For
-each article, a locally run language model (Gemma 4 26B) extracted a summary of the
+each article, a locally run language model (Gemma 4 27B) extracted a summary of the
 topic, the key facts (names, places, dates, numbers), and the length and number of
 paragraphs, and it derived a profile of the author's style from the author's other
 articles (leave-one-out). GPT-5.4 then wrote an article of the same length and
