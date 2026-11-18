@@ -46,7 +46,8 @@ paragraphs, and it derived a profile of the author's style from the author's oth
 articles (leave-one-out). GPT-5.4 then wrote an article of the same length and
 paragraph count that incorporated all key facts, either from the topic and facts alone
 ("naive") or additionally following the style profile ("style-matched"); both prompts
-instructed the model not to reveal AI authorship. The style-matched articles were
+were written in English, did not use web search, and instructed the model not to reveal AI
+authorship. The style-matched articles were
 finally revised to avoid nine surface features that the students of the lab course had
 identified as AI markers in a sample of the articles (e.g., dashes, lists of exactly three items, "not only … but
 also" constructions, effusive closing sentences, uniform paragraph lengths, too few

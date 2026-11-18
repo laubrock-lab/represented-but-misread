@@ -35,7 +35,7 @@ English templates with a system and a user part; placeholders in braces.
 | `prompt_gemma_style.txt` | a locally run model derives a style profile from the author's other articles (`{N}`, `{TRAINING_TEXTS}`) |
 | `prompt_frontier_naive.txt` | a frontier model writes an article from topic and key facts |
 | `prompt_frontier_style_matched.txt` | the same, additionally following the style profile (`{STYLE_PROFILE}`) |
-| `prompt_frontier_naive_search.txt`, `prompt_frontier_style_matched_search.txt` | variants in which the model first searches the web for context |
+| `prompt_frontier_naive_search.txt`, `prompt_frontier_style_matched_search.txt` | variants in which the model first searches the web for context; not used for the texts of the experiment |
 
 The step in which the style-matched articles were revised to avoid surface features that
 students had named as typical of AI text is described in the manuscript; its prompt
