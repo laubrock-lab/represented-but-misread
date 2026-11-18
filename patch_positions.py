@@ -123,6 +123,8 @@ def main() -> None:
     ap.add_argument("--max-text-tokens", type=int, default=2048)
     ap.add_argument("--limit", type=int)
     ap.add_argument("--device", default="auto")
+    ap.add_argument("--dtype", default="bfloat16", choices=["bfloat16", "float16"],
+                    help="precision of both models (float16 is faster on Apple silicon; the cluster runs of the paper used bfloat16)")
     ap.add_argument("--prompt-variant", default="default",
                     choices=sorted(set(config.RAW_VARIANTS) | set(F.RAW_VARIANTS)),
                     help="raw template variant: qfirst/para for the authorship prompts, "
@@ -181,7 +183,7 @@ def main() -> None:
 
     # 1. donor activations at every requested layer k, for every prompt position
     t0 = time.time()
-    tok, donor = load_model(ids[donor_name], device, torch.bfloat16)
+    tok, donor = load_model(ids[donor_name], device, getattr(torch, args.dtype))
     store, n_cached = {}, 0
     with torch.no_grad():
         for r in texts.itertuples(index=False):
@@ -192,7 +194,7 @@ def main() -> None:
                                           F.question_marker() if truth else "Frage:")
                 ids_t = tok(prompt, add_special_tokens=add, return_tensors="pt")["input_ids"].to(device)
                 hs = donor(input_ids=ids_t, output_hidden_states=True, use_cache=False).hidden_states
-                act = torch.stack([hs[k][0] for k in todo]).to("cpu", torch.bfloat16)
+                act = torch.stack([hs[k][0] for k in todo]).to("cpu", getattr(torch, args.dtype))
                 store[(r.text_id, order)] = (prompt, add, pos, act)
                 n_cached += act.numel()
     del donor
@@ -202,7 +204,7 @@ def main() -> None:
           f"({len(store)} prompts x {len(todo)} layers) in {time.time() - t0:.0f}s", flush=True)
 
     # 2. recipient with patched positions, one pass per layer
-    tok, model = load_model(ids[args.recipient], device, torch.bfloat16)
+    tok, model = load_model(ids[args.recipient], device, getattr(torch, args.dtype))
     dec = find_decoder_layers(model)
     cands, eow = (F.candidate_seqs(tok) if truth else candidate_ids(tok)), {}
     from sdt_summary import sdt
