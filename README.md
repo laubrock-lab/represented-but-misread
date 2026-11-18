@@ -39,6 +39,34 @@ The stimulus texts are **not** part of this repository and never will be:
   open-weight models, with no API calls.
 - Scripts never print text content. The sanity output shows answer tokens only.
 
+## Code overview
+
+The manuscript sources are in `paper/draft/` (build: `cd paper && bash build_draft.sh`).
+Every number in the manuscript is written by one of the scripts below into `outputs/`
+(not part of the repository, because the per-text files of the authorship corpora carry
+identifiers of unpublished texts). The public part, the negated statements, can be rerun
+with `reproduce/negation.sh`; see `reproduce/README.md`.
+
+| Step | Script | What it does | Manuscript |
+|---|---|---|---|
+| Answers | `judge_logits.py`, `config.py` | Prompts, log-odds of the two answer words (dv), activations at the last position and averaged over the text positions | 2.3 |
+| Signal detection | `sdt_summary.py`, `contrasts.py`, `meta_multilevel.R`, `meta_prompts.R`, `promptvar_summary.py` | d′ from the area under the ROC curve, criterion, grouped bootstrap, contrasts between checkpoints, family-level tests | 2.4, 3.1, 3.2 |
+| Base rate | `sdt_invariance.py`, `base_rate_shift.py`, `base_rate_scale.py` | Invariance of d′ and c under bias manipulations; shift of dv with the stated share of AI texts | 3.3, Appendix F |
+| Readout probes | `probe_layers.py` (`_make_probe`, `_fit_probe`, `cv_logits`) | The linear probe: standardization, principal component rotation, L2-regularized logistic regression with the penalty chosen by inner grouped cross-validation; out-of-fold scores with whole source groups held out; label-shuffle control | 2.5, 3.1 |
+| Probe transfer | `probe_transfer.py` (between corpora), `checkpoint_transfer.py` (between base and post-trained model), `checkpoint_transfer_last_summary.py` | A probe fitted on one corpus or checkpoint and tested on another | 3.1, 3.5 |
+| Baselines | `baselines.py`, `editlens_score.py` | n-gram and surface classifiers, input-embedding probe, external detector | 2.5, 3.1 |
+| Few-shot | `fewshot_summary.py` | Labeled examples in the prompt | 2.6, 3.2 |
+| Lens model | `lens_model.py`, `cue_lens_chats.py`, `segment_features.py`, `lens_opspam.py` | Lens model equation on interpretable text properties | Appendix B |
+| Stitching | `stitch.py`, `stitch_summary.py` | Lower layers of one checkpoint under the upper layers of another | 2.7, 3.4 |
+| Patching | `patch_positions.py`, `localization_summary.py`, `patch_sweep_summary.py` | Exchange of internal states between checkpoints at sets of prompt positions, at one layer or across layers | 2.7, 3.4, 3.6 |
+| Steering | `steer_logits.py`, `steer_nulls_analysis.py`, `steer_cache_check.py` | Shift of the state at the last position along the class direction, with control directions | Appendix D |
+| Similarity | `cka.py` | Linear CKA between checkpoints | 3.4 |
+| Truth and review judgments | `factuality.py`, `truth_stages.py`, `truth_variant_answers.py`, `truth/*.py`, `review_convergence.py` | Answers and probes (logistic regression, C = 0.01, last position, two thirds of the depth) for the public statement and review sets | 2.8, 3.6, Appendix C |
+| Fine-tuning data | `sft_check.py` | Pattern search in the published fine-tuning mixtures | 3.6 |
+| Training study | `training_study/` | Data preparation, LoRA fine-tuning, evaluation, contrasts, formality check, prediction test | 2.9, 3.7 |
+| Figures | `plots/` | All figures from tidy tables without text content | |
+| Cluster jobs | `slurm/`, `local/` | Job scripts that record the arguments of every run | |
+
 ## Setup
 
 ```bash
