@@ -124,13 +124,18 @@ def main() -> None:
                 transfer_hi=float(np.nanquantile(boot_t, .975)) if boot_t and ok else np.nan,
                 shift=float(np.abs(s_patch - s_none).mean()), p_mass=float(g.p_mass.mean())))
 
-    res = pd.DataFrame(rows).sort_values(["corpus", "preset", "recipient", "donor", "layer", "set"])
+    res = pd.DataFrame(rows)
+    # the prompt variant comes from the file-name suffix ("" = default layout, e.g. "sfirst"
+    # for the statement-first truth prompt); it is a key, not a detail: rows of different
+    # layouts must never be pooled
+    res["variant"] = res["variant"].replace("", "default")
+    res = res.sort_values(["corpus", "preset", "variant", "recipient", "donor", "layer", "set"])
     out = args.out or (args.in_dir / "patch_sweep_summary.csv")
     res.to_csv(out, index=False)
     with pd.option_context("display.width", 220, "display.max_columns", None,
                            "display.max_rows", 400, "display.float_format", "{:.2f}".format):
-        print(res[["corpus", "preset", "recipient", "donor", "layer", "set", "n", "d", "lo", "hi",
-                   "d_recipient", "d_donor", "transfer"]].to_string(index=False))
+        print(res[["corpus", "preset", "variant", "recipient", "donor", "layer", "set", "n",
+                   "d", "lo", "hi", "d_recipient", "d_donor", "transfer"]].to_string(index=False))
     print(f"\n-> {out}")
 
 

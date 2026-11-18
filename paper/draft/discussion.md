@@ -187,8 +187,8 @@ weights in the early layers, where the question begins to select information fro
 text, and was fully located in the question positions by the middle of the network.
 
 The sweep over layers for the negated statements qualifies this picture. In Apertus, the
-repair arose at the positions after the statement, as the picture of a changed reader
-suggests. In OLMo 2, it arose in the states of the statement itself at layers 10 to 14, and
+repair arose at the positions after the statement (the answer instruction and cue), as the
+picture of a changed reader suggests. In OLMo 2, it arose in the states of the statement itself at layers 10 to 14, and
 the upper layers of the base model read these states correctly; here, supervised fine-tuning
 changed what is read, and the reader of the base model was adequate. Note that in the
 prompt for the truth judgments the question precedes the statement, so that the statement

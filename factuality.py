@@ -33,6 +33,12 @@ Usage
     python factuality.py --statements S.py --out-dir D --presets gemma3-4b \
         --adapter D/adapters/<run>/ckpt-<step> --tag <name>
     python factuality.py --statements S.py --out-dir D --analyze-only
+    python factuality.py --statements truth/cities_statements.py --out-dir outputs/truth_cities \
+        --presets olmo2-7b --prompt-variant sfirst     # -> *_raw_tf_sfirst.csv, summary_sfirst.csv
+
+Prompt variants (raw format): --prompt-variant default|sfirst, see RAW_VARIANTS. The
+variant is part of every output file name (suffix _<variant>), so runs of different
+layouts live side by side in one output directory; the default keeps the old names.
 """
 
 from __future__ import annotations
@@ -63,6 +69,48 @@ USER = ("Is the following statement true or false?\n\n"
         "Statement: {s}\n\n"
         "Answer with exactly one word: {opts}.")
 CONDITIONS = [("base", "raw")] + [(v, f) for v in ("sft", "rl", "dpo", "instruct") for f in ("raw", "chat")]
+
+# ---------------------------------------------------------------------------
+# Raw prompt variants (completion format only; the chat format is unaffected).
+# "default": the question precedes the statement, so the statement is read with the
+# task already known and the positions after it hold only the answer cue.
+# "sfirst": the statement comes first and the question follows it, so the positions
+# after the statement carry the question. Answer words, candidate sets and scoring
+# are identical in both. Selected with --prompt-variant; output file names get the
+# suffix "_<variant>" (the default variant keeps the existing names).
+# ---------------------------------------------------------------------------
+RAW_SFIRST = ("Statement: {s}\n\n"
+              "Is this statement true or false?\n\n"
+              "Answer with one word ({opts}).\n"
+              "Answer:")
+RAW_VARIANTS = {"default": None, "sfirst": RAW_SFIRST}   # None = the set's own RAW
+# first characters of the question line, for the "question" position set of
+# patch_positions.py; None = this variant has no question line after the statement
+QUESTION_MARKERS = {"default": None, "sfirst": "Is this statement true or false?"}
+PROMPT_VARIANT = "default"
+
+
+def set_prompt_variant(name: str) -> None:
+    """Switch the raw template globally (build_prompt reads raw_template())."""
+    global PROMPT_VARIANT
+    if name not in RAW_VARIANTS:
+        raise SystemExit(f"unknown prompt variant {name!r} (have: {', '.join(RAW_VARIANTS)})")
+    PROMPT_VARIANT = name
+
+
+def raw_template() -> str:
+    """Default variant: RAW, i.e. whatever the statement set put there (apply_set_overrides);
+    any other variant: its own template."""
+    return RAW if PROMPT_VARIANT == "default" else RAW_VARIANTS[PROMPT_VARIANT]
+
+
+def variant_suffix() -> str:
+    """File-name suffix of the active prompt variant ("" for the default)."""
+    return "" if PROMPT_VARIANT == "default" else f"_{PROMPT_VARIANT}"
+
+
+def question_marker() -> str | None:
+    return QUESTION_MARKERS[PROMPT_VARIANT]
 
 
 def load_statements(path: Path) -> ModuleType:
@@ -112,7 +160,7 @@ def truth_items(corpus: str, limit_pairs: int | None = None) -> pd.DataFrame:
 def build_prompt(tok, s: str, fmt: str, order: str) -> tuple[str, bool]:
     opts = " or ".join(ORDERS[order])
     if fmt == "raw":
-        return RAW.format(s=s, opts=opts), True
+        return raw_template().format(s=s, opts=opts), True
     return chat_prompt(tok, USER.format(s=s, opts=opts)), False
 
 
@@ -181,15 +229,16 @@ def load_condition(preset: str, variant: str, device: str, adapter: Path | None 
 def run_model(preset: str, variant: str, fmts: list[str], df: pd.DataFrame, out: Path,
               device: str, gen_n: int, adapter: Path | None = None, tag: str | None = None) -> None:
     label = tag or variant
+    sfx = variant_suffix()
     todo = [(f, o) for f in fmts for o in ORDERS
-            if not (out / f"{preset}_{label}_{f}_{o}.csv").exists()]
+            if not (out / f"{preset}_{label}_{f}_{o}{sfx}.csv").exists()]
     if not todo:
         return
     tok, model = load_condition(preset, variant, device, adapter)
     model_id = config.MODEL_PRESETS[preset][variant] + (f"+{adapter}" if adapter else "")
     cands, eow = candidate_seqs(tok), {}
     for fmt, order in todo:
-        stem = f"{preset}_{label}_{fmt}_{order}"
+        stem = f"{preset}_{label}_{fmt}_{order}{sfx}"
         want_acts = order == "tf"
         rows, acts, t0 = [], [], time.time()
         for r in df.itertuples(index=False):
@@ -226,13 +275,13 @@ def eq_var_d(score: np.ndarray, y: np.ndarray) -> float:
     return float((t.mean() - f.mean()) / np.sqrt((t.var(ddof=1) + f.var(ddof=1)) / 2))
 
 
-def judgment_files(out: Path) -> list[Path]:
-    return [f for f in out.glob("*.csv") if f.stem.endswith(("_tf", "_ft"))
+def judgment_files(out: Path, sfx: str = "") -> list[Path]:
+    return [f for f in out.glob("*.csv") if f.stem.endswith((f"_tf{sfx}", f"_ft{sfx}"))
             and not f.name.startswith("steer")]
 
 
-def output_level(out: Path, n_boot: int) -> pd.DataFrame:
-    df = pd.concat([pd.read_csv(f) for f in judgment_files(out)])
+def output_level(out: Path, n_boot: int, sfx: str = "") -> pd.DataFrame:
+    df = pd.concat([pd.read_csv(f) for f in judgment_files(out, sfx)])
     keys = ["preset", "variant", "fmt"]
     avg = (df.groupby(keys + ["item_id", "pair_id", "topic", "is_true"], as_index=False)
              .agg(dv=("dv", "mean"), p_mass=("p_mass", "mean")))
@@ -252,12 +301,12 @@ def output_level(out: Path, n_boot: int) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def probe_curves(st: ModuleType, out: Path) -> pd.DataFrame:
+def probe_curves(st: ModuleType, out: Path, sfx: str = "") -> pd.DataFrame:
     meta = items(st).set_index("item_id")
     controls = [t for t in st.TOPICS if t != st.TARGET]
     rows = []
-    for f in sorted(out.glob("*_tf_acts.npz")):
-        cond = f.name[: -len("_tf_acts.npz")]
+    for f in sorted(out.glob(f"*_tf{sfx}_acts.npz")):
+        cond = f.name[: -len(f"_tf{sfx}_acts.npz")]
         preset, variant, fmt = cond.rsplit("_", 2)
         z = np.load(f)
         m = meta.loc[z["item_id"]]
@@ -283,9 +332,10 @@ def probe_curves(st: ModuleType, out: Path) -> pd.DataFrame:
 
 
 def analyze(st: ModuleType, out: Path, n_boot: int) -> pd.DataFrame:
-    outl = output_level(out, n_boot)
-    curves = probe_curves(st, out)
-    curves.to_csv(out / "probe_curves.csv", index=False)
+    sfx = variant_suffix()
+    outl = output_level(out, n_boot, sfx)
+    curves = probe_curves(st, out, sfx)
+    curves.to_csv(out / f"probe_curves{sfx}.csv", index=False)
     keys = ["preset", "variant", "fmt"]
     sel = []
     for key, g in curves.groupby(keys + ["method"]):
@@ -298,7 +348,7 @@ def analyze(st: ModuleType, out: Path, n_boot: int) -> pd.DataFrame:
            .pivot_table(index=keys + ["topic"], columns="method", values=["probe_d", "probe_dz"]))
     sel.columns = [f"{v}_{m}" for v, m in sel.columns]
     table = outl.merge(sel.reset_index(), on=keys + ["topic"], how="left")
-    table.to_csv(out / "summary.csv", index=False)
+    table.to_csv(out / f"summary{sfx}.csv", index=False)
     pd.set_option("display.width", 200)
     cols = keys + ["topic", "out_d", "d_dv", "out_c", "bias_nats", "true_called_false",
                    "p_mass", "probe_dz_massmean", "probe_dz_logreg"]
@@ -319,6 +369,10 @@ def main() -> None:
     ap.add_argument("--generate", type=int, default=0,
                     help="also store a greedy free answer of N tokens (instruct, chat format)")
     ap.add_argument("--limit", type=int, help="smoke test: first N pairs per topic")
+    ap.add_argument("--prompt-variant", default="default", choices=list(RAW_VARIANTS),
+                    help="raw prompt layout: default = question before the statement; "
+                         "sfirst = statement first, question after it. Output names get "
+                         "the suffix _<variant> (default: unchanged names)")
     ap.add_argument("--analyze-only", action="store_true")
     ap.add_argument("--no-analyze", action="store_true")
     ap.add_argument("--n-boot", type=int, default=1000)
@@ -329,7 +383,9 @@ def main() -> None:
 
     st = load_statements(args.statements)
     apply_set_overrides(st)
-    print(f"system prompt (chat format): {SYSTEM!r}; answer words: {ORDERS['tf']}")
+    set_prompt_variant(args.prompt_variant)       # after the set overrides: a variant wins over RAW
+    print(f"system prompt (chat format): {SYSTEM!r}; answer words: {ORDERS['tf']}"
+          + (f"; prompt variant: {args.prompt_variant}" if variant_suffix() else ""))
     out = args.out_dir
     df = items(st)
     if args.limit:
@@ -345,7 +401,10 @@ def main() -> None:
                           args.adapter, args.tag)
                 continue
             for variant in args.variants:
-                fmts = [f for v, f in CONDITIONS if v == variant]
+                # the prompt variants are raw-format layouts; the chat format is identical
+                # to the default run, so it is not repeated (and not stored under the suffix)
+                fmts = [f for v, f in CONDITIONS if v == variant
+                        and (f == "raw" or not variant_suffix())]
                 run_model(preset, variant, fmts, df, out, device, args.generate)
     if not args.no_analyze:
         analyze(st, out, args.n_boot)

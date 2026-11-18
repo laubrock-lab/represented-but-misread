@@ -7,12 +7,15 @@ k (hidden_states[k] = output of decoder layer k) is stored for all prompt
 positions. The recipient model (e.g. SFT) is then run with its layer-k output
 replaced by the donor's at one set of prompt positions only:
 
-    text  the tokens of the text being judged
-    pre   the instruction before the text
-    post  everything after the text (question + "Antwort:")
-    last  the last prompt token only
-    all   all prompt positions
-    none  no patching (recipient reference)
+    text      the tokens of the text being judged
+    pre       the instruction before the text
+    post      everything after the text (question + "Antwort:")
+    question  the question line, wherever it stands (empty where the prompt has none:
+              authorship --prompt-variant qfirst puts it before the text, the truth
+              prompts have one after the statement only with --prompt-variant sfirst)
+    last      the last prompt token only
+    all       all prompt positions
+    none      no patching (recipient reference)
 
 Prediction if post-training changes the answer-side processing (not the text
 representation): patching base activations into SFT at `post` (or `last`) restores
@@ -27,6 +30,9 @@ Usage (cluster)
 Output: outputs/patch/<corpus>/<preset>_<recipient>-from-<donor>_L<k>.csv (one row per text x order x set)
 True/false judgments (prompt and scoring of factuality.py): --corpus truth:<name>
 (--limit = number of pairs); "text" = the statement, output in outputs/patch/truth_<name>/.
+With --prompt-variant sfirst the truth prompt puts the statement first and the question
+after it, so "question" is non-empty and "post" = question + answer cue; the output
+file name gets the suffix _sfirst (the default layout keeps the existing names).
 
 Layer sweep
 -----------
@@ -72,7 +78,8 @@ class Patcher:
         return (h,) + tuple(output[1:]) if isinstance(output, tuple) else h
 
 
-def prompt_positions(tok, prompt: str, add_special: bool, text: str) -> tuple[int, dict]:
+def prompt_positions(tok, prompt: str, add_special: bool, text: str,
+                     qmarker: str | None = "Frage:") -> tuple[int, dict]:
     enc = tok(prompt, add_special_tokens=add_special, return_offsets_mapping=True)
     offs = np.array(enc["offset_mapping"])
     n = len(enc["input_ids"])
@@ -81,17 +88,20 @@ def prompt_positions(tok, prompt: str, add_special: bool, text: str) -> tuple[in
     in_text = (offs[:, 0] >= start) & (offs[:, 1] <= end) & (offs[:, 1] > offs[:, 0])
     t_idx = np.where(in_text)[0]
     first, last_t = (t_idx.min(), t_idx.max()) if len(t_idx) else (n, n)
-    # the question line ("Frage: ...") wherever it stands (after the text by default, before it
-    # with --prompt-variant qfirst); occurrences inside the text itself are skipped
+    # the question line, found by its first words (authorship: "Frage: ..."; truth with
+    # --prompt-variant sfirst: "Is this statement true or false?"), wherever it stands —
+    # after the text by default, before it with --prompt-variant qfirst. Occurrences
+    # inside the text itself are skipped; qmarker=None leaves the set empty (truth
+    # prompts of the default layout, whose post-statement part is only the answer cue).
     q_idx = np.array([], int)
-    k = prompt.find("Frage:")
+    k = prompt.find(qmarker) if qmarker else -1
     while k != -1:
         if not (start <= k < end):
             q_end = prompt.find("\n", k)
             q_end = len(prompt) if q_end == -1 else q_end
             q_idx = np.where((offs[:, 0] >= k) & (offs[:, 1] <= q_end) & (offs[:, 1] > offs[:, 0]))[0]
             break
-        k = prompt.find("Frage:", k + 1)
+        k = prompt.find(qmarker, k + 1)
     pos = {"text": t_idx, "pre": np.arange(0, first), "post": np.arange(last_t + 1, n),
            "last": np.array([n - 1]), "all": np.arange(n), "none": np.array([], int),
            "question": q_idx}
@@ -113,8 +123,11 @@ def main() -> None:
     ap.add_argument("--max-text-tokens", type=int, default=2048)
     ap.add_argument("--limit", type=int)
     ap.add_argument("--device", default="auto")
-    ap.add_argument("--prompt-variant", default="default", choices=list(config.RAW_VARIANTS),
-                    help="raw template variant (authorship only); adds a suffix to the output name")
+    ap.add_argument("--prompt-variant", default="default",
+                    choices=sorted(set(config.RAW_VARIANTS) | set(F.RAW_VARIANTS)),
+                    help="raw template variant: qfirst/para for the authorship prompts, "
+                         "sfirst (statement first, question after it) for truth corpora; "
+                         "adds a suffix to the output name")
     ap.add_argument("--out-root", default="patch",
                     help="write to outputs/<root>/<corpus>/ (default: patch)")
     ap.add_argument("--self-check", action="store_true",
@@ -123,7 +136,14 @@ def main() -> None:
     ap.add_argument("--skip-existing", action="store_true",
                     help="leave layers whose output CSV already exists untouched (for restarts)")
     args = ap.parse_args()
-    config.set_prompt_variant(args.prompt_variant)
+    truth = args.corpus.startswith("truth:")
+    # the two prompt families have their own variants; pick the matching one
+    avail = F.RAW_VARIANTS if truth else config.RAW_VARIANTS
+    if args.prompt_variant not in avail:
+        ap.error(f"--prompt-variant {args.prompt_variant} is not defined for "
+                 f"{'truth corpora' if truth else 'the authorship prompts'} "
+                 f"(available: {', '.join(avail)})")
+    (F.set_prompt_variant if truth else config.set_prompt_variant)(args.prompt_variant)
 
     layers = args.layers if args.layers else ([args.layer] if args.layer is not None else None)
     if not layers:
@@ -133,7 +153,6 @@ def main() -> None:
 
     device = pick_device(args.device)
     ids = config.MODEL_PRESETS[args.preset]
-    truth = args.corpus.startswith("truth:")
     orders = tuple(F.ORDERS) if truth else ("mk", "km")
     if truth:     # true/false statements; --limit counts pairs
         texts = F.truth_items(args.corpus, args.limit)
@@ -169,7 +188,8 @@ def main() -> None:
             text = r.text if truth else truncate_text(tok, r.text, args.max_text_tokens)[0]
             for order in orders:
                 prompt, add = make_prompt(tok, text, order)
-                n, pos = prompt_positions(tok, prompt, add, text)
+                n, pos = prompt_positions(tok, prompt, add, text,
+                                          F.question_marker() if truth else "Frage:")
                 ids_t = tok(prompt, add_special_tokens=add, return_tensors="pt")["input_ids"].to(device)
                 hs = donor(input_ids=ids_t, output_hidden_states=True, use_cache=False).hidden_states
                 act = torch.stack([hs[k][0] for k in todo]).to("cpu", torch.bfloat16)

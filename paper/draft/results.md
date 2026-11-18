@@ -79,7 +79,8 @@ with a partial contribution of the layers below (outputs/stitch/stitch_neg_citie
 repair acts, we exchanged the internal states between the checkpoints at selected positions
 of the prompt (activation patching; Figure 2D). Note that in the prompt for the truth
 judgments the question precedes the statement, so that the statement is read with the task
-known, and the positions after the statement contain only the answer cue ("Answer:"). At
+known, and the positions after the statement contain no question, only the instruction to answer
+with one word and the answer cue ("Answer:"). At
 layer 16, the SFT model's states at the positions after the statement repaired the base
 model completely (OLMo 2: 0.63 → 3.26; Apertus: −0.87 → 4.15), and the base model's states
 at these positions abolished the repair in the SFT model (3.20 → 1.07; 4.15 → −1.09). In
