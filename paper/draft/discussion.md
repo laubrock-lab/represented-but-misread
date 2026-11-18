@@ -12,9 +12,10 @@ considerable variation between models, text types, and prompts, and in the two m
 stage-wise checkpoints the change occurred during supervised fine-tuning. Post-training
 also changed how strongly a stated base rate moved the answers, from less than an ideal
 observer would to more. Model stitching implicated the weights of the early layers, with the
-caveat that stitched hybrids produce effects of their own, and activation patching showed
-that, by the middle of the network, the states at the positions after the text transferred
-the change between checkpoints. A judgment on public data, the truth of negated statements,
+caveat that stitched hybrids produce effects of their own, and activation patching across layers showed
+that, from the middle of the network onward, the states at the positions after the text
+transferred the change between checkpoints and the states of the text did not; in the lower
+layers, the text states carried part of the change in Apertus and none of it in OLMo 2. A judgment on public data, the truth of negated statements,
 showed the complementary case: The truth could be decoded at ceiling in all six model
 families, the answers of several base models did not use it, and supervised fine-tuning
 repaired the answers while the probes stayed at ceiling. A sweep over layers located this
@@ -24,11 +25,13 @@ the readout in the direction their labels implied, and the item-level answers fo
 class direction of the training texts. In short, post-training changed how a judgment is
 read out of information that the models represent, in a direction that depended on the
 judgment. That this change leaves the representation of the text untouched and resides in
-how the question reads it, as our title suggests, held for the probes at the text positions
-and for one of the two models in which we could trace the repair of negation; in the other,
-the representation of the statement changed as well. Note that the localization rests on
-two model families, for authorship on single layers, and that for the deceptive reviews
-(Appendix C) it was inconclusive.
+how the question reads it, as our title suggests, held for the probes at the text positions,
+for authorship in OLMo 2, and for negation in Apertus. In the two remaining cases, the
+representation of the text changed as well: in the lower layers of Apertus for authorship,
+and at mid-depth in OLMo 2 for negation. What all four cases share is that, by the middle
+of the network, the change resided at the positions after the text. Note that the
+localization rests on two model families, and that for the deceptive reviews (Appendix C)
+it was inconclusive.
 
 ## Relation to previous work
 

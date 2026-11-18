@@ -91,7 +91,17 @@ inserted into the SFT model; orange: SFT model's states inserted into the base m
 bootstrap confidence intervals. Patching at layer 8 (more mixed; text positions
 contribute somewhat) is shown in Supplementary Figure S1.
 
-**Figure 6 (`fig_negation`).** Negated statements: where supervised fine-tuning repairs the
+**Figure 6 (`fig_authorship_sweep`).** Authorship: activation patching across layers
+(textbook summaries, 238 texts; error bars: 95% grouped-bootstrap confidence intervals).
+Sensitivity (d′) of the recipient checkpoint after its residual stream was replaced by the
+donor's at one set of positions and one layer: the tokens of the text, the question and
+answer cue after the text, the final position only, or all positions. Horizontal lines show
+the unpatched recipient (dotted) and the donor (dashed). In OLMo 2, the text states had no
+effect at any layer; in Apertus, they carried part of the difference between the
+checkpoints up to layer 12. From layer 14 onward, the states after the text carried it in
+both models. Hybrids can lie outside the range of the two checkpoints.
+
+**Figure 7 (`fig_negation`).** Negated statements: where supervised fine-tuning repairs the
 readout (300 statement pairs; error bars: 95% grouped-bootstrap confidence intervals). (A)
 Model stitching: sensitivity (d′) of the answers of hybrids that take the first ℓ layers
 from one checkpoint and all layers above from the other; horizontal lines show the

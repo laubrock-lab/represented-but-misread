@@ -368,6 +368,35 @@ OLMo 2 the change accumulates up to about layer 14. Thus, at the middle of the n
 exchanging the states at the positions after the text (question and answer cue) transferred
 the difference, and exchanging the text states did not.
 
+Patching at two layers can miss a contribution that is confined to other layers, as the
+negated statements show (Section 3.6). We therefore repeated the patching on the textbook
+summaries at 12 layers between 2 and 32 (Figure 6; outputs/patch_sweep/patch_sweep_summary.csv).
+In OLMo 2, the text states did not transfer the difference at any layer, in either
+direction: The base model with the SFT model's text states stayed between −0.17 and −0.05
+(unpatched −0.12), and the SFT model with the base model's text states between −0.61 and
+−0.44 (unpatched −0.50). The states after the text transferred the difference from layer 12
+onward (base model with SFT states: −0.50 at layer 12 and −0.59 at layer 14; SFT model with
+base states: −0.02 at layer 14). Below layer 12, only the exchange of all positions had a
+clear effect (e.g., −0.48 for the base model at layer 6), so that in the lower layers the
+difference was not carried by any single set of positions. In Apertus, in contrast, the
+text states carried part of the difference in the lower half of the network: With the SFT
+model's text states, the base model fell from 0.43 to 0.21–0.33 at layers 2 to 12 (22–46%
+of the difference between the checkpoints), and with the base model's text states, the SFT
+model rose from −0.04 to 0.10–0.26 at layers 4 to 12 (30–64%); the bootstrap interval of
+the transferred share excluded zero at layers 6 to 12 in the first direction and at layers
+4, 8, 10, and 12 in the second. From layer 14 onward, the text states had no effect in
+either direction. The SFT model's states after the text lowered the base model from layer 4
+onward, by more than the whole difference between the checkpoints (e.g., to −0.48 at layer
+12, compared with −0.04 for the SFT model), which again shows that hybrids produce effects
+of their own; in the other direction, the base model's states after the text restored the
+SFT model partly at layers 6 to 12 (0.09–0.31) and fully from layer 14 onward (0.61). Because the text
+precedes the question in this prompt, the contribution of the text states in Apertus
+cannot be specific to the judgment; it reflects a change in how the lower layers encode
+the text in general, in line with the stitching result that implicated layers 3 to 8 in
+this model. Thus, from layer 14 onward the difference between the checkpoints was carried
+by the positions after the text in both models; below, the text states contributed in
+Apertus, but not in OLMo 2.
+
 Note that in our prompt the text precedes the question, so that its states are computed
 before the question is read, and a change that is specific to the judgment can only
 appear at the question positions. We therefore repeated the patching with the question
@@ -424,9 +453,9 @@ essentially unchanged where the test is informative, and both reorganized and, i
 models, degraded the information available at the answer position.
 
 In summary, for authorship the information was represented, the probes at the text
-positions changed little with post-training, and the states at the positions after the text
-transferred the change between checkpoints at layer 16. Note that this localization rests
-on two layers; TODO(authorship sweep).
+positions changed little with post-training, and from the middle of the network onward the
+states at the positions after the text transferred the change between checkpoints. In the
+lower layers, the text states contributed to the change in Apertus, but not in OLMo 2.
 
 ## 3.6 A reproducible case with the opposite direction: negated statements
 
@@ -498,7 +527,7 @@ several base models did not reflect it. Post-training thus changed the answers w
 fell short of what was represented, not where they were limited by what the model knows.
 
 Where does the repair arise? We combined the lower layers of one checkpoint with the upper
-layers of the other (model stitching; Section 2.7, Figure 2C; results in Figure 6A). Stitching located the repair in the middle of the network
+layers of the other (model stitching; Section 2.7, Figure 2C; results in Figure 7A). Stitching located the repair in the middle of the network
 rather than in the early layers. In OLMo 2, the first 8 base layers combined with all
 upper SFT layers still judged at the level of the SFT model (d′ = 3.76; base 0.63, SFT
 3.20 in this subset of 300 pairs), whereas the first 16 base layers abolished the
@@ -519,12 +548,12 @@ Apertus, the final position alone carried the full effect in one direction (base
 the SFT model's final state: 4.15). Exchanging the states of the statement itself had no
 effect in Apertus and in the SFT model of OLMo 2, but a partial one in the OLMo 2 base
 model (0.63 → 1.51). At layer 8, the SFT model's states after the statement repaired the
-base models only partly (Apertus: 1.61; OLMo 2: 1.07; Figure 6B), in line with the
+base models only partly (Apertus: 1.61; OLMo 2: 1.07; Figure 7B), in line with the
 stitching result that the repair is not complete at this depth. Exchanging the states of
 the instruction and question before the statement had no effect at either layer.
 
 Patching at two layers cannot show where the repair first appears. We therefore repeated
-the patching at 12 layers between 2 and 32, with 100 statement pairs (Figure 6C;
+the patching at 12 layers between 2 and 32, with 100 statement pairs (Figure 7C;
 outputs/patch_sweep/patch_sweep_summary.csv; on this subset, d′ = 0.34 for the OLMo 2 base
 model and 3.09 for its SFT model, and −0.86 and 3.64, the maximum for 100 pairs, for
 Apertus). We express each effect as the share of the difference between the two

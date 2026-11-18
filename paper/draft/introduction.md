@@ -140,8 +140,9 @@ test whether the training signal sets the direction of the readout. We find that
 authorship information was readily available but that the models' answers did not use it,
 and that post-training lowered the sensitivity of the answers on average. In the two models
 with stage-wise checkpoints, the weights that carried this change resided in the early
-layers, and by mid-depth the states at the positions after the text transferred it between
-checkpoints. For negated statements, post-training acted in the opposite direction: It
+layers, and a sweep over layers showed that from mid-depth onward the states at the
+positions after the text, and not those of the text, transferred it between checkpoints;
+below mid-depth, the text states contributed in one of the two models. For negated statements, post-training acted in the opposite direction: It
 repaired answers that several base models gave poorly although the truth could be decoded
 at ceiling, through weights in the middle layers; the repair arose at the positions after
 the statement in one model and in the representation of the statement itself in the other.

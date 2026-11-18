@@ -28,9 +28,10 @@ sensitivity of the answers on average (Δd′ = −0.34 across model families; �
 prompt wordings). It also changed the use of a stated base rate: Base models shifted their
 answers less than an ideal observer would, most post-trained models more. In two models with
 stage-wise checkpoints, the change occurred during supervised fine-tuning, model stitching
-implicated the early layers, and exchanging internal states at mid-depth transferred the
-change with the states at the positions after the text. Because our corpora cannot be
-shared, we add a case that can be reproduced from public data, the truth of negated
+implicated the early layers, and from mid-depth onward the internal states at the positions
+after the text, not those of the text, transferred the change between checkpoints (below
+it, the text states contributed in one model). Because our corpora cannot be
+shared, we add a case reproducible from public data, the truth of negated
 statements. Here, post-training acted in the opposite direction: Probes decoded truth
 perfectly in every model, the answers of several base models did not use it, and fine-tuning
 repaired them, at the positions after the statement in one model and in the representation
