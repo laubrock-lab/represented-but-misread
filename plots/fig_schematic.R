@@ -32,7 +32,7 @@ grid_panel <- function(fill_fun, title) {
     annotate("text", x = -0.35, y = (L + 1) / 2, label = "layer", angle = 90, size = 2.4, colour = INK) +
     # answer read-out
     annotate("segment", x = 15, xend = 15, y = L + 0.45, yend = L + 0.95, colour = INK, linewidth = 0.35, arrow = arr(0.05)) +
-    annotate("text", x = 15, y = L + 1.35, label = "“Mensch” or “KI”?", size = 2.3, colour = INK) +
+    annotate("text", x = 15, y = L + 1.35, label = "“human” or “AI”?", size = 2.3, colour = INK) +
     coord_cartesian(xlim = c(-0.6, 17), ylim = c(-1.0, L + 1.6), clip = "off") +
     labs(title = title) + theme_void(base_size = 8.5) +
     theme(plot.title = element_text(face = "bold", size = 8.5, hjust = 0),
@@ -61,8 +61,8 @@ u <- c(ma$x - mh$x, ma$y - mh$y); u <- u / sqrt(sum(u^2))
 p0 <- c(-0.55, 0.75); p1 <- p0 + 1.25 * u
 pB <- ggplot(pts, aes(x, y)) +
   geom_abline(intercept = 0.05, slope = -1.4, colour = INK, linetype = "dashed", linewidth = 0.35) +
-  annotate("text", x = -1.75, y = 2.05, label = "model answers\n“Mensch”", size = 2.2, colour = INK, lineheight = 0.9) +
-  annotate("text", x = 1.75, y = -1.75, label = "model answers\n“KI”", size = 2.2, colour = INK, lineheight = 0.9) +
+  annotate("text", x = -1.75, y = 2.05, label = "model answers\n“human”", size = 2.2, colour = INK, lineheight = 0.9) +
+  annotate("text", x = 1.75, y = -1.75, label = "model answers\n“AI”", size = 2.2, colour = INK, lineheight = 0.9) +
   geom_point(aes(shape = cls, colour = cls), size = 1.3, stroke = 0.4) +
   annotate("segment", x = mh$x, y = mh$y, xend = ma$x, yend = ma$y, colour = DARK, linewidth = 0.7, arrow = arr(0.07)) +
   annotate("label", x = 0.55, y = -0.62, label = "AI–human direction", size = 2.2, colour = DARK,
