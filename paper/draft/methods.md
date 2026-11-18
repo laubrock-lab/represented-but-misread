@@ -20,8 +20,9 @@ only that the message should sound natural, spontaneous, and everyday, as in a r
 group chat rather than an essay. The style-matched prompt additionally provided the
 other messages of the same student, on other topics, as style references (tone,
 sentence length, directness, colloquialism, punctuation, spontaneity). Finally, each
-style-matched message was revised according to the students' written feedback on what
-still sounded AI-like ("optimized"). The students' messages and their feedback cannot be shared, because the students have not
+style-matched message was revised according to written feedback on what
+still sounded AI-like, which the students gave on messages that they had not written
+themselves ("optimized"). The students' messages and their feedback cannot be shared, because the students have not
 yet been asked for consent to publication; the prompts are therefore described here and
 not reproduced verbatim (TODO(prompts): add the templates to the repository if released). Because AI and human
 messages differed considerably in length, we truncated every message to its first 25 words and discarded shorter
@@ -46,8 +47,8 @@ articles (leave-one-out). GPT-5.4 then wrote an article of the same length and
 paragraph count that incorporated all key facts, either from the topic and facts alone
 ("naive") or additionally following the style profile ("style-matched"); both prompts
 instructed the model not to reveal AI authorship. The style-matched articles were
-finally revised to avoid nine surface features that participants of pilot runs had
-identified as AI markers (e.g., dashes, lists of exactly three items, "not only … but
+finally revised to avoid nine surface features that the students of the lab course had
+identified as AI markers in a sample of the articles (e.g., dashes, lists of exactly three items, "not only … but
 also" constructions, effusive closing sentences, uniform paragraph lengths, too few
 numbers; "optimized"). We used the 103
 segments (38 human, 65 AI) from 14 articles that had been presented in a human judgment
