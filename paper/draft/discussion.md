@@ -187,6 +187,20 @@ Duncan, 1995). It is instructive to see that the effect of post-training, too, i
 weights in the early layers, where the question begins to select information from the
 text, and was fully located in the question positions by the middle of the network.
 
+The layer-by-position sweep adds a further distinction. In OLMo 2, post-training changed
+not only the readout but also the text representation: The SFT model's text states at
+layers 12–14 transferred 82% of the repair, an effect that vanished at layers below 10 and
+above 16. In Apertus, by contrast, the text states contributed at most 23% and their
+replacement caused no disruption in the reverse direction. The post-text readout change
+generalized across architectures; the text-representation change did not. It is plausible
+that the difference reflects the post-training recipes — different training objectives or
+data may distribute the gradient signal differently across positions and layers — or that
+the base models differ in how readily their text representations can be read by the
+post-trained readout, so that one requires an adaptation of both the reader and the text,
+while the other requires only the reader. Cross-model patching, in which the text states of
+one model family are combined with the readout of another through a learned adapter, might
+distinguish these accounts.
+
 The parallel to human judges is equally instructive. Human readers fail to recognize AI
 text because they rely on cues that are plausible but invalid (Jakesch et al., 2023;
 Rosin & Laubrock, in preparation),

@@ -106,6 +106,16 @@ Post-training changed not only the reader but also what is being read, and the c
 confined to the layers where the reading takes place. The final position alone carried the
 full effect only from layer 20 onward (transfer 0.89).
 
+The same sweep in Apertus 1.5 replicated the post-text localization: Transfer through the
+post-text states began at layer 6 (0.46), reached ceiling at layer 10 (0.96), and remained
+there through layer 32 — an earlier onset than in OLMo 2 but the same qualitative pattern.
+In the reverse direction, replacing the SFT model's post-text states with the base model's
+disrupted d′ progressively from layer 10 onward. The text-state inverted-U, however, was
+weaker: a peak of 0.20–0.23 at layers 12–14, compared with 0.82 at layer 12 in OLMo 2, and
+no disruption at all when the SFT model's text states were replaced with the base model's
+(transfer ≈ 0.00 at every layer). The readout change thus generalized across architectures;
+the additional change in the text representation did not.
+
 Steering at the answer position was consistent with a readout that uses the represented
 truth direction after SFT; as explained in Appendix D, this is a consistency check rather
 than an independent test. Shifting
