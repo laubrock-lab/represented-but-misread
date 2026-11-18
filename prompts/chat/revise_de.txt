@@ -1,0 +1,27 @@
+$chat_setting
+
+Aufgabe:
+Überarbeite den bestehenden Entwurf zum Thema "$topic" auf Basis des menschlichen Feedbacks.
+
+Bisheriger Entwurf:
+$previous_draft
+
+Menschliches Feedback:
+$feedback_text
+
+Zur Erinnerung: Die folgenden Referenznachrichten stammen von derselben Person und dienen
+weiterhin nur als Stilvorlage.
+
+$style_references
+
+Anforderungen:
+- Setze das Feedback so konkret wie möglich um.
+- Behalte das Thema bei.
+- Bleibe stilistisch nah an den Referenznachrichten.
+- Bleibe bei einer einzelnen Nachricht, nicht bei einem Dialog.
+- Keine Meta-Kommentare, keine Erklärungen über den Schreibprozess.
+- Keine Hashtags. Emojis nur, wenn sie wirklich natürlich wirken.
+- Länge: $length_hint.
+
+Gib nur die überarbeitete Nachricht aus.
+

@@ -23,8 +23,8 @@ sentence length, directness, colloquialism, punctuation, spontaneity). Finally, 
 style-matched message was revised according to written feedback on what
 still sounded AI-like, which the students gave on messages that they had not written
 themselves ("optimized"). The students' messages and their feedback cannot be shared, because the students have not
-yet been asked for consent to publication; the prompts are therefore described here and
-not reproduced verbatim (TODO(prompts): add the templates to the repository if released). Because AI and human
+yet been asked for consent to publication; the prompt templates, which contain placeholders only, are included in the project
+repository (`prompts/`). Because AI and human
 messages differed considerably in length, we truncated every message to its first 25 words and discarded shorter
 messages. The resulting corpus comprised 300 texts (61 human, 239 AI) from 61 groups. We verified the
 labels of this corpus: All human messages are verbatim the students' submissions, all AI
@@ -50,7 +50,9 @@ instructed the model not to reveal AI authorship. The style-matched articles wer
 finally revised to avoid nine surface features that the students of the lab course had
 identified as AI markers in a sample of the articles (e.g., dashes, lists of exactly three items, "not only … but
 also" constructions, effusive closing sentences, uniform paragraph lengths, too few
-numbers; "optimized"). We used the 103
+numbers; "optimized"). The templates for the extraction and writing steps are included in
+the project repository; the revision prompt, which contains the students' list of features,
+is not. We used the 103
 segments (38 human, 65 AI) from 14 articles that had been presented in a human judgment
 experiment, each preceded by its headline and subheadline, as in that experiment.
 These texts are confidential and were processed only on university machines.

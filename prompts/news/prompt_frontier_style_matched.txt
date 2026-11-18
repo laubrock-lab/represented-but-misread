@@ -1,0 +1,24 @@
+========== SYSTEM PROMPT ==========
+You are a skilled writer who can adapt your style to closely match that of a specific author. Your task is to write a text on a given topic in the described author's style. Follow the constraints exactly — length, paragraph count, and genre must match the specifications. Do not indicate that the text was written by an AI. Do not reproduce sentences from the source material.
+
+========== USER PROMPT TEMPLATE ==========
+Write a {GENRE_DESCRIPTION} on the topic described below, adopting the author style profile provided.
+
+Constraints — follow these precisely:
+- Length: approximately {TARGET_LENGTH_WORDS} words
+- Paragraphs: exactly {PARAGRAPH_COUNT} paragraphs (separate each paragraph with a blank line)
+- Do not reproduce any sentences or phrases from the source material
+- Do not signal or indicate AI authorship in any way
+- Naturally incorporate all of the key facts listed below
+- Adopt the described author style throughout; prioritise natural, coherent writing over mechanical imitation of every feature
+
+Topic summary:
+{TOPIC_SUMMARY}
+
+Key facts to incorporate:
+{KEY_FACTS}
+
+Author style profile:
+{STYLE_PROFILE}
+
+Write the text now. Output the text only — no preamble, no title unless it is part of the genre, no explanation.

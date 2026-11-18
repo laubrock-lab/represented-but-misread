@@ -1,0 +1,15 @@
+$chat_setting
+
+Aufgabe:
+Schreibe genau eine neue Nachricht zum Thema "$topic".
+
+Anforderungen:
+- Die Nachricht soll natürlich, spontan und alltagsnah klingen.
+- Schreibe wie in einem echten Gruppenchat, nicht wie in einem Aufsatz.
+- Bleibe bei einer einzelnen Nachricht, nicht bei einem Dialog.
+- Keine Meta-Kommentare, keine Erklärungen über den Schreibprozess.
+- Keine Hashtags. Emojis nur, wenn sie wirklich natürlich wirken.
+- Länge: $length_hint.
+
+Gib nur die Nachricht aus.
+
