@@ -88,6 +88,19 @@ the SFT model's states after the statement repaired the base models only partly 
 1.61; OLMo 2: 1.07; Figure 3B), in line with the stitching result that the repair is not
 complete at this depth.
 
+A patching sweep across all layers of OLMo 2 (layers 2 to 32, 100 statement pairs;
+outputs/patch_sweep/patch_sweep_summary.csv) confirmed and extended this localization.
+Transfer of the repair through the positions after the statement began at layer 10
+(transfer fraction 0.36) and was essentially complete at layer 16 (0.97), consistent with
+the stitching zone. The statement states showed a different profile: negligible transfer at
+layers 2 to 8, a peak at layer 12 where the SFT model's statement representation alone
+transferred 82% of the repair (d′ = 2.59; base unpatched 0.34), then a decline to 33% at
+layer 16 and zero from layer 20. The reverse direction confirmed this pattern: replacing the
+SFT model's statement states with the base model's at layer 12 reduced d′ from 3.09 to
+1.38. At mid-depth, post-training thus changed the text representation itself; by layer 16,
+the relevant information had moved to the positions after the statement. The final position
+alone carried the full effect only from layer 20 onward (transfer 0.89).
+
 Steering at the answer position was consistent with a readout that uses the represented
 truth direction after SFT; as explained in Appendix D, this is a consistency check rather
 than an independent test. Shifting
@@ -107,7 +120,7 @@ supervised fine-tuning repaired the readout, through weights in the middle layer
 states at the positions after the statement. Note that the localization rests on the two
 models with stage-wise checkpoints whose base models misread negation; the Gemma 3 base
 models showed the same change of the answers, but with low answer probability, and two
-base models had nothing to repair. TODO(sweep): layer-by-position patching for OLMo 2.
+base models had nothing to repair.
 
 ## 3.2 Authorship: the information is available, but the answers do not use it
 
