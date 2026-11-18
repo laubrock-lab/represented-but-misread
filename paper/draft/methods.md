@@ -62,7 +62,8 @@ are described in Section 2.8.
 ## 2.2 Models
 
 We studied six open-weight base models with 4 to 12 billion parameters from four
-developers (Table 1). For each base model, we compared the pretrained model with its final
+developers (Table 1): Gemma 3 [@gemma2025gemma3], Qwen3 [@yang2025qwen3], OLMo 2
+[@olmo2024olmo2], OLMo 3 [@olmo2025olmo3], and Apertus [@apertus2025; @apertus2026v15]. For each base model, we compared the pretrained model with its final
 post-trained version. For three base models, the developers released checkpoints
 after each stage of post-training, which allowed us to follow the change step by step:
 OLMo 2 7B (base, supervised fine-tuning [SFT], direct preference optimization [DPO],
@@ -235,7 +236,14 @@ representation of the text from the processing of the question, we ran the donor
 after layer k at all prompt positions, and then ran the recipient checkpoint with its
 residual stream replaced by the donor's at a selected set of positions: the tokens of the
 text, the instruction before the text, the question and answer cue after the text, the
-final position only, or all positions.
+final position only, or all positions. For the negated statements, we additionally repeated
+the exchange at 12 layers (2 to 16 in steps of 2, then 20, 24, 28, and 32) with the first 100
+statement pairs, and expressed each effect as the share of the difference in d′ between the
+two unpatched checkpoints that the exchange transferred. These runs for OLMo 2 used NVIDIA
+V100 GPUs; in half precision, their scores differed slightly from those obtained on A100
+GPUs (unpatched condition: largest difference 0.10 nats per item, r > .998;
+outputs/patch/sweep_check.csv), so that the sweep is compared only with its own unpatched
+conditions.
 
 ## 2.8 Two further judgments
 

@@ -57,7 +57,10 @@ unstitched base (dotted) and SFT (dashed) checkpoints. (B) Activation patching a
 and 16: d′ of the recipient checkpoint after its residual stream was replaced by the
 donor's at one set of positions (the statement, the instruction before it, the question
 and answer cue after it, the final position only, or all positions); dotted lines show the
-unpatched recipients.
+unpatched recipients. Note that in the truth prompt the question precedes the statement,
+so that the positions after the statement contain only the answer cue. (C) The same
+exchange at 12 layers (100 statement pairs): share of the difference between the two
+checkpoints that the exchange transferred (values below 0 and above 1 are clipped).
 
 **Figure 4 (`fig1_information_vs_answers`).** The authorship information is available but
 not used. Sensitivity (d′) for separating AI from human texts in the three corpora.

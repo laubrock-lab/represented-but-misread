@@ -545,9 +545,12 @@ upper layers showed no deficit). Probes still transferred partially at this posi
 (mean d′ in the upper third up to 2.4, but near zero for Gemma 3 4B on the newspaper
 segments), so the readout position was reorganized rather than replaced. Probes trained
 within each checkpoint continued to decode the information at the last position, but in
-some models less well after post-training (e.g., Gemma 3 4B on the newspaper segments,
-upper third: d′ = 2.40 in the base and 1.88 in the final model; OLMo 3 Think on the
-textbook summaries: 3.72 and 3.03). Post-training thus left the text positions
+four of the six families less well after post-training on at least one corpus (upper third
+of the network, final vs. base model: Gemma 3 4B, −0.52 on the newspaper segments and −0.90
+on the textbook summaries; Gemma 3 12B, −0.57 and −0.47; OLMo 3 Think, −0.41 and −0.70;
+Qwen3, −0.38 on the textbook summaries). In Apertus, the change was mixed (chats −0.26,
+newspaper segments +0.43), and in OLMo 2 there was no decline
+(checkpoint_transfer_last_summary.py). Post-training thus left the text positions
 essentially unchanged where the test is informative, and both reorganized and, in some
 models, degraded the information available at the answer position.
 
@@ -608,7 +611,8 @@ Because the background condition C0 did not learn to answer with the two answer 
 whereas the three conditions with authorship examples did, we compared each condition with
 three baselines: C0; C3, the condition with random labels, which learned the question and
 the answer words but no valid mapping; and C4, which practiced an unrelated judgment in the
-same layout (differences in d′ with 95% CIs from a grouped bootstrap). Practicing the
+same layout (differences in d′ with 95% CIs from a grouped bootstrap that resamples texts and is
+conditional on the three seeds per condition). Practicing the
 unrelated judgment left the authorship answers where C0 left them (C4 − C0 between −0.13
 and +0.10 on the three test corpora, all CIs including zero; on the held-out news, C4 was
 higher than C0, +0.34 [0.26, 0.43]), so that practice with a

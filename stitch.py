@@ -119,6 +119,9 @@ def main() -> None:
             layers_b[i].load_state_dict(sd_a)
             continue
         sd_b = layers_b[i].state_dict()
+        unassigned = sorted(k for k in sd_a if block(k) == "other")
+        if unassigned:   # a parameter that belongs to neither sublayer would silently stay with the upper model
+            raise SystemExit(f"layer {i}: parameters not assigned to attn or mlp: {unassigned}")
         for k, v in sd_a.items():
             if block(k) == args.component:
                 sd_b[k] = v

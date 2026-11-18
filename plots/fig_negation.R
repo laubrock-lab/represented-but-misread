@@ -50,17 +50,18 @@ pB <- ggplot(pa, aes(d, set, colour = rec)) +
 fig <- pA / pB + plot_layout(heights = c(1, 1.25)); h <- 6.4
 sw <- "outputs/patch_sweep/patch_sweep_summary.csv"
 if (file.exists(sw)) {
-  s <- read_csv(sw, show_col_types = FALSE)
-  if ("corpus" %in% names(s)) s <- filter(s, corpus == "truth_neg_cities")
-  s <- s |> filter(set %in% names(sets)) |>
-    mutate(set = factor(sets[set], levels = rev(sets)),
-           rec = ifelse(recipient == "base", "base model with SFT states", "SFT model with base states"))
-  pC <- ggplot(s, aes(factor(layer), set, fill = d)) + geom_tile(colour = "white", linewidth = 0.2) +
-    facet_wrap(~rec) +
-    scale_fill_gradient2(low = BLUE, mid = "grey95", high = ORANGE, midpoint = mean(range(s$d)), name = "d′") +
-    labs(title = "C  Layer-by-position patching (OLMo 2 7B)", x = "layer at which states are exchanged", y = NULL) +
-    th + theme(legend.position = "right", legend.key.height = unit(6, "mm"), panel.grid = element_blank())
-  fig <- pA / pB / pC + plot_layout(heights = c(1, 1.25, 0.8)); h <- 8.6
+  s <- read_csv(sw, show_col_types = FALSE) |>
+    filter(corpus == "truth_neg_cities", preset %in% names(fam), set %in% names(sets))
+  if ("variant" %in% names(s)) s <- filter(s, is.na(variant) | variant %in% c("", "default"))
+  s <- s |> mutate(family = fam[preset], set = factor(sets[set], levels = rev(sets)),
+                   rec = ifelse(recipient == "base", "base + SFT states", "SFT + base states"),
+                   share = pmin(pmax(transfer, 0), 1))
+  pC <- ggplot(s, aes(factor(layer), set, fill = share)) + geom_tile(colour = "white", linewidth = 0.2) +
+    facet_grid(rec ~ family) +
+    scale_fill_gradient(low = "grey96", high = "#7A3E9D", limits = c(0, 1), name = "share of the\ncheckpoint\ndifference\ntransferred") +
+    labs(title = "C  Layer-by-position patching (100 pairs)", x = "layer at which states are exchanged", y = NULL) +
+    th + theme(legend.position = "right", legend.key.height = unit(5, "mm"), panel.grid = element_blank())
+  fig <- pA / pB / pC + plot_layout(heights = c(1, 1.25, 1.1)); h <- 9.4
 }
 f <- "paper/figures/fig_negation.pdf"
 ggsave(f, fig, width = 7, height = h, device = cairo_pdf)   # cairo: the prime in d′ is outside Latin-1
