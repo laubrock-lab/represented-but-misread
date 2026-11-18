@@ -21,9 +21,9 @@ group chat rather than an essay. The style-matched prompt additionally provided 
 other messages of the same student, on other topics, as style references (tone,
 sentence length, directness, colloquialism, punctuation, spontaneity). Finally, each
 style-matched message was revised according to the students' written feedback on what
-still sounded AI-like ("optimized"). The prompt templates are included in the project repository (TODO(prompts): verify); the
-students' messages and their feedback cannot be shared, because the students have not yet
-been asked for consent to publication. Because AI and human
+still sounded AI-like ("optimized"). The students' messages and their feedback cannot be shared, because the students have not
+yet been asked for consent to publication; the prompts are therefore described here and
+not reproduced verbatim (TODO(prompts): add the templates to the repository if released). Because AI and human
 messages differed considerably in length, we truncated every message to its first 25 words and discarded shorter
 messages. The resulting corpus comprised 300 texts (61 human, 239 AI) from 61 groups. We verified the
 labels of this corpus: All human messages are verbatim the students' submissions, all AI
@@ -49,7 +49,7 @@ instructed the model not to reveal AI authorship. The style-matched articles wer
 finally revised to avoid nine surface features that participants of pilot runs had
 identified as AI markers (e.g., dashes, lists of exactly three items, "not only … but
 also" constructions, effusive closing sentences, uniform paragraph lengths, too few
-numbers; "optimized"). The prompt templates are included in the project repository. We used the 103
+numbers; "optimized"). We used the 103
 segments (38 human, 65 AI) from 14 articles that had been presented in a human judgment
 experiment, each preceded by its headline and subheadline, as in that experiment.
 These texts are confidential and were processed only on university machines.
