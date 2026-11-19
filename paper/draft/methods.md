@@ -124,8 +124,8 @@ Treating AI texts as signal, we computed sensitivity as d′ = √2 · z(AUC), w
 the area under the ROC curve of dv. For this transformation, the AUC is limited to the
 interval [1/(2m), 1 − 1/(2m)], where m is the size of the smaller class, so that d′ has a
 maximum that depends on the number of texts (e.g., 3.64 for 100 statement pairs and 4.54
-for 748); values at this maximum mean that all pairs were ordered correctly, and differences
-near it are compressed. This measure does not depend on where the model sets
+for 748); values at this maximum mean that all or nearly all pairs were ordered correctly
+(any AUC at or above the bound yields the maximum), and differences near it are compressed. This measure does not depend on where the model sets
 its decision threshold, and negative values indicate that the model judges AI texts as
 less AI-like than human texts. As a measure of response bias, we computed the criterion
 c at the model's natural threshold (dv = 0), with a log-linear correction of hit and

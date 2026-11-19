@@ -301,12 +301,12 @@ information that the models failed to use was largely lexical and stylistic, as 
 simple n-gram classifiers, so our results concern the readout of ordinary cues rather
 than of any deep representation of authorship. The stitching analyses and the patching for authorship were
 restricted to two models, because stage-wise checkpoints with a clear change
-were available for these two only (for the negated statements, the patching across layers
-included the two Gemma 3 models, whose base models answer with low probability), to two
-corpora for authorship, and to the plain
-prompt format, because base models cannot be queried with a chat template; the patching
-across layers was run for one authorship corpus and with 100 statement pairs, which was what
-the available computing time allowed. The two
+were available for these two only. For the negated statements, the patching across layers
+additionally included the two Gemma 3 models, whose base models answer with low probability.
+These analyses covered two corpora for authorship and used the plain prompt format, because
+base models cannot be queried with a chat template. The patching across layers was run for
+one authorship corpus and with 100 statement pairs, which was what the available computing
+time allowed. The two
 further judgments were studied with four to six models, steering for them with two
 models each and on 300 items, and the effects of post-training on the reviews were
 small; steering did not explain them. Steering itself is limited in two ways: It tests
