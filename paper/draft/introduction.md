@@ -74,10 +74,9 @@ internal representation; in a second lens, this representation is read out into 
 answer to the question. Splitting the judge side of the lens model in this way has precedents in
 research on personality judgment, which distinguishes the detection of cues from their
 utilization [@funder1995accuracy], and in neuroscience, which distinguishes the information that
-a neural population encodes from the information that is read out for behavior (Panzeri
-et al., 2017). Because the two fields often use different words for the same idea, and
-sometimes the same word for different ideas, Appendix A lists the correspondences between
-their terms.
+a neural population encodes from the information that is read out for behavior [@panzeri2017cracking]. Because psychology and machine learning often use
+different words for the same idea, and sometimes the same word for different ideas,
+Appendix A lists the correspondences between their terms.
 
 A brief description of how a language model processes a prompt may be helpful for readers
 from psychology. The prompt is split into a sequence of tokens (words or parts of words),
