@@ -76,7 +76,7 @@ in that file and in the output of `check_negation.py`.
 | 3.1 / Table D1 steering (+0.36, +1.07, −0.14, +0.09 and their p-values) | f | `steer_nulls_summary.csv` | `class_E2`, `all_p`, `own_all_p` | `se_*` |
 | Table 3, diverse facts (counterfact) rows | a + b with `--with-counterfact` | `truth_counterfact/stages.csv` | `probe_d`, `ans_d` | not in the reference file |
 | 3.1 "answers 1.61 → 1.34; probes 1.89 → 1.64" (OLMo 3, diverse facts) | a + b with `--with-counterfact` | `truth_counterfact/stages.csv` | `ans_d`, `probe_d` | not in the reference file |
-| 3.1 "TODO(sweep): layer-by-position patching for OLMo 2" | `--sweep` | `outputs/patch_sweep/` | — | open in the manuscript |
+| 3.6 patching across layers (Figure 7C) | `--sweep` | `outputs/patch_sweep/patch_sweep_summary.csv` | `d`, `transfer` | not in the reference file |
 
 Two statements of Section 3.6 are **not** backed by a value in the current outputs:
 
@@ -256,7 +256,7 @@ f2560a0c1758c69935b50125111b574b71896bb75930dd87b1d8c973c1fa086e  cities.csv
 5af51456d6dbd3a53d8e2ee6e4aadaca7eb02ff9136ad825866458e7283b5273  counterfact_true_false.csv
 ```
 
-**License:** TODO: provenance to be confirmed by the author. Neither the module headers
+**License of the statement sets:** not stated by their source. Neither the module headers
 nor this repository state under which license the Geometry of Truth CSVs (and the
 CounterFact data they derive from) may be redistributed; only the source URL and the
 citation are recorded, and the upstream GitHub repository carried no LICENSE file when
