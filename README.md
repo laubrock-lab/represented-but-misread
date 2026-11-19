@@ -4,8 +4,7 @@
 
 Code, derived results and manuscript sources for the paper *Represented but misread:
 Post-training changes how language models read out what they represent*
-(https://github.com/laubrock-lab/represented-but-misread). The working name of the project
-was `latent-detection`.
+(https://github.com/laubrock-lab/represented-but-misread).
 
 **The three authorship corpora are not part of this repository and cannot be shared.**
 The newspaper texts are unpublished and confidential, the human chat messages were written
@@ -135,5 +134,4 @@ uncorrected value is kept as `dv_prefix`.
   source groups) should be ≈ 0.5.
 - `probe_oof.csv` holds the out-of-fold probe score per text, which allows item-level
   comparison with human detection rates.
-- On macOS with Python 3.12, joblib may print `ResourceTracker … No child
-  processes` at exit. This is harmless.
+- joblib may print `ResourceTracker … No child processes` at exit. This is harmless.
