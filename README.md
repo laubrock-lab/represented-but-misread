@@ -24,7 +24,7 @@ The history of the public repository was filtered to remove unrelated internal w
 internal planning documents and private paths; commit dates, order, authorship and
 messages are otherwise unchanged.
 
-## Project description (from the start of the project)
+## Background of the project
 
 **Do language models know more than they say?** This project separates sensitivity
 from response bias when language models judge whether a German text was written by
@@ -221,7 +221,7 @@ The three follow-up controls are in `probe_controls.py`:
   The naive chat texts are much shorter, and length alone gives AUC 0.988 for
   human vs. naive; the fixed-length control replicates the ordering. The hard,
   style-matched contrast yields the generalisable readout; the easy one does
-  not. See `PLAN_probe_transfer.md` and `outputs/controls/`.
+  not.
 
 All three controls replicate in Qwen3-8B: author-held-out CV changes d′ by at
 most 0.13, cross-generator transfer stays above 1.8 d′, and the naive-trained
@@ -231,10 +231,7 @@ transfer ordering replicates as well, more sharply than in Gemma: +0.65 (all
 AI), −0.06 (naive), +0.88 (style-matched) at text mean, and the naive-trained
 mean shift no longer transfers (−0.88).
 
-A manuscript draft of the transfer and controls analysis is in
-`paper/cross_corpus_transfer.md` (Methods, Results, interpretation, and
-limitations, ready to integrate into `paper/outline.md`); the
-transfer-versus-depth figure is produced by `plots/fig_transfer_depth.R` and
+The transfer-versus-depth figure is produced by `plots/fig_transfer_depth.R` and
 written to `paper/figures/`.
 
 
@@ -335,17 +332,3 @@ uncorrected value is kept as `dv_prefix`.
   comparison with human detection rates.
 - On macOS with Python 3.12, joblib may print `ResourceTracker … No child
   processes` at exit. This is harmless.
-
-## Status
-
-- [x] Step 1: logit-level judgments + activation extraction (`judge_logits.py`, `sdt_summary.py`)
-- [x] Step 2: layer-wise probes with grouped CV and controls (`probe_layers.py`), incl. length-only and stylometric baselines
-- [x] Length control: truncation, fixed windows, journalism segments; model-based residualization (total / ANCOVA)
-- [x] Lens model: humans vs. base vs. instruct (`lens_model.py`)
-- [x] Cross-corpus probe transfer (`probe_transfer.py`, `PLAN_probe_transfer.md`)
-- [x] Author-, generator-, and prompt-type controls (`probe_controls.py`, `run_controls.sh`)
-- [x] Manuscript draft of the transfer/controls analysis (`paper/cross_corpus_transfer.md`) and depth figure
-- [x] Replication with gemma3-12b (`run_replication.sh`)
-- [ ] Base-rate instruction (`--priors`, counterbalanced mention order; `prior_analysis.py`) — running for gemma3-4b (v1 had a mention-order confound, archived in `flawed_priors_v1/`)
-- [ ] Step 3: steering (`steer_logits.py`) — running for gemma3-4b
-- [ ] Write-up

@@ -627,7 +627,19 @@ more pronounced: The base models ordered the negated statements at or below chan
 d′ = −0.14 [−0.24, −0.05]; Apertus: −2.13 [−2.29, −1.99]), and the SFT models judged them
 nearly as with the default prompt (3.42 and 4.54; truth_variant_answers.py). The repair by
 supervised fine-tuning thus does not depend on the question being known when the statement
-is read. TODO(sfirst): patching across layers with this prompt.
+is read. Patching across layers with this prompt (same 12 layers, 100 statement pairs)
+gave the same localization as with the default prompt. In OLMo 2, the SFT model's statement
+states alone transferred 36%, 75%, and 61% of the repair at layers 10, 12, and 14 (base
+model: d′ = 0.85, 2.14, and 1.69, from −0.36; SFT model 2.99), and the base model's
+statement states lowered the SFT model at the same layers (to 2.13, 1.25, and 1.71); the
+states after the statement carried the repair completely from layer 16 onward (3.09), and
+the question line by itself transferred nothing in either direction. In Apertus, the SFT
+model's statement states did not repair the base model at any layer (at layers 8 to 12
+they even lowered it, to between −3.01 and −2.64, from −2.11), whereas its states after the
+statement transferred the repair partly from layer 4 and completely from layer 12 onward.
+Because the statement is read before the question in this prompt, the contribution of the
+statement states in OLMo 2 cannot reflect a reading of the statement in the light of the
+task: Supervised fine-tuning changed how this model encodes a negated statement as such.
 
 Steering at the answer position was consistent with a readout that uses the represented
 truth direction after SFT; as explained in Appendix D, this is a consistency check rather

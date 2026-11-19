@@ -199,11 +199,11 @@ The sweeps over layers qualify this picture. For the negated statements in Apert
 repair arose at the positions after the statement (the answer instruction and cue), as the
 picture of a changed reader suggests. In OLMo 2, it arose in the states of the statement itself at layers 10 to 14, and
 the upper layers of the base model read these states correctly; here, supervised fine-tuning
-changed what is read, and the reader of the base model was adequate. Note that in the
-prompt for the truth judgments the question precedes the statement, so that the statement
-is processed with the task known; a change of the statement states under this prompt is
-therefore a change in how the statement is encoded for the task, not necessarily a change in
-how the model represents statements in general. Why the two models differ is open. It is
+changed what is read, and the reader of the base model was adequate. The same held when
+the statement was placed before the question, so that it was processed without the task
+being known: The change of the statement states in OLMo 2 is therefore a change in how this
+model encodes a negated statement as such, not in how it reads the statement in the light of
+the question. Why the two models differ is open. It is
 conceivable that the difference reflects their post-training data, or the degree to which
 the base model already encodes negation at the statement positions; our data do not
 distinguish these possibilities.
