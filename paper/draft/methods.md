@@ -427,10 +427,10 @@ corpora are not included, because their identifiers refer to unpublished texts.
 
 ## 2.12 Use of AI tools
 
-The analyses for this study were implemented and run with the assistance of AI coding
-agents (Claude Code with Claude Opus and Claude Fable; additional analyses with GLM and
-DeepSeek models), successive drafts were reviewed by Claude Fable 5.2 in the role of a
-referee, and a first draft of the manuscript was prepared with the assistance of Claude under the
-supervision of the author, who designed the study, decided on all analyses and
-interpretations, and is responsible for the content. The complete history of the
+AI tools assisted at all stages of this work. The analyses were implemented and run with
+the assistance of AI coding agents (Claude Code with Claude Opus and Claude Fable;
+additional analyses with GLM and DeepSeek models). Claude also assisted in planning the
+analyses and in drafting and revising the manuscript, and, in separate sessions, reviewed
+successive drafts in the role of a referee. The author designed the study, decided on all
+analyses and interpretations, and is responsible for the content. The complete history of the
 analyses is documented in the repository.
