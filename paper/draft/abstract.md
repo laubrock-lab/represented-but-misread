@@ -12,7 +12,7 @@ sensitivity of the answers on average (Δd′ = −0.34 across model families; �
 prompts). It also changed the use of a stated base rate: Base models shifted their
 log-odds by less than the stated change in prior odds, most post-trained models by more. In two models with
 stage-wise checkpoints, the change occurred during supervised fine-tuning, model stitching
-implicated the early layers, and from mid-depth on the states at the positions
+implicated the early layers, and from mid-depth on internal states at positions
 after the text, not those of the text, transferred the change between checkpoints. Because our corpora cannot be
 shared, we add a case reproducible from public data, the truth of negated
 statements. Here, post-training acted in the opposite direction: Probes decoded truth
