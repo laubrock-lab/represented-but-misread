@@ -534,9 +534,12 @@ def main() -> None:
                 rows.append(row(test="P2", news_corpus=news, probe_model=f"ts{c}s{s}",
                                 site="last", layer=str(layer), condition=c, seed=str(s),
                                 statistic=stat, estimate=est, ci_lo=lo, ci_hi=hi, n=n))
-                per_layer.setdefault((c, stat, str(layer)), []).append(est)
-                per_layer.setdefault((c, stat, MEAN_KEY), []).append(est)
-            for (c, stat, lk), vals in sorted(per_layer.items()):
+                per_layer.setdefault((c, stat, str(layer)), {}).setdefault(s, []).append(est)
+                per_layer.setdefault((c, stat, MEAN_KEY), {}).setdefault(s, []).append(est)
+            for (c, stat, lk), by_seed in sorted(per_layer.items()):
+                # one value per seed (for MEAN_KEY: that seed's mean over the fixed layers), so
+                # that min/max is a range across seeds and not across seeds and layers
+                vals = [float(np.mean(v)) for v in by_seed.values()]
                 rows.append(row(test="P2", news_corpus=news, probe_model="", site="last",
                                 layer=lk, condition=c, seed="mean", statistic=stat,
                                 estimate=float(np.mean(vals)),

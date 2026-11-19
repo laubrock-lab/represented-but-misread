@@ -800,7 +800,7 @@ news probe fitted on the 14 articles of the newspaper segments, the pattern was 
 weaker (C1: .51; C3: .04), and this probe did not separate the chats reliably in the base
 model (−0.11 [−0.36, 0.14]). At the last prompt position, the direction along which the C1
 models' answers to the chats varied was aligned with the direction that separated AI from
-human news in the same model (cosine .85, range across seeds .79–.90; C3: −.10; C4: .00;
+human news in the same model (cosine .85, range across seeds .82–.87; C3: −.10; C4: .00;
 random directions: 95% of the absolute cosines below .43); note that this second comparison
 is partly circular, because the last position of a model that answers the news correctly
 carries its decision. The statistics were fixed before this analysis was run, but the
