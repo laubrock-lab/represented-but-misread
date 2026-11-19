@@ -80,7 +80,7 @@ Appendix A lists the correspondences between their terms.
 
 A brief description of how a language model processes a prompt may be helpful for readers
 from psychology. The prompt is split into a sequence of tokens (words or parts of words),
-and in each of its layers the model computes an internal state for every position of this
+and in each of its several dozen layers the model computes an internal state for every position of this
 sequence. Through the attention mechanism, the state at a position can draw on the states
 at all earlier positions, but not on later ones. The answer is generated from the state at
 the last position after the final layer. In a prompt that presents a text and then asks a
@@ -93,8 +93,8 @@ computer program whose every state can be recorded, replaced, and restored.
 
 This possibility has been used to show that language models often represent more than
 they say. Simple linear classifiers ("probes") trained on a model's internal activations
-can recover properties such as the truth of a statement [@burns2023discovering; @hu2023prompting; @marks2024geometry] or the correctness of the model's own answers (Orgad et al.,
-2025) better than the model's answers do, and prompting a model for a judgment can
+can recover properties such as the truth of a statement [@burns2023discovering; @hu2023prompting; @marks2024geometry] or the correctness of the model's own answers [@orgad2025know]
+better than the model's answers do, and prompting a model for a judgment can
 underestimate what it knows [@hu2023prompting]. The same dissociation has been reported
 for authorship: Models encode whether they wrote a text themselves although they fail
 to report it [@zhou2025cosur], and a direction in the residual stream that tracks
