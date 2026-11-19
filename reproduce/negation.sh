@@ -176,7 +176,9 @@ fi
 for ds in "${SETS[@]}"; do
     csv=$GOT_CSV/$ds.csv
     [[ $ds == counterfact ]] && csv=$GOT_CSV/counterfact_true_false.csv
-    if [[ ! -f $csv ]]; then
+    if [[ ! -f $csv && $DRY -eq 1 ]]; then
+        echo "# (dry run) $csv is not present; --fetch-data would download it"
+    elif [[ ! -f $csv ]]; then
         echo "missing: $csv" >&2
         echo "The statement sets are public but are not part of the repository." >&2
         echo "Run with --fetch-data, or copy datasets/*.csv of" >&2

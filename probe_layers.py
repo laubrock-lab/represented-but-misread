@@ -11,7 +11,10 @@ Probe pipeline per training fold:
     StandardScaler -> PCA (all components) -> LogisticRegressionCV (L2)
 With n < d, the L2 solution lies in the span of the training data, so
 projecting onto all principal components is lossless; it only makes the fits fast.
-C is selected by an inner grouped CV on the training fold.
+C is selected by an inner grouped CV on the training fold. Standardization and the
+principal component rotation are fitted once on the whole (outer) training fold, i.e., before
+the inner split; the inner validation folds therefore enter these two unsupervised steps (not
+the labels). The outer held-out fold enters neither.
 
 Reported per (condition, site, layer):
     auc, d_auc [95% CI, grouped bootstrap]    representational sensitivity

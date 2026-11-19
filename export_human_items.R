@@ -20,6 +20,13 @@ if (is.na(corpus)) corpus <- "chat"
 labcourse <- Sys.getenv("LABCOURSE_DIR",
                      "/path/to/labcourse/experiment_v1")
 pre <- file.path(labcourse, "analysis", "preprocessed")
+# items excluded in the preprocessing; the identifiers refer to unpublished texts and are read
+# from a local file that is not tracked (data/segment_exclude.csv: source_id, generator)
+segment_exclude <- if (file.exists("data/segment_exclude.csv")) {
+  read.csv("data/segment_exclude.csv", colClasses = "character")
+} else {
+  data.frame(source_id = character(), generator = character())
+}
 
 summarise_items <- function(d, ...) {
   d |>
@@ -44,7 +51,7 @@ if (corpus == "chat") {
   items <- readRDS(file.path(pre, "journ_trials.rds")) |>
     select(participant, trial_id, source_id, generator, seg_idx, choice, confidence) |>
     # same exclusion as in preprocessing.qmd
-    filter(!(source_id == "<excluded-item-id>" & generator == "openai_naive")) |>
+    anti_join(segment_exclude, by = c("source_id", "generator")) |>
     summarise_items(trial_id, source_id, generator, seg_idx) |>
     rename(text_id = trial_id)
 } else {

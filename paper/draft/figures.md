@@ -1,4 +1,4 @@
-# Figure captions (draft, 11 Nov 2026)
+# Figure captions
 
 Figures: `paper/figures/` (PDF for the manuscript, PNG for review). Code:
 `plots/fig_data.py` (tidy data, no text content) → `plots/figures.R`,

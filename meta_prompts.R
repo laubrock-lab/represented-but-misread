@@ -1,4 +1,4 @@
-# Post-training effect across three prompt wordings (review round 2, 17 Nov 2026).
+# Post-training effect across three prompt wordings.
 # Input: outputs/promptvar_summary.csv (promptvar_summary.py): 54 contrasts final - base on the
 # identical plain prompt, 6 model families x 3 corpora x 3 prompts (default, paraphrase,
 # question first), each with a grouped-bootstrap CI.

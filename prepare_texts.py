@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import argparse
 import re
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -106,8 +107,18 @@ def load_journalism(all_generators: bool) -> pd.DataFrame:
     return _finish(rows)
 
 
-# Items excluded in the lab course preprocessing (analysis/preprocessing.qmd); mirrored here.
-SEGMENT_EXCLUDE = [("<excluded-item-id>", "openai_naive")]
+# Items excluded in the lab course preprocessing (analysis/preprocessing.qmd). The identifiers
+# refer to unpublished texts and are therefore read from a local file that is not tracked
+# (data/segment_exclude.csv with the columns source_id, generator).
+def _segment_exclude() -> list[tuple[str, str]]:
+    f = Path(__file__).resolve().parent / "data" / "segment_exclude.csv"
+    if not f.exists():
+        return []
+    d = pd.read_csv(f, dtype=str)
+    return list(zip(d.source_id, d.generator))
+
+
+SEGMENT_EXCLUDE = _segment_exclude()
 
 
 def load_journalism_segments(with_headline: bool = True) -> pd.DataFrame:

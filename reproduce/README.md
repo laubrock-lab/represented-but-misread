@@ -7,7 +7,7 @@ three authorship corpora, which are confidential (see "What cannot be reproduced
 publicly").
 
 ```bash
-git clone <repo> && cd latent-detection
+git clone https://github.com/laubrock-lab/represented-but-misread.git && cd represented-but-misread
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 hf auth login                                   # Gemma 3 is gated; OLMo and Qwen are not

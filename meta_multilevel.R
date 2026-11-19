@@ -1,5 +1,5 @@
 # Multilevel meta-analysis of the post-training effect (final vs. base, identical raw prompt),
-# response to review (W6/S6, 16 Nov 2026). The 18 contrasts are not independent: each model
+# The 18 contrasts are not independent: each model
 # family contributes three corpora and each corpus six families. Model: Δd′_ij = μ + u_family +
 # v_corpus + e_ij + sampling error (SE from the grouped bootstrap CI), REML, t-based inference
 # (metafor rma.mv, test = "t"). Also: family-level t-test on the six family means, and the

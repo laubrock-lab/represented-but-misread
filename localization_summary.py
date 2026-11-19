@@ -1,4 +1,4 @@
-"""Tables behind the localization statements in the text (review round 2, 17 Nov 2026).
+"""Tables behind the localization statements in the text.
 
 1. outputs/patch/patch_summary.csv: every single-layer patching run in outputs/patch/ (all
    corpora, layers and prompt variants). Per run and position set: d′ of the patched recipient

@@ -70,8 +70,9 @@ def main() -> None:
             continue
         dst = RES / f.relative_to(OUT)
         dst.parent.mkdir(parents=True, exist_ok=True)
-        if f.suffix == ".csv" and "note" in d.columns:      # remarks of the analyst, not data
-            pd.read_csv(f).drop(columns=["note"]).to_csv(dst, index=False)
+        drop = [c for c in ("note", "run_old", "run_new", "file_old", "file_new") if c in d.columns]
+        if f.suffix == ".csv" and drop:      # remarks and run descriptions (hosts, job ids, paths), not data
+            pd.read_csv(f).drop(columns=drop).to_csv(dst, index=False)
         else:
             shutil.copy2(f, dst)
         kept.append(f.relative_to(OUT))

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Response to review (16 Nov 2026): (1) stitching control task, (2) localization on a second
+# (1) stitching control task, (2) localization on a second
 # authorship corpus.
 #   (1) counterfact statements, where base and SFT judge alike: do stitched hybrids leave the
 #       range of their parents (overshoot = stitching artifact)? Same splits as for the

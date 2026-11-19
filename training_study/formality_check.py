@@ -1,5 +1,5 @@
 """Training study: validity of the formality stereotype per corpus, and confounds of the
-stereotype labels (response to review, W5, 16 Nov 2026). Prints numbers only, never text.
+stereotype labels. Prints numbers only, never text.
 
 1. Validity: AUC of the formality score (judgment_examples.formality) for AI vs. human texts
    in each evaluation corpus (AUC < .5: AI texts less formal). Grouped-bootstrap CI.

@@ -13,7 +13,7 @@ the seed mean, the seed range, and the paired change on the same texts with a
 grouped-bootstrap CI (texts in the few-shot run only; demonstrations come from
 other sources, so every text is scored).
 
-Two estimates of the few-shot d′ (response to review, 16 Nov 2026): d_few = d′ of the dv
+Two estimates of the few-shot d′: d_few = d′ of the dv
 averaged over the example sets (seeds), which pools four readouts and is inflated
 relative to a single prompt; d_few_seedmean = mean of the per-seed d′ (the primary,
 unbiased comparison with zero-shot), with its own paired change and CI (diff_sm).

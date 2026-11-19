@@ -7,7 +7,7 @@ source, topic, register or length. Grouped CV and shuffled-label controls rule
 out memorising individual texts, but not a corpus-level confound.
 
 This script fits the readout on one corpus and evaluates it, unchanged, on a
-corpus with different sources. See ``PLAN_probe_transfer.md``.
+corpus with different sources.
 
 Readouts per directed pair (source -> target), condition and site
 ----------------------------------------------------------------

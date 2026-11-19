@@ -9,8 +9,7 @@ AI texts). Labels by condition:
         the class median) is labeled "KI", the rest "Mensch" -> labels independent of the
         truth (50 % agreement), determined by formality alone
     C3  shuffled: random balanced labels (format control)
-    C4  unrelated judgment (format control without the authorship question; added 16 Nov
-        2026 after review): same texts and number of examples, same raw layout with a
+    C4  unrelated judgment (format control without the authorship question): same texts and number of examples, same raw layout with a
         one-word answer and random option order, but the question is whether the text is
         about politics, business or society (answer "Ja"/"Nein", label from the GNAD
         section: Inland, International, Wirtschaft, Panorama, Etat -> "Ja"; Sport,

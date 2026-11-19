@@ -1,14 +1,4 @@
-# Title and abstract (draft, 17 Nov 2026; authorship first, negated statements as the reproducible case, training study last)
-
-## Title options
-
-1. Represented but misread: Post-training changes how language models read out what
-   they represent
-
-(Chosen on 19 Nov 2026. Earlier title: "Post-training changes how the question reads the
-text: Representation and readout in language-model judgments"; it was dropped because the
-patching across layers showed that the representation of the text changed as well in
-several cases.)
+# Represented but misread: Post-training changes how language models read out what they represent
 
 ## Abstract
 

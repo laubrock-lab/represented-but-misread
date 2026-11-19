@@ -8,7 +8,7 @@
 #SBATCH --time=12:00:00
 #SBATCH -o slurm/steerN_%j.out
 #SBATCH -e slurm/steerN_%j.err
-# Wider steering nulls (response to review, 15 Nov 2026): 50 pcrandom + 50 split control
+# Wider steering nulls: 50 pcrandom + 50 split control
 # directions, each drawn ONCE for all texts (--fixed-controls), at +-2 SD; class and decision
 # directions with a dose curve (+-1, 2, 4, 6 SD). KV-cached batched scoring (--batched).
 # Usage: sbatch slurm/steer_nulls.sh <outdir> <preset> <variant> <fmt> <layer> [extra args]

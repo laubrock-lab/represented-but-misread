@@ -1,5 +1,5 @@
 """Training study: contrasts between conditions against two baselines, and the held-out
-breakdown (response to review, W5/Q5, 16 Nov 2026).
+breakdown.
 
 Baselines: C0 (background data only) and C3 (random labels: learns the question and the
 answer words, but no valid mapping); C4 (unrelated topic judgment in the same layout) once

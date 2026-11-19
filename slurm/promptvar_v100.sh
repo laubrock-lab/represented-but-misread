@@ -7,7 +7,7 @@
 #SBATCH --time=04:00:00
 #SBATCH -o slurm/pvar_%j.out
 #SBATCH -e slurm/pvar_%j.err
-# Prompt robustness (response to review, 16 Nov 2026): answers of base and final model with a
+# Prompt robustness: answers of base and final model with a
 # raw template variant (qfirst = question before text; para = paraphrase), no activations.
 # Usage: sbatch slurm/promptvar.sh <preset> <corpus> <qfirst|para>
 # Output: outputs/promptvar_<variant>/<corpus>/<preset>_<variant>_raw_<order>.csv

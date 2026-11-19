@@ -1,4 +1,4 @@
-"""Textbook corpus (N. Rosin, B.Sc. thesis): German textbook summaries, human vs. AI.
+"""Textbook corpus (Rosin & Laubrock, in preparation): German textbook summaries, human vs. AI.
 
 119 textbook passages (Biology, Psychology, Business) x 2 versions: the human
 summary from the textbook and an AI summary (ChatGPT, prompt 2). 36 of the 238
@@ -14,7 +14,7 @@ plus genre, pair_id, and exp_text_id (Text_ID in the experiment; NaN if not rate
 
 Usage
 -----
-    python prepare_textbook.py --src "<path to Niklas Rosin/code>"
+    python prepare_textbook.py --src "<path to the textbook corpus>"
 """
 
 from __future__ import annotations
@@ -34,7 +34,7 @@ KEY = ["Genre", "Buch", "Kapitel"]
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--src", type=Path, required=True, help="Niklas Rosin/code folder")
+    ap.add_argument("--src", type=Path, required=True, help="folder with the textbook corpus (not public)")
     ap.add_argument("--out", type=Path, default=config.REPO / "data" / "texts_textbook.parquet")
     args = ap.parse_args()
 

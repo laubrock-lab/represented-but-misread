@@ -1,6 +1,6 @@
 """Assemble the manuscript parts into one Markdown file for pandoc.
 
-Order: title (option 1 of abstract.md), abstract, introduction, methods, results,
+Order: title (first line of abstract.md), abstract, introduction, methods, results,
 discussion (each numbered figure placed after the paragraph that first mentions it;
 images and captions from figures.md), references (cited works only, via citeproc),
 appendix, supplementary figures.
@@ -20,8 +20,7 @@ def section(name: str) -> str:
 
 
 abstract_md = section("abstract.md")
-titles = re.findall(r"^1\. (.+?)(?:\n   (.+?))?\n", abstract_md, flags=re.M)
-title = " ".join(t for t in titles[0] if t) if titles else "Draft"
+title = abstract_md.splitlines()[0].lstrip("# ").strip()
 abstract = abstract_md.split("## Abstract", 1)[1].strip()
 
 figs, supp = {}, []

@@ -20,6 +20,10 @@ statements from the public statement sets and the open-weight checkpoints, and
 `reproduce/check_negation.py` compares the regenerated numbers with the values reported in
 the paper.
 
+**License.** The MIT license (`LICENSE`) applies to the software in this repository. The
+manuscript text and figures in `paper/` are the author's and are not covered by it. No
+third-party data are included; the public statement sets are downloaded from their source.
+
 The history of the public repository was filtered to remove unrelated internal work,
 internal planning documents and private paths; commit dates, order, authorship and
 messages are otherwise unchanged.

@@ -72,7 +72,7 @@ RAW_TEMPLATE = (
     "Antwort:"
 )
 
-# Prompt variants for the robustness check (response to review, 16 Nov 2026); answer words
+# Prompt variants for the robustness check; answer words
 # and scoring unchanged. "qfirst": the question precedes the text, so that the text
 # positions are processed with the task in context; "para": reworded instruction and
 # question. Selected with --prompt-variant (judge_logits.py, patch_positions.py).

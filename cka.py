@@ -1,6 +1,5 @@
 """Linear CKA between the base and a post-trained checkpoint, per layer, at the text positions
-(mean over text tokens) and at the last prompt position (response to review, W3/Q7,
-16 Nov 2026; the values in Section 3.4 were first computed ad hoc on 10 Nov).
+(mean over text tokens) and at the last prompt position.
 
 Linear CKA (Kornblith et al., 2019) on the same texts, plain prompt, answer order mk:
 CKA(X, Y) = ||Yc' Xc||_F^2 / (||Xc' Xc||_F ||Yc' Yc||_F), computed via n x n Gram matrices.

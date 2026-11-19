@@ -1,4 +1,4 @@
-"""Prompt robustness (response to review, Q6, 16 Nov 2026): answers of base and final models
+"""Prompt robustness: answers of base and final models
 with the default raw prompt, with the question before the text (qfirst), and with a
 paraphrased instruction and question (para). Per model x corpus x variant: d′ (both answer
 orders averaged), the post-training change Δd′ = final − base on the same texts with a

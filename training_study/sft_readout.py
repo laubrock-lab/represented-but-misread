@@ -1,6 +1,6 @@
 """Training study: LoRA SFT of a base model on background chat data plus (condition-
 dependent) authorship-judgment examples. Tests whether the training signal sets the
-direction of the readout (plan: paper/plan_C_training_study.md).
+direction of the readout (manuscript, Sections 2.9 and 3.7).
 
 Data per run: --bg-n Tülu 3 conversations (loss on assistant tokens, rendered with the
 chat template of the official SFT checkpoint) + the judgment examples of --condition

@@ -1,5 +1,5 @@
 """Analysis of the fixed-control steering runs (steer_logits.py --fixed-controls, suffix
-_nulls; response to review, 15 Nov 2026). One row per cell (model x corpus x layer):
+_nulls). One row per cell (model x corpus x layer):
 
   in-range      share of steered texts whose projection onto the steered direction stays
                 within the 1st-99th percentile of the real texts' projections, per step
@@ -237,6 +237,8 @@ def analyze(path: str, rng) -> dict:
 
 
 def main() -> None:
+    import argparse
+    argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter).parse_args()
     rng = np.random.default_rng(1)
     files = sorted(f for f in glob.glob("outputs/*/steer_*_fixed*_nulls.csv")
                    if "summary" not in f and "decomp" not in f)

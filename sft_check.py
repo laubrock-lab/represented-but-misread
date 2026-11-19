@@ -118,7 +118,7 @@ PATTERNS = {
 }
 NEG = re.compile(r"\b(?:not|never|no longer|isn't|aren't|wasn't|weren't|doesn't|don't|didn't)\b", re.I)
 
-# German counterparts (response to review, 16 Nov 2026: English-only patterns are weak evidence
+# German counterparts (English-only patterns are weak evidence
 # of absence for a German task and a multilingual mixture). Counted under separate keys.
 AI_REF_DE = r"(?:KI|künstlichen? Intelligenz|Maschine|Sprachmodell|Chatbot|ChatGPT|GPT-?\d?|Computer)"
 PATTERNS |= {

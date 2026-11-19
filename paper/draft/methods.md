@@ -167,7 +167,9 @@ representation, we trained linear probes on the activations of the residual stre
 the last position of the prompt, i.e., where the answer is formed, for every layer.
 Each probe consisted of standardization, a principal component rotation, and an
 L2-regularized logistic regression whose regularization strength was selected by an
-inner grouped cross-validation. Performance was estimated out of fold with a 10-fold
+inner grouped cross-validation (standardization and rotation were fitted on the whole
+training fold, so that the inner validation folds entered these unsupervised steps; the
+held-out fold of the outer cross-validation entered none). Performance was estimated out of fold with a 10-fold
 cross-validation that held out whole source groups, and expressed as d′ (AUC). As a
 check, the same procedure was repeated with labels shuffled within source groups. For
 comparisons across models, we report the probe at a fixed relative depth of two thirds
@@ -234,8 +236,10 @@ from the same pretrained weights; we verified this by linear centered kernel ali
 same inputs are arranged, which is 1 for identical arrangements irrespective of a rotation
 of the activation space, between the activations of base and post-trained checkpoints
 (cka.py), by the perplexity of
-each stitched model on 40 texts, and by checking that stitching at ℓ = 0 and ℓ = L
-reproduced the parent models. As a control task, we stitched the same checkpoints on
+each stitched model on 40 texts, and by checking the two extremes: With ℓ = 0 (only the
+embedding from the other checkpoint) and with ℓ = L (all layers from the other checkpoint,
+but the own final normalization and output layer), d′ was within 0.05 of the respective
+unstitched checkpoint in 15 of 16 cases (largest difference 0.12; stitch_summary.py). As a control task, we stitched the same checkpoints on
 statements of diverse facts (counterfact), which base and SFT models judged alike; for
 authorship, stitching and patching were run on the textbook summaries and the short chats,
 and patching was repeated with a prompt that placed the question before the text. We also exchanged only the attention blocks or only the
@@ -367,10 +371,12 @@ the project repository (https://github.com/laubrock-lab/represented-but-misread)
 The newspaper texts are unpublished and confidential, the human chat messages were
 written by students who have not yet been asked for consent to publication, and the human textbook summaries are protected by copyright.
 Therefore, these texts cannot be shared. The two further judgments (Section 2.8) use
-publicly available data [@marks2024geometry; @ott2011finding; @ott2013negative], so that these
-analyses can be reproduced in full (see `reproduce/` in the repository); the same holds for the training data of the training
-study (Section 2.9), whose human texts are public [@block2019gnad] and whose AI texts we
-generated and will release. All code and the tables of derived results from which the
+publicly available data [@marks2024geometry; @ott2011finding; @ott2013negative]. For the
+negated statements, the repository contains one entry point that reruns the analyses from
+the public statement sets and a check against the values reported here (`reproduce/`); for
+the reviews, it contains the code but no such entry point. The human texts of the training
+study (Section 2.9) are public [@block2019gnad]; the AI texts that we generated for it are
+not yet released. All code and the tables of derived results from which the
 reported numbers are taken are available in the project repository; files cited here as
 `outputs/…` are found there under `results/`. The per-text model outputs for the authorship
 corpora are not included, because their identifiers refer to unpublished texts.

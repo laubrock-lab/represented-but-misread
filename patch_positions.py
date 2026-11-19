@@ -148,6 +148,8 @@ def main() -> None:
     (F.set_prompt_variant if truth else config.set_prompt_variant)(args.prompt_variant)
 
     layers = args.layers if args.layers else ([args.layer] if args.layer is not None else None)
+    if layers and min(layers) < 1:
+        ap.error("layers are hidden_states indices >= 1 (the output of decoder layer k); the embedding state (0) cannot be patched")
     if not layers:
         ap.error("give --layer or --layers")
     layers = sorted(dict.fromkeys(layers))

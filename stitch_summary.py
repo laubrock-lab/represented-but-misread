@@ -1,4 +1,4 @@
-"""Summary of model-stitching runs (response to review, W3/Q3, 16 Nov 2026).
+"""Summary of model-stitching runs.
 
 Per corpus and model family: d′ (order-averaged dv, AUC-based) and answer probability of
 every stitched hybrid "<lower>-<upper>_L<k>" (first k decoder layers from <lower>, the rest

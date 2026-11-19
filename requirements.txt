@@ -1,3 +1,5 @@
+# Core: answers, probes, stitching, patching, summaries (the versions used for the paper were
+# torch 2.6 and transformers 5.22.2; for Apertus, the developers' fork of transformers 5.18)
 torch>=2.5
 transformers>=4.56
 pandas>=2.0
@@ -7,3 +9,10 @@ numpy
 scipy
 scikit-learn
 tqdm
+# Contrasts and the search in the fine-tuning data
+statsmodels
+requests
+# Training study and adapters (optional)
+peft
+# Not listed: R packages for the meta-analyses and figures (metafor, dplyr, readr, tidyr,
+# ggplot2, patchwork) and pandoc with XeLaTeX for building the manuscript.
