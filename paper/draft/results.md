@@ -861,7 +861,6 @@ decision. We therefore do not rest a conclusion on it. The statistics of the ite
 test were specified in the analysis brief before it was run, which is not documented in the
 repository, and the inversion of the chats was known at that time. Within these limits, the
 results support the following reading: Fine-tuning on valid labels made the answers follow
-features of the text that the base model already represents and that distinguish AI from
-human news, and the answers to texts of another genre followed these features also where
-they pointed the wrong way. They do not show along which direction of the fine-tuned
+the authorship signal for news that the base model already represents, and the answers to
+texts of another genre followed this signal also where it pointed the wrong way. They do not show along which direction of the fine-tuned
 model's internal states this readout runs.
