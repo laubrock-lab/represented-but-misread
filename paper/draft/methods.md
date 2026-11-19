@@ -139,12 +139,12 @@ judgments, we manipulated the response bias in two ways that should leave the se
 unchanged: the order of the two answer options, and a sentence stating the share of AI texts
 in the study (20, 50, or 80%), added to the plain prompt. For each single prompt condition,
 we computed d′ and c from the dv of that prompt alone and estimated the changes between
-conditions with a grouped bootstrap (sdt_invariance.py); where a model gave the same answer
+conditions with a grouped bootstrap; where a model gave the same answer
 to at least 98% of the texts, c is close to its bound and can hardly move. To measure how
 strongly a model uses the stated base rate, we computed for every text the shift of dv between
 the prompts stating 20% and 80% AI texts and compared its mean with the shift of the prior
 log-odds, ln(.8/.2) − ln(.2/.8) = ln 16 = 2.77 nats, by which an ideal observer would shift
-the posterior log-odds of every text (base_rate_shift.py). The base-rate sentence named the
+the posterior log-odds of every text. The base-rate sentence named the
 share of AI texts first ("In dieser Studie wurden etwa 20 % der Texte von einer KI generiert
 und etwa 80 % von Menschen geschrieben."); for Gemma 3 4B, OLMo 2 and OLMo 3 Think, the
 manipulation was repeated with the human share named first. Confidence intervals (95%) were obtained by a grouped bootstrap that resampled
@@ -179,7 +179,7 @@ training fold, so that the inner validation folds entered these unsupervised ste
 held-out fold of the outer cross-validation entered none; a strictly nested version, in
 which all steps were refitted within each inner split, changed the probe d′ for the short
 chats by −0.03 on average, with a range from −0.20 to +0.12 across the base and final
-checkpoints of the six families; probe_inner_cv_check.py). Performance was estimated out of fold with a 10-fold
+checkpoints of the six families). Performance was estimated out of fold with a 10-fold
 cross-validation that held out whole source groups, and expressed as d′ (AUC). As a
 check, the same procedure was repeated with labels shuffled within source groups. For
 comparisons across models, we report the probe at a fixed relative depth of two thirds
@@ -233,8 +233,7 @@ the effect of a shift by one class-mean distance, extrapolated from the ±1 SD s
 this number of directions feasible, the prompt up to the last position was processed once
 per text and its cached activations were reused for all steering settings, which
 reproduced the scores of the uncached computation in a check on three statements with all
-steering settings (102 scores: r = .999, largest difference 0.06 nats;
-outputs/steer_cache_check.csv). Steering was run for 25
+steering settings (102 scores: r = .999, largest difference 0.06 nats). Steering was run for 25
 cells (model × corpus × layer; Table D1 in Appendix D).
 
 *Model stitching.* Model stitching combines parts of different networks [@lenc2015equivariance; @bansal2021stitching]. For the models with stage-wise checkpoints, we combined the
@@ -244,12 +243,11 @@ on unchanged. Stitching without an adapter is justified because both checkpoints
 from the same pretrained weights; we verified this by linear centered kernel alignment
 [CKA; @kornblith2019similarity], a measure of how similarly two sets of activations for the
 same inputs are arranged, which is 1 for identical arrangements irrespective of a rotation
-of the activation space, between the activations of base and post-trained checkpoints
-(cka.py), by the perplexity of
+of the activation space, between the activations of base and post-trained checkpoints, by the perplexity of
 each stitched model on 40 texts, and by checking the two extremes: With ℓ = 0 (only the
 embedding from the other checkpoint) and with ℓ = L (all layers from the other checkpoint,
 but the own final normalization and output layer), d′ was within 0.05 of the respective
-unstitched checkpoint in 15 of 16 cases (largest difference 0.12; stitch_summary.py). As a control task, we stitched the same checkpoints on
+unstitched checkpoint in 15 of 16 cases (largest difference 0.12). As a control task, we stitched the same checkpoints on
 statements of diverse facts (counterfact), which base and SFT models judged alike; for
 authorship, stitching and patching were run on the textbook summaries and the short chats,
 and patching was repeated with a prompt that placed the question before the text. We also exchanged only the attention blocks or only the
@@ -285,7 +283,7 @@ the patching across layers with the statement placed first ("Statement: … Is t
 statement true or false? Answer with one word (True or False). Answer:"). The runs across
 layers for OLMo 2 used NVIDIA V100 GPUs; in half precision, their scores differed slightly
 from those obtained on A100 GPUs (unpatched condition: largest difference 0.10 nats per
-item, r > .998; outputs/patch/sweep_check.csv), so that each run across layers is compared
+item, r > .998), so that each run across layers is compared
 only with its own unpatched conditions.
 
 ## 2.8 Two further judgments
@@ -418,12 +416,11 @@ written by students who have not yet been asked for consent to publication, and 
 Therefore, these texts cannot be shared. The two further judgments (Section 2.8) use
 publicly available data [@marks2024geometry; @ott2011finding; @ott2013negative]. For the
 negated statements, the repository contains one entry point that reruns the analyses from
-the public statement sets and a check against the values reported here (`reproduce/`); for
+the public statement sets and a check against the values reported here; for
 the reviews, it contains the code but no such entry point. The human texts of the training
 study (Section 2.9) are public [@block2019gnad]; the AI texts that we generated for it are
 not yet released. All code and the tables of derived results from which the
-reported numbers are taken are available in the project repository; files cited here as
-`outputs/…` are found there under `results/`. The per-text model outputs for the authorship
+reported numbers are taken are available in the project repository. The per-text model outputs for the authorship
 corpora are not included, because their identifiers refer to unpublished texts.
 
 ## 2.12 Use of AI tools

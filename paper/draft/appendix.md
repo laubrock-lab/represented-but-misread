@@ -146,7 +146,7 @@ post-trained mainly for conversation became more similar: The mean correlation b
 models rose from .36 (range .16–.50) for the base models to .52 (.45–.58) for the final
 models; OLMo 3 Think did not join this convergence (.18–.33 with the other final models).
 Without separating the polarities, the correlations fell (from .75 to .48), because the
-shared polarity heuristic of the base models disappeared (review_convergence.py).
+shared polarity heuristic of the base models disappeared.
 
 *Localization.* Stitching and patching were run for Gemma 3 4B (which lost sensitivity)
 and Qwen3 (which gained). In Qwen3, the gain arose gradually over layers 2–18 in stitching;
@@ -211,8 +211,7 @@ these are the cells with the most negative d′, and that this is expected: The 
 direction is the difference between the class means at the position from which the answer is
 read, so that, if the answer depends approximately linearly on this state, shifting along it
 must reproduce the observed difference between the classes. Across the 25 cells, the effect
-of a shift by one class distance correlated with the observed difference (r = .91;
-outputs/steer_nulls_summary.csv). The test therefore does not provide evidence that is independent of the answers'
+of a shift by one class distance correlated with the observed difference (r = .91). The test therefore does not provide evidence that is independent of the answers'
 d′; it shows that the inverse ordering is carried by the class-mean difference at the answer
 position, more than by typical directions. In the
 remaining cells, the authorship direction did not move the answer more than arbitrary
@@ -293,7 +292,7 @@ plain prompt for both checkpoints, this was not the case.
 
 > **Table E1.** Gain in d′ from 0 to 16 labeled examples (mean of the per-set d′ minus
 > zero-shot d′), for base and final post-trained models on the same texts, and the
-> difference of the gains with a grouped-bootstrap CI (fewshot_summary.py).
+> difference of the gains with a grouped-bootstrap CI.
 >
 > | Corpus | Model | Gain base | Gain post-trained | Difference [95% CI] |
 > |:---|:---|---:|---:|---:|
@@ -311,7 +310,7 @@ plain prompt for both checkpoints, this was not the case.
 > oder KI", without base-rate sentence), and presence of a base-rate sentence (50% vs. none).
 > The changes of d′ had no consistent direction (mean signed change ≤ 0.03). In 56% of the
 > conditions, the model gave the same answer to at least 98% of the texts, so that c could
-> hardly move (sdt_invariance.py; outputs/sdt_invariance_conditions.csv, sdt_invariance_tests.csv).
+> hardly move.
 
 | Model | Checkpoint | Base rate 20→80%: c | Base rate 20→80%: d′ | Answer order: c | Answer order: d′ | Base-rate sentence: c | Base-rate sentence: d′ |
 |:---|:---|---:|---:|---:|---:|---:|---:|
@@ -333,7 +332,7 @@ plain prompt for both checkpoints, this was not the case.
 > 20% and 80% AI texts, averaged over three corpora and both answer orders (six cells; range
 > over cells in brackets), its ratio to the shift of the prior log-odds (ln 16 = 2.77), and the
 > mean between-text SD of the shift within a cell. Wording: share named first in the base-rate
-> sentence (base_rate_shift.py; outputs/base_rate_shift_models.csv).
+> sentence.
 
 | Model | Checkpoint | Wording | Shift [range] | Ratio to ln 16 | Between-text SD |
 |:---|:---|:---|---:|---:|---:|
@@ -397,7 +396,7 @@ blocks.
 > **Table H1.** Activation patching at layer 16 with the question placed before the text
 > (textbook summaries): d′ of the recipient after receiving the donor's states at one set of
 > positions; change relative to the unpatched recipient with 95% CI (grouped bootstrap) for
-> the three sets of interest (localization_summary.py; outputs/patch/patch_summary.csv).
+> the three sets of interest.
 >
 > | Recipient ← donor | Unpatched | Donor | Text | Question (before text) | After text | All positions |
 > |:---|---:|---:|---:|---:|---:|---:|

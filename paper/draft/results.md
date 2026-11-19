@@ -181,7 +181,7 @@ from −0.12 (base) to −0.50 after SFT and then remained stable (−0.46 after
 optimization, −0.44 after the final reinforcement-learning stage). For Apertus, d′ fell
 from +0.43 to −0.04 after SFT and stayed near zero through the subsequent stages (0.00,
 −0.03, −0.04). The other corpora and the OLMo 3 lines, for which stage-wise checkpoints exist as well,
-mostly gave the same picture (stages_summary.csv): On the newspaper segments, d′ fell at
+mostly gave the same picture: On the newspaper segments, d′ fell at
 the supervised stage in OLMo 2 (−0.14 to −0.54), OLMo 3 Think (+0.60 to +0.08), and OLMo 3
 Instruct (+0.60 to −0.28), and on the short chats in Apertus (−0.23 to −0.73). There were two
 exceptions: OLMo 3 Instruct on the short chats declined only at the preference stage
@@ -278,7 +278,7 @@ texts, the stated base rate already moved the base models considerably (by 0.9�
 model) and the post-trained models somewhat more (2.0–5.3 SD); the relative shift increased
 with post-training in five families and decreased in OLMo 3 Think (3.3 to 2.0 SD), and with
 the second wording it increased only in Gemma 3 4B (0.8 to 4.2 SD), not in OLMo 2 (2.5 to
-2.4 SD; base_rate_scale.py). Thus, the post-trained models gave more extreme log-odds in
+2.4 SD). Thus, the post-trained models gave more extreme log-odds in
 general, to the base rate as well as to the texts; that the base rate gained weight relative
 to the texts holds for most, but not all, models and wordings.
 
@@ -332,7 +332,7 @@ within or close to the range of their parents (largest deviation from the unstit
 0.08 for OLMo 2; none of 14 Apertus hybrids and one of 14 OLMo 2 hybrids reliably outside),
 whereas on the textbook
 summaries 6 of 18 Apertus hybrids and 4 of 18 OLMo 2 hybrids lay reliably outside
-(largest deviation 0.46 and 0.15; outputs/stitch/stitch_summary.csv). Stitching thus
+(largest deviation 0.46 and 0.15). Stitching thus
 does not disturb the models' judgments in general. The control does not show, however, that
 the overshoot is specific to the judgment that post-training changed: The control judgment
 was far from chance, with high answer probability, whereas the textbook judgments were close
@@ -398,7 +398,7 @@ the difference, and exchanging the text states did not.
 
 Patching at two layers can miss a contribution that is confined to other layers, as the
 negated statements show (Section 3.6). We therefore repeated the patching on the textbook
-summaries at 12 layers between 2 and 32 (Figure 6; outputs/patch_sweep/patch_sweep_summary.csv).
+summaries at 12 layers between 2 and 32 (Figure 6).
 In OLMo 2, the text states did not transfer the difference at any layer, in either
 direction: The base model with the SFT model's text states stayed between −0.17 and −0.05
 (unpatched −0.12), and the SFT model with the base model's text states between −0.61 and
@@ -485,8 +485,7 @@ four of the six families less well after post-training on at least one corpus (u
 of the network, final vs. base model: Gemma 3 4B, −0.52 on the newspaper segments and −0.90
 on the textbook summaries; Gemma 3 12B, −0.57 and −0.47; OLMo 3 Think, −0.41 and −0.70;
 Qwen3, −0.38 on the textbook summaries). In Apertus, the change was mixed (chats −0.26,
-newspaper segments +0.43), and in OLMo 2 there was no decline
-(checkpoint_transfer_last_summary.py). Post-training thus left the text positions
+newspaper segments +0.43), and in OLMo 2 there was no decline. Post-training thus left the text positions
 essentially unchanged where the test is informative, and both reorganized and, in some
 models, degraded the information available at the answer position.
 
@@ -501,7 +500,7 @@ The authorship corpora cannot be shared. Is the dissociation between representat
 answer, and its modification by post-training, specific to them? We repeated the central
 analyses with truth judgments on public statement sets (Section 2.8), whose main
 analyses (answers, probes, stitching, and patching at two layers) can be rerun with one
-script (`reproduce/negation.sh`). Here, post-training acted in the opposite
+script. Here, post-training acted in the opposite
 direction: It repaired answers that the base models gave poorly.
 Table 3 summarizes the results.
 
@@ -576,7 +575,7 @@ repair (0.38). In Apertus, the first 8 base layers under SFT upper layers likewi
 the repair intact (4.15), the first 12 removed most of it (1.33), and the first 16 all of it
 (−0.94); conversely, the first 8 SFT layers under base upper layers produced part of the
 repair (1.21) and the first 12 all of it (4.15). The repair thus involved layers 9 to 16,
-with a partial contribution of the layers below (outputs/stitch/stitch_neg_cities.csv). To ask where in the prompt the
+with a partial contribution of the layers below. To ask where in the prompt the
 repair acts, we exchanged the internal states between the checkpoints at selected positions
 of the prompt (activation patching; Figure 2D). Note that in the prompt for the truth
 judgments the question precedes the statement, so that the statement is read with the task
@@ -657,7 +656,7 @@ Because the question precedes the statement in this prompt, we also posed the ju
 the statement placed before the question. The pattern of the answers was the same, and
 more pronounced: The base models ordered the negated statements at or below chance (OLMo 2:
 d′ = −0.14 [−0.24, −0.05]; Apertus: −2.13 [−2.29, −1.99]), and the SFT models judged them
-nearly as with the default prompt (3.42 and 4.54; truth_variant_answers.py). The repair by
+nearly as with the default prompt (3.42 and 4.54). The repair by
 supervised fine-tuning thus does not depend on the question being known when the statement
 is read. Patching across layers with this prompt (same 12 layers, 100 statement pairs)
 gave the same localization as with the default prompt. In OLMo 2, the SFT model's statement
@@ -707,7 +706,7 @@ we found no request to judge whether a text had been written by a
 human or by an AI: The search pattern matched five conversations in Tülu 3 and none in the
 Apertus sample, and on inspection none of the five posed this judgment (they concerned,
 e.g., a training script for an audio classifier and summaries of research papers; the matches
-are listed in outputs/sft_check/). The matches for fake or deceptive reviews were sentiment tasks or
+are listed in the repository). The matches for fake or deceptive reviews were sentiment tasks or
 summaries of research papers. Because our judgments were posed in German, we repeated the
 search with German patterns in the conversations written in German, which made up only
 0.1% of Tülu 3 (992 conversations) and 1.7% of the Apertus sample (6,330). They
@@ -820,7 +819,7 @@ The account that the valid news labels installed a readout of the cues of the ne
 mislead on the chats, makes a prediction that can be tested item by item (Section 2.9). We
 fitted a probe for authorship on the held-out news in the base model, at the text
 positions, so that it is defined independently of any fine-tuned readout, and applied it
-unchanged to the chats (mean of layers 20 and 24; training_study/prediction_test.py). This
+unchanged to the chats (mean of layers 20 and 24). This
 news probe separated the chats with the wrong sign (d′ = −0.44 [−0.70, −0.15]). If training
 with valid news labels makes the answer follow what distinguishes AI from human news, the
 answers of the C1 models to the individual chats should follow the probe's scores, and those
@@ -836,7 +835,7 @@ did not separate the chats reliably in the base model (−0.11 [−0.36, 0.14]).
 Any classifier that has learned to tell AI from human news might agree with the C1 models
 on the chats, whatever happens inside the models. We therefore repeated the test with two
 classifiers that use no activations, logistic regressions on word and on character n-grams
-of the same held-out news (training_study/prediction_ngram_control.py). They, too, separated
+of the same held-out news. They, too, separated
 the chats with the wrong sign (d′ = −0.53 [−0.80, −0.28] and −0.55 [−0.84, −0.27]), so that
 the reversal between the genres is a property of the texts and not of the model's
 representation. Their scores also correlated with the answers of the C1 models (ρ = .32

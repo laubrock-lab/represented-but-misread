@@ -46,7 +46,7 @@ by a human or by an AI are weak and biased judges: Their errors lean in one dire
 and the direction differs between models and model generations [@bhattacharjee2024fighting; @yuan2026crossgen]. When GPT-3.5 and GPT-4 judged transcripts of Turing-test
 conversations, their accuracy was even below chance [@rathi2024gpt4]. In pilot work
 with the German chat messages used here, four commercial models judged each message with
-five prompt versions and rated their confidence (pilot_llm_judge_summary.py). Two of them,
+five prompt versions and rated their confidence. Two of them,
 GPT-5.4 and Claude Opus 4.6, had written the AI messages themselves. None of the four
 models recognized these messages: With any prompt version, each model called at most 16%
 of them AI, and the two generators called at most 7% and 14% of their own messages AI.
