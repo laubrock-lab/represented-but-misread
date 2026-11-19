@@ -1,0 +1,29 @@
+true_class,variable,value,n
+human,words (AUC of label),0.38442928339865484,
+human,target_len=25,0.6602564102564102,312.0
+human,target_len=80,0.4590643274853801,342.0
+human,target_len=150,0.39473684210526316,342.0
+human,section=Etat,0.5566037735849056,106.0
+human,section=Inland,0.628099173553719,121.0
+human,section=International,0.6355140186915887,107.0
+human,section=Kultur,0.39344262295081966,122.0
+human,section=Panorama,0.5425531914893617,94.0
+human,section=Sport,0.319672131147541,122.0
+human,section=Web,0.30833333333333335,120.0
+human,section=Wirtschaft,0.6846846846846847,111.0
+human,section=Wissenschaft,0.4731182795698925,93.0
+AI,words (AUC of label),0.4267953577838407,
+AI,target_len=25,0.5598802395209581,334.0
+AI,target_len=80,0.5446153846153846,325.0
+AI,target_len=150,0.39644970414201186,338.0
+AI,section=Etat,0.4959349593495935,123.0
+AI,section=Inland,0.6132075471698113,106.0
+AI,section=International,0.5321100917431193,109.0
+AI,section=Kultur,0.40384615384615385,104.0
+AI,section=Panorama,0.42016806722689076,119.0
+AI,section=Sport,0.26262626262626265,99.0
+AI,section=Web,0.55,100.0
+AI,section=Wirtschaft,0.6017699115044248,113.0
+AI,section=Wissenschaft,0.5887096774193549,124.0
+AI,generator=gemma3-12b,0.6101010101010101,495.0
+AI,generator=qwen3-8b,0.3904382470119522,502.0

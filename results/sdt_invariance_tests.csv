@@ -1,0 +1,361 @@
+corpus,preset,variant,contrast,measure,est,lo,hi,excl0,moved,any_saturated
+chat_tw25,gemma3-4b,base,order km-mk,d,0.02825743766327793,-0.15770992885211554,0.21674839654539202,False,True,False
+chat_tw25,gemma3-4b,base,order km-mk,c,1.551737554797497,1.3400056234684734,1.9425897932470684,True,True,False
+chat_tw25,gemma3-4b,base,sentence p50-none (mk),d,0.05668373537102345,-0.08999804648869691,0.1919495275961563,False,True,True
+chat_tw25,gemma3-4b,base,sentence p50-none (mk),c,-0.6177925103594153,-0.8622321234959665,-0.18757425165470354,True,True,True
+chat_tw25,gemma3-4b,base,base rate slope per 10 pts (mk),d,0.010604905216858446,-0.005828122937034021,0.026223095283569618,False,True,True
+chat_tw25,gemma3-4b,base,base rate slope per 10 pts (mk),c,-0.10174999278482791,-0.15693766596798747,-0.04106005073615904,True,True,True
+chat_tw25,gemma3-4b,base,sentence p50-none (km),d,0.08143662374599214,-0.05063222245369976,0.2004030309924985,False,True,False
+chat_tw25,gemma3-4b,base,sentence p50-none (km),c,0.2258898879285411,0.09336327588930025,0.36656836427420625,True,True,False
+chat_tw25,gemma3-4b,base,base rate slope per 10 pts (km),d,0.004529552179141845,-0.0100739030211597,0.020013537870743968,False,True,False
+chat_tw25,gemma3-4b,base,base rate slope per 10 pts (km),c,-0.1356678581015289,-0.16581939525488815,-0.11270674448394173,True,True,False
+chat_tw25,gemma3-4b,instruct,order km-mk,d,0.0994153194976718,-0.029735389400703218,0.2327455034324679,False,True,False
+chat_tw25,gemma3-4b,instruct,order km-mk,c,-0.04416242213788635,-0.1723361859351262,0.07571239940956286,False,True,False
+chat_tw25,gemma3-4b,instruct,sentence p50-none (mk),d,0.22005976410305284,0.061846948341884235,0.39091769309860336,True,True,False
+chat_tw25,gemma3-4b,instruct,sentence p50-none (mk),c,-0.5144945186638763,-0.6888441014796689,-0.3697117193741987,True,True,False
+chat_tw25,gemma3-4b,instruct,base rate slope per 10 pts (mk),d,0.005091557736508866,-0.013242044406037852,0.02319300553783506,False,True,False
+chat_tw25,gemma3-4b,instruct,base rate slope per 10 pts (mk),c,-0.357335944816944,-0.4288179982785579,-0.31149054625943906,True,True,False
+chat_tw25,gemma3-4b,instruct,sentence p50-none (km),d,0.2925810706078783,0.1391098584330199,0.46795185874777107,True,True,False
+chat_tw25,gemma3-4b,instruct,sentence p50-none (km),c,-1.0392508775190759,-1.2602762518904507,-0.8430810911028661,True,True,False
+chat_tw25,gemma3-4b,instruct,base rate slope per 10 pts (km),d,0.018159803295182252,-0.0016445974421292373,0.038418419493030154,False,True,False
+chat_tw25,gemma3-4b,instruct,base rate slope per 10 pts (km),c,-0.4076883018975952,-0.449788287519873,-0.37237096490263677,True,True,False
+chat_tw25,gemma3-12b,base,order km-mk,d,-0.03948253264215684,-0.17459802698836402,0.11060079552521772,False,True,True
+chat_tw25,gemma3-12b,base,order km-mk,c,2.2202222560380385,1.9324968835952094,2.6821257478742857,True,True,True
+chat_tw25,gemma3-12b,base,sentence p50-none (mk),d,0.1349358087252297,-0.06729450677779243,0.3528288843340856,False,True,False
+chat_tw25,gemma3-12b,base,sentence p50-none (mk),c,-0.7192160765136716,-0.9213867984666795,-0.5397129146861968,True,True,False
+chat_tw25,gemma3-12b,base,base rate slope per 10 pts (mk),d,-0.010540104751629094,-0.03083646425356052,0.00765354041423054,False,True,False
+chat_tw25,gemma3-12b,base,base rate slope per 10 pts (mk),c,-0.26813197287998436,-0.3351861836863197,-0.22902604905866092,True,True,False
+chat_tw25,gemma3-12b,base,sentence p50-none (km),d,0.2469582192504193,0.06352717118440089,0.43165148859983443,True,True,True
+chat_tw25,gemma3-12b,base,sentence p50-none (km),c,-0.4167972771506443,-0.8266658488701778,-0.1134990081205185,True,True,True
+chat_tw25,gemma3-12b,base,base rate slope per 10 pts (km),d,-0.02186055398256141,-0.04161423912385993,-0.00600487778877371,True,True,True
+chat_tw25,gemma3-12b,base,base rate slope per 10 pts (km),c,-0.2209197514459607,-0.2788480208235869,-0.17526989711350652,True,True,True
+chat_tw25,gemma3-12b,instruct,order km-mk,d,-0.10463091852936024,-0.19445350084004387,-0.019102964131069513,True,True,False
+chat_tw25,gemma3-12b,instruct,order km-mk,c,0.12514740237908462,0.02247851105777432,0.2772636940066321,True,True,False
+chat_tw25,gemma3-12b,instruct,sentence p50-none (mk),d,-0.0728055956161704,-0.19942713770084183,0.051493270653984895,False,True,False
+chat_tw25,gemma3-12b,instruct,sentence p50-none (mk),c,-0.862304698474869,-1.0841729977203907,-0.6967901211135363,True,True,False
+chat_tw25,gemma3-12b,instruct,base rate slope per 10 pts (mk),d,0.011237237225874124,-0.009775966523687816,0.03232661177802569,False,True,False
+chat_tw25,gemma3-12b,instruct,base rate slope per 10 pts (mk),c,-0.3451850536389486,-0.4108787419988575,-0.29779936781060296,True,True,False
+chat_tw25,gemma3-12b,instruct,sentence p50-none (km),d,-0.032852435214519526,-0.16718718152444362,0.0978823405064625,False,True,False
+chat_tw25,gemma3-12b,instruct,sentence p50-none (km),c,-0.2076036686046625,-0.43594891577766637,-0.028152727634350252,True,True,False
+chat_tw25,gemma3-12b,instruct,base rate slope per 10 pts (km),d,0.00969536211583308,-0.013302267145861569,0.03268562815474559,False,True,False
+chat_tw25,gemma3-12b,instruct,base rate slope per 10 pts (km),c,-0.2937159277917543,-0.32822731033045577,-0.25943588431337167,True,True,False
+chat_tw25,qwen3-8b,base,order km-mk,d,-0.05205340194476382,-0.14549835076073608,0.04112988494791437,False,True,False
+chat_tw25,qwen3-8b,base,order km-mk,c,0.6462782374900298,0.48787414123686884,0.8340537630077403,True,True,False
+chat_tw25,qwen3-8b,base,sentence p50-none (mk),d,-0.023324642540366036,-0.16522375873835643,0.10905307471222936,False,True,False
+chat_tw25,qwen3-8b,base,sentence p50-none (mk),c,-1.0712120821254119,-1.2711031002395858,-0.8992474339576747,True,True,False
+chat_tw25,qwen3-8b,base,base rate slope per 10 pts (mk),d,-0.003167308264674853,-0.021978113765516807,0.013460770808177109,False,True,False
+chat_tw25,qwen3-8b,base,base rate slope per 10 pts (mk),c,-0.2436329942188332,-0.3043188608848619,-0.20625484594623733,True,True,False
+chat_tw25,qwen3-8b,base,sentence p50-none (km),d,0.06768444561468445,-0.0942103159800563,0.22524125901195652,False,True,False
+chat_tw25,qwen3-8b,base,sentence p50-none (km),c,-0.6732004655739432,-0.8549387555843181,-0.48903244766525,True,True,False
+chat_tw25,qwen3-8b,base,base rate slope per 10 pts (km),d,-0.0021977944090158627,-0.016692699938428125,0.012269819013611676,False,True,False
+chat_tw25,qwen3-8b,base,base rate slope per 10 pts (km),c,-0.24007992884126222,-0.28880439136203145,-0.20205130384555553,True,True,False
+chat_tw25,qwen3-8b,instruct,order km-mk,d,-0.14106176876645793,-0.2764017463631371,-0.014073560239176379,True,True,True
+chat_tw25,qwen3-8b,instruct,order km-mk,c,-0.18377738205988026,-0.3423432084850728,0.0,False,True,True
+chat_tw25,qwen3-8b,instruct,sentence p50-none (mk),d,0.041078919390997726,-0.11613051746380038,0.19618975460616986,False,True,True
+chat_tw25,qwen3-8b,instruct,sentence p50-none (mk),c,-0.18377738205988026,-0.3423432084850728,0.0,False,True,True
+chat_tw25,qwen3-8b,instruct,base rate slope per 10 pts (mk),d,0.02577978012228901,0.005115966570299357,0.04913470635006616,True,True,True
+chat_tw25,qwen3-8b,instruct,base rate slope per 10 pts (mk),c,-2.7629943525931064e-16,-2.7629943525931064e-16,-9.209981175310355e-17,False,False,True
+chat_tw25,qwen3-8b,instruct,sentence p50-none (km),d,0.03471877018446479,-0.13533949650819616,0.1875718911594509,False,True,True
+chat_tw25,qwen3-8b,instruct,sentence p50-none (km),c,0.0,0.0,0.0,False,False,True
+chat_tw25,qwen3-8b,instruct,base rate slope per 10 pts (km),d,0.030111128807923663,0.010974887797800557,0.05110178087884944,True,True,True
+chat_tw25,qwen3-8b,instruct,base rate slope per 10 pts (km),c,-0.06541514883390516,-0.08837177737559876,-0.03059041415635488,True,True,True
+chat_tw25,olmo2-7b,base,order km-mk,d,-0.48532437598137906,-0.7907476656665875,-0.196794303475227,True,True,True
+chat_tw25,olmo2-7b,base,order km-mk,c,3.794507143830658,3.5849824800068752,4.048055025536971,True,True,True
+chat_tw25,olmo2-7b,base,sentence p50-none (mk),d,0.08221382806413335,-0.12516086405026977,0.3129539618817937,False,True,True
+chat_tw25,olmo2-7b,base,sentence p50-none (mk),c,-0.23868601383326382,-0.5247712103023785,0.00523181239386006,False,True,True
+chat_tw25,olmo2-7b,base,base rate slope per 10 pts (mk),d,-0.012878865622002784,-0.025667311088219815,-0.001640936737947414,True,True,True
+chat_tw25,olmo2-7b,base,base rate slope per 10 pts (mk),c,-0.2617334183957649,-0.36592883340751553,-0.19801193537542544,True,True,True
+chat_tw25,olmo2-7b,base,sentence p50-none (km),d,0.19717586530906434,7.107447568200536e-05,0.41519044333230304,True,True,True
+chat_tw25,olmo2-7b,base,sentence p50-none (km),c,0.0,0.0,0.0,False,False,True
+chat_tw25,olmo2-7b,base,base rate slope per 10 pts (km),d,-0.008319362772612719,-0.022442226831678,0.00376276600661991,False,True,True
+chat_tw25,olmo2-7b,base,base rate slope per 10 pts (km),c,1.3814971762965532e-16,4.6049905876551777e-17,2.7629943525931064e-16,False,False,True
+chat_tw25,olmo2-7b,instruct,order km-mk,d,-0.18259255266074523,-0.408660889033826,0.0059558868120059075,False,True,True
+chat_tw25,olmo2-7b,instruct,order km-mk,c,0.4931492985515882,0.0,0.7528642856032549,False,True,True
+chat_tw25,olmo2-7b,instruct,sentence p50-none (mk),d,-0.023726556108210117,-0.16222749170143044,0.11017490748166216,False,True,True
+chat_tw25,olmo2-7b,instruct,sentence p50-none (mk),c,-1.7062115928526942,-2.2118027392388204,-1.3766744528117936,True,True,True
+chat_tw25,olmo2-7b,instruct,base rate slope per 10 pts (mk),d,-0.02472980344410324,-0.04504954961307884,-0.004482827254512565,True,True,True
+chat_tw25,olmo2-7b,instruct,base rate slope per 10 pts (mk),c,-0.3947413061456587,-0.44953455148564136,-0.35594153426937275,True,True,True
+chat_tw25,olmo2-7b,instruct,sentence p50-none (km),d,0.01762711379056464,-0.15450506077973347,0.19723384273271163,False,True,True
+chat_tw25,olmo2-7b,instruct,sentence p50-none (km),c,0.0,0.0,0.0,False,False,True
+chat_tw25,olmo2-7b,instruct,base rate slope per 10 pts (km),d,-0.02946067374282755,-0.050936135764774744,-0.009244445757894222,True,True,True
+chat_tw25,olmo2-7b,instruct,base rate slope per 10 pts (km),c,1.3814971762965532e-16,4.6049905876551777e-17,2.7629943525931064e-16,False,False,True
+chat_tw25,apertus15-8b,base,order km-mk,d,0.05255768344367778,-0.18697304074286417,0.282106097235592,False,True,True
+chat_tw25,apertus15-8b,base,order km-mk,c,-0.685894290413152,-0.9439804717923523,-0.2772608928153306,True,True,True
+chat_tw25,apertus15-8b,base,sentence p50-none (mk),d,0.23623789978673942,0.02805394598732208,0.4257320768002901,True,True,True
+chat_tw25,apertus15-8b,base,sentence p50-none (mk),c,0.47872574568793014,0.17283999832001032,0.8375326768439503,True,True,True
+chat_tw25,apertus15-8b,base,base rate slope per 10 pts (mk),d,-0.00024320736879987305,-0.028349578437763184,0.026203576619786815,False,True,True
+chat_tw25,apertus15-8b,base,base rate slope per 10 pts (mk),c,-0.20333427618554473,-0.26223968864171404,-0.14619093349388454,True,True,True
+chat_tw25,apertus15-8b,base,sentence p50-none (km),d,0.1622729213303976,-0.016421525500279102,0.3721573900798654,False,True,True
+chat_tw25,apertus15-8b,base,sentence p50-none (km),c,0.0,0.0,0.0,False,False,True
+chat_tw25,apertus15-8b,base,base rate slope per 10 pts (km),d,-0.011160846257918198,-0.0343392677633455,0.008707413294021759,False,True,True
+chat_tw25,apertus15-8b,base,base rate slope per 10 pts (km),c,-2.7629943525931064e-16,-2.7629943525931064e-16,-9.209981175310355e-17,False,False,True
+chat_tw25,apertus15-8b,instruct,order km-mk,d,-0.049488220262638216,-0.15972370109950962,0.04608860835932528,False,True,False
+chat_tw25,apertus15-8b,instruct,order km-mk,c,0.2423467583438783,0.12174442694458991,0.38961030211017716,True,True,False
+chat_tw25,apertus15-8b,instruct,sentence p50-none (mk),d,0.014066779414462993,-0.2006197042493745,0.19969813686028606,False,True,True
+chat_tw25,apertus15-8b,instruct,sentence p50-none (mk),c,0.06990763235526054,-0.041877268104851824,0.19290421621657744,False,True,True
+chat_tw25,apertus15-8b,instruct,base rate slope per 10 pts (mk),d,-0.0003116106223858595,-0.032140676099201765,0.033692285144608425,False,True,True
+chat_tw25,apertus15-8b,instruct,base rate slope per 10 pts (mk),c,-0.3073426799409174,-0.364037720770368,-0.26017806666664556,True,True,True
+chat_tw25,apertus15-8b,instruct,sentence p50-none (km),d,-0.03329174269572022,-0.21121525373736869,0.1363024263952659,False,True,True
+chat_tw25,apertus15-8b,instruct,sentence p50-none (km),c,-0.04201401312930919,-0.13677018661824492,0.052381297928332494,False,True,True
+chat_tw25,apertus15-8b,instruct,base rate slope per 10 pts (km),d,-0.012350896285549846,-0.039586263483971734,0.014804676026667222,False,True,True
+chat_tw25,apertus15-8b,instruct,base rate slope per 10 pts (km),c,-0.365291822789288,-0.41666991886225535,-0.3206790445177197,True,True,True
+chat_tw25,olmo3-7b-think,base,order km-mk,d,0.13418034152153938,-0.09209190761528525,0.3724398592583595,False,True,True
+chat_tw25,olmo3-7b-think,base,order km-mk,c,0.4341676302447137,0.18393610500688284,0.5551655546647614,True,True,True
+chat_tw25,olmo3-7b-think,base,sentence p50-none (mk),d,-0.004641646408115541,-0.220062267385701,0.20266088405035268,False,True,True
+chat_tw25,olmo3-7b-think,base,sentence p50-none (mk),c,0.0,0.0,0.0,False,False,True
+chat_tw25,olmo3-7b-think,base,base rate slope per 10 pts (mk),d,-0.05550728809644606,-0.09095526137614257,-0.022475478643127503,True,True,True
+chat_tw25,olmo3-7b-think,base,base rate slope per 10 pts (mk),c,-2.7629943525931064e-16,-2.7629943525931064e-16,-9.209981175310355e-17,False,False,True
+chat_tw25,olmo3-7b-think,base,sentence p50-none (km),d,0.09270583010982268,-0.07779643326891016,0.25456549824083974,False,True,True
+chat_tw25,olmo3-7b-think,base,sentence p50-none (km),c,1.4244925326253186,1.1867433168193668,1.6823898270484536,True,True,True
+chat_tw25,olmo3-7b-think,base,base rate slope per 10 pts (km),d,-0.03132383283165116,-0.053613540050699675,-0.012476507766572139,True,True,True
+chat_tw25,olmo3-7b-think,base,base rate slope per 10 pts (km),c,-0.20329813020641288,-0.24296296334938,-0.17250553234661814,True,True,True
+chat_tw25,olmo3-7b-think,instruct,order km-mk,d,0.033338846135501726,-0.2314350025760607,0.3145540170201169,False,True,True
+chat_tw25,olmo3-7b-think,instruct,order km-mk,c,0.3997922304741106,0.0,0.6720340894792358,False,True,True
+chat_tw25,olmo3-7b-think,instruct,sentence p50-none (mk),d,0.20373672264791126,0.025714274569755384,0.38584599819767584,True,True,True
+chat_tw25,olmo3-7b-think,instruct,sentence p50-none (mk),c,0.0,0.0,0.0,False,False,True
+chat_tw25,olmo3-7b-think,instruct,base rate slope per 10 pts (mk),d,-0.018362872332954888,-0.040495333762822654,0.0034875840569748777,False,True,True
+chat_tw25,olmo3-7b-think,instruct,base rate slope per 10 pts (mk),c,-2.7629943525931064e-16,-2.7629943525931064e-16,-9.209981175310355e-17,False,False,True
+chat_tw25,olmo3-7b-think,instruct,sentence p50-none (km),d,0.05641672371157157,-0.11173533867572732,0.25061818627367316,False,True,True
+chat_tw25,olmo3-7b-think,instruct,sentence p50-none (km),c,-0.3997922304741106,-0.6720340894792358,0.0,False,True,True
+chat_tw25,olmo3-7b-think,instruct,base rate slope per 10 pts (km),d,-0.024408438464092363,-0.039647107219225645,-0.0097693361655231,True,True,True
+chat_tw25,olmo3-7b-think,instruct,base rate slope per 10 pts (km),c,-2.7629943525931064e-16,-2.7629943525931064e-16,-9.209981175310355e-17,False,False,True
+journalism_seg,gemma3-4b,base,order km-mk,d,0.19804537747608086,-0.11261949907572175,0.6743763806632047,False,True,False
+journalism_seg,gemma3-4b,base,order km-mk,c,-0.1122865776459463,-0.17206377893249447,0.0,False,True,False
+journalism_seg,gemma3-4b,base,sentence p50-none (mk),d,-0.005920190749491905,-0.29697429088180183,0.3324595379744866,False,True,True
+journalism_seg,gemma3-4b,base,sentence p50-none (mk),c,-0.1122865776459463,-0.17206377893249447,0.0,False,True,True
+journalism_seg,gemma3-4b,base,base rate slope per 10 pts (mk),d,0.005832962628170312,-0.02947697611318453,0.048646829806247016,False,True,True
+journalism_seg,gemma3-4b,base,base rate slope per 10 pts (mk),c,-0.03934834561538887,-0.06057778022845556,-9.209981175310355e-17,False,True,True
+journalism_seg,gemma3-4b,base,sentence p50-none (km),d,0.038931649830198145,-0.24530751270443854,0.346415530758832,False,True,True
+journalism_seg,gemma3-4b,base,sentence p50-none (km),c,0.1122865776459463,0.0,0.17206377893249444,False,True,True
+journalism_seg,gemma3-4b,base,base rate slope per 10 pts (km),d,0.03447548252578001,-0.006913041379160653,0.084648240523363,False,True,True
+journalism_seg,gemma3-4b,base,base rate slope per 10 pts (km),c,-0.06756308380874428,-0.11438689249723129,-1.3814971762965532e-16,False,True,True
+journalism_seg,gemma3-4b,instruct,order km-mk,d,-0.09783340533285323,-0.35210802704815936,0.1766197642315281,False,True,True
+journalism_seg,gemma3-4b,instruct,order km-mk,c,0.8717082435104899,0.3601489186464505,1.3295095931592966,True,True,True
+journalism_seg,gemma3-4b,instruct,sentence p50-none (mk),d,-0.1778112005710759,-0.4902236779806223,0.2444173996671478,False,True,True
+journalism_seg,gemma3-4b,instruct,sentence p50-none (mk),c,-0.8005399073565017,-1.3795280429065535,-0.39103910600821046,True,True,True
+journalism_seg,gemma3-4b,instruct,base rate slope per 10 pts (mk),d,-0.007042447471676242,-0.033649464490197484,0.021495330664506616,False,True,True
+journalism_seg,gemma3-4b,instruct,base rate slope per 10 pts (mk),c,-0.6837515311904998,-0.7891751535350178,-0.5936756367191499,True,True,True
+journalism_seg,gemma3-4b,instruct,sentence p50-none (km),d,-0.1615467523499391,-0.5418955843978633,0.21293033088807287,False,True,True
+journalism_seg,gemma3-4b,instruct,sentence p50-none (km),c,-1.242374360615351,-1.6691067818129648,-0.8660127541912661,True,True,True
+journalism_seg,gemma3-4b,instruct,base rate slope per 10 pts (km),d,0.013960776733898035,-0.02133340664244014,0.05460574417718705,False,True,True
+journalism_seg,gemma3-4b,instruct,base rate slope per 10 pts (km),c,-0.7381587539303495,-0.791484259603873,-0.6839516538576529,True,True,True
+journalism_seg,gemma3-12b,base,order km-mk,d,0.5597999181049452,0.44244334270162067,0.7448057730678035,True,True,False
+journalism_seg,gemma3-12b,base,order km-mk,c,0.2437732025631688,-0.030838962339587384,0.5523835855424178,False,True,False
+journalism_seg,gemma3-12b,base,sentence p50-none (mk),d,0.1159195209533884,-0.08656289266015889,0.32963147896549017,False,True,False
+journalism_seg,gemma3-12b,base,sentence p50-none (mk),c,-0.4485878219641003,-0.7270343264856195,-0.19930806743040727,True,True,False
+journalism_seg,gemma3-12b,base,base rate slope per 10 pts (mk),d,-0.012793126647450241,-0.047450727343752504,0.014035866875002856,False,True,False
+journalism_seg,gemma3-12b,base,base rate slope per 10 pts (mk),c,-0.3623563240986904,-0.47380544254446744,-0.29757054004877376,True,True,False
+journalism_seg,gemma3-12b,base,sentence p50-none (km),d,0.027600165161185436,-0.2926909363252002,0.3412018422279478,False,True,False
+journalism_seg,gemma3-12b,base,sentence p50-none (km),c,-0.5346461607593412,-0.8518848494565967,-0.30969417481899464,True,True,False
+journalism_seg,gemma3-12b,base,base rate slope per 10 pts (km),d,0.01384658794802331,-0.00760390817670309,0.03286832704928501,False,True,False
+journalism_seg,gemma3-12b,base,base rate slope per 10 pts (km),c,-0.30632650194768674,-0.39401077967307513,-0.25359141418517694,True,True,False
+journalism_seg,gemma3-12b,instruct,order km-mk,d,0.1007243364065013,0.009570914987731802,0.2168043850241555,True,True,True
+journalism_seg,gemma3-12b,instruct,order km-mk,c,0.0,0.0,0.0,False,False,True
+journalism_seg,gemma3-12b,instruct,sentence p50-none (mk),d,0.0344812657133037,-0.25657337287086396,0.2872084165503157,False,True,True
+journalism_seg,gemma3-12b,instruct,sentence p50-none (mk),c,-1.2013440704062512,-1.4896466313466163,-0.6330174829020258,True,True,True
+journalism_seg,gemma3-12b,instruct,base rate slope per 10 pts (mk),d,0.0382624513920636,0.001042280989705564,0.08048810041215328,True,True,True
+journalism_seg,gemma3-12b,instruct,base rate slope per 10 pts (mk),c,-0.7767238203255342,-0.7937159107787402,-0.7562466593756018,True,True,True
+journalism_seg,gemma3-12b,instruct,sentence p50-none (km),d,-0.31496219737175835,-0.6501398673713329,-0.07595140689295841,True,True,True
+journalism_seg,gemma3-12b,instruct,sentence p50-none (km),c,0.0,0.0,0.0,False,False,True
+journalism_seg,gemma3-12b,instruct,base rate slope per 10 pts (km),d,0.016663667693295074,-0.015038048792859067,0.05691023473801852,False,True,True
+journalism_seg,gemma3-12b,instruct,base rate slope per 10 pts (km),c,-0.5024695437095542,-0.5839290031837129,-0.43281680180932,True,True,True
+journalism_seg,qwen3-8b,base,order km-mk,d,-0.19710243666702282,-0.3639845804777552,-0.032780782492278344,True,True,True
+journalism_seg,qwen3-8b,base,order km-mk,c,0.0,0.0,0.0,False,False,True
+journalism_seg,qwen3-8b,base,sentence p50-none (mk),d,0.25971504324395683,-0.014521583358785109,0.6034604310397459,False,True,True
+journalism_seg,qwen3-8b,base,sentence p50-none (mk),c,-2.825604438910459,-3.3221827214845967,-2.454753114432872,True,True,True
+journalism_seg,qwen3-8b,base,base rate slope per 10 pts (mk),d,0.01962569348821179,-0.012238231322789476,0.05892287060350097,False,True,True
+journalism_seg,qwen3-8b,base,base rate slope per 10 pts (mk),c,-0.5280147699734444,-0.658546742404348,-0.45939683451544155,True,True,True
+journalism_seg,qwen3-8b,base,sentence p50-none (km),d,0.3864693968608279,0.06610996141566178,0.6912639775346956,True,True,True
+journalism_seg,qwen3-8b,base,sentence p50-none (km),c,-1.5918015218963943,-1.893675577569136,-1.2481031906076365,True,True,True
+journalism_seg,qwen3-8b,base,base rate slope per 10 pts (km),d,4.94676723283271e-18,-0.03580615642486338,0.028498306880342453,False,False,True
+journalism_seg,qwen3-8b,base,base rate slope per 10 pts (km),c,-0.46839511422267105,-0.5377795916373347,-0.4121140224606983,True,True,True
+journalism_seg,qwen3-8b,instruct,order km-mk,d,0.04330129177156383,-0.1606637113117013,0.24938323144196614,False,True,True
+journalism_seg,qwen3-8b,instruct,order km-mk,c,0.0,0.0,0.0,False,False,True
+journalism_seg,qwen3-8b,instruct,sentence p50-none (mk),d,0.1985774385009299,-0.1598560415905369,0.6297541659338602,False,True,True
+journalism_seg,qwen3-8b,instruct,sentence p50-none (mk),c,0.0,0.0,0.0,False,False,True
+journalism_seg,qwen3-8b,instruct,base rate slope per 10 pts (mk),d,0.07778823455460122,0.0500854660235369,0.11079098624013661,True,True,True
+journalism_seg,qwen3-8b,instruct,base rate slope per 10 pts (mk),c,-1.841996235062071e-16,-2.302495293827589e-16,-9.209981175310355e-17,False,False,True
+journalism_seg,qwen3-8b,instruct,sentence p50-none (km),d,0.11145628280277775,-0.20312638800668661,0.4850710274430683,False,True,True
+journalism_seg,qwen3-8b,instruct,sentence p50-none (km),c,0.0,0.0,0.0,False,False,True
+journalism_seg,qwen3-8b,instruct,base rate slope per 10 pts (km),d,0.04872735439535782,0.011181019504994236,0.10284369623230259,True,True,True
+journalism_seg,qwen3-8b,instruct,base rate slope per 10 pts (km),c,-1.841996235062071e-16,-2.302495293827589e-16,-9.209981175310355e-17,False,False,True
+journalism_seg,olmo2-7b,base,order km-mk,d,0.299694550899798,-0.009671862015922175,0.538403194919322,False,True,True
+journalism_seg,olmo2-7b,base,order km-mk,c,2.9907125058923523,2.6987389599502913,3.3877319819250897,True,True,True
+journalism_seg,olmo2-7b,base,sentence p50-none (mk),d,-0.09969585667300723,-0.404682934830935,0.17532605283280409,False,True,True
+journalism_seg,olmo2-7b,base,sentence p50-none (mk),c,0.02390460940514849,-0.31770728215719907,0.279888290954217,False,True,True
+journalism_seg,olmo2-7b,base,base rate slope per 10 pts (mk),d,0.0009904052834340982,-0.024038910167011304,0.032872367007559945,False,True,True
+journalism_seg,olmo2-7b,base,base rate slope per 10 pts (mk),c,-0.48616862775206254,-0.5804502923953458,-0.4184778310673873,True,True,True
+journalism_seg,olmo2-7b,base,sentence p50-none (km),d,-0.12921267327324495,-0.4083037926257901,0.17440239879060265,False,True,True
+journalism_seg,olmo2-7b,base,sentence p50-none (km),c,0.0,0.0,0.0,False,False,True
+journalism_seg,olmo2-7b,base,base rate slope per 10 pts (km),d,-0.004067666235005551,-0.040712176496557353,0.032443249196147196,False,True,True
+journalism_seg,olmo2-7b,base,base rate slope per 10 pts (km),c,1.3814971762965532e-16,9.209981175310355e-17,2.302495293827589e-16,False,False,True
+journalism_seg,olmo2-7b,instruct,order km-mk,d,0.14302534240127074,-0.10637120128545854,0.39091231219838335,False,True,True
+journalism_seg,olmo2-7b,instruct,order km-mk,c,0.0,0.0,0.0,False,False,True
+journalism_seg,olmo2-7b,instruct,sentence p50-none (mk),d,-0.09141573919461443,-0.39341482913049997,0.24513092068380693,False,True,True
+journalism_seg,olmo2-7b,instruct,sentence p50-none (mk),c,0.0,0.0,0.0,False,False,True
+journalism_seg,olmo2-7b,instruct,base rate slope per 10 pts (mk),d,0.027874635842096738,0.0015846509799435388,0.059195144557605495,True,True,True
+journalism_seg,olmo2-7b,instruct,base rate slope per 10 pts (mk),c,-0.03856506639518465,-0.07523897104945639,1.841996235062071e-16,False,True,True
+journalism_seg,olmo2-7b,instruct,sentence p50-none (km),d,0.03844294234866524,-0.20873633206891862,0.33602873663204247,False,True,True
+journalism_seg,olmo2-7b,instruct,sentence p50-none (km),c,0.0,0.0,0.0,False,False,True
+journalism_seg,olmo2-7b,instruct,base rate slope per 10 pts (km),d,0.0219861123197958,-0.0007861106587672256,0.05874545603797505,False,True,True
+journalism_seg,olmo2-7b,instruct,base rate slope per 10 pts (km),c,1.3814971762965532e-16,9.209981175310355e-17,2.302495293827589e-16,False,False,True
+journalism_seg,apertus15-8b,base,order km-mk,d,-0.4046676617876195,-0.7273499437138817,-0.12276294917770895,True,True,True
+journalism_seg,apertus15-8b,base,order km-mk,c,-1.9195532091287313,-2.324851184048274,-1.4623649974018538,True,True,True
+journalism_seg,apertus15-8b,base,sentence p50-none (mk),d,-0.26915467181060276,-0.5827492512313026,-0.036069404341350454,True,True,False
+journalism_seg,apertus15-8b,base,sentence p50-none (mk),c,0.8343100580264227,0.6576970046944476,1.060902794301843,True,True,False
+journalism_seg,apertus15-8b,base,base rate slope per 10 pts (mk),d,0.0600099041679755,0.026504454839856875,0.0977124937656429,True,True,False
+journalism_seg,apertus15-8b,base,base rate slope per 10 pts (mk),c,-0.274499237374901,-0.3734791545376743,-0.2053563754224632,True,True,False
+journalism_seg,apertus15-8b,base,sentence p50-none (km),d,-1.942890293094024e-16,-0.4015061236467531,0.4006743346207794,False,False,True
+journalism_seg,apertus15-8b,base,sentence p50-none (km),c,0.0,0.0,0.0,False,False,True
+journalism_seg,apertus15-8b,base,base rate slope per 10 pts (km),d,0.07058581374147711,0.03493512444399692,0.10498868756037917,True,True,True
+journalism_seg,apertus15-8b,base,base rate slope per 10 pts (km),c,-1.841996235062071e-16,-2.302495293827589e-16,-9.209981175310355e-17,False,False,True
+journalism_seg,apertus15-8b,instruct,order km-mk,d,0.2676112338999102,0.0920151241886999,0.40837535507929873,True,True,True
+journalism_seg,apertus15-8b,instruct,order km-mk,c,0.0,0.0,0.0,False,False,True
+journalism_seg,apertus15-8b,instruct,sentence p50-none (mk),d,0.03761416515555818,-0.2946979139157769,0.33988320899274566,False,True,True
+journalism_seg,apertus15-8b,instruct,sentence p50-none (mk),c,-0.3551938944174957,-0.5779415563497086,0.0,False,True,True
+journalism_seg,apertus15-8b,instruct,base rate slope per 10 pts (mk),d,-0.09607541529732719,-0.13697464827014444,-0.05138956168257267,True,True,True
+journalism_seg,apertus15-8b,instruct,base rate slope per 10 pts (mk),c,-0.12691407947373137,-0.17660596802216016,-0.03841153215941028,True,True,True
+journalism_seg,apertus15-8b,instruct,sentence p50-none (km),d,-0.09618785952333171,-0.3357155778347408,0.1424306938948332,False,True,True
+journalism_seg,apertus15-8b,instruct,sentence p50-none (km),c,-0.3551938944174957,-0.5779415563497086,0.0,False,True,True
+journalism_seg,apertus15-8b,instruct,base rate slope per 10 pts (km),d,-0.024899675299777338,-0.07464005757708868,0.013884249307026622,False,True,True
+journalism_seg,apertus15-8b,instruct,base rate slope per 10 pts (km),c,-0.1689811689030788,-0.23260080458643884,-0.06666320617219684,True,True,True
+journalism_seg,olmo3-7b-think,base,order km-mk,d,0.17325579039478883,-0.03191615157525301,0.4499153258318112,False,True,True
+journalism_seg,olmo3-7b-think,base,order km-mk,c,0.9842321387746003,0.4468088582910008,1.3114402516921841,True,True,True
+journalism_seg,olmo3-7b-think,base,sentence p50-none (mk),d,-0.17436898366244236,-0.40571297978849763,0.03802196956353763,False,True,True
+journalism_seg,olmo3-7b-think,base,sentence p50-none (mk),c,0.0,0.0,0.0,False,False,True
+journalism_seg,olmo3-7b-think,base,base rate slope per 10 pts (mk),d,-0.0652038366822816,-0.12375903987196832,-0.02650769369975532,True,True,True
+journalism_seg,olmo3-7b-think,base,base rate slope per 10 pts (mk),c,-1.841996235062071e-16,-2.302495293827589e-16,-9.209981175310355e-17,False,False,True
+journalism_seg,olmo3-7b-think,base,sentence p50-none (km),d,-0.2802485073712721,-0.5913248846576395,-0.040270376108950526,True,True,True
+journalism_seg,olmo3-7b-think,base,sentence p50-none (km),c,-0.32544030238961863,-0.712758504244199,0.015372256521148691,False,True,True
+journalism_seg,olmo3-7b-think,base,base rate slope per 10 pts (km),d,-0.02867666700043341,-0.064772635631039,0.0019306529453364271,False,True,True
+journalism_seg,olmo3-7b-think,base,base rate slope per 10 pts (km),c,-0.30967118772503477,-0.3784733306948082,-0.25354582403188547,True,True,True
+journalism_seg,olmo3-7b-think,instruct,order km-mk,d,-0.0689161609786918,-0.3366221647019865,0.15043439660831467,False,True,True
+journalism_seg,olmo3-7b-think,instruct,order km-mk,c,1.4550652245978073,0.7882544669527644,1.8595120308576745,True,True,True
+journalism_seg,olmo3-7b-think,instruct,sentence p50-none (mk),d,-0.038774987828582935,-0.27831311992929814,0.18768418646093857,False,True,True
+journalism_seg,olmo3-7b-think,instruct,sentence p50-none (mk),c,0.0,0.0,0.0,False,False,True
+journalism_seg,olmo3-7b-think,instruct,base rate slope per 10 pts (mk),d,0.009338003547218263,-0.01805238073135782,0.036468532181344604,False,True,True
+journalism_seg,olmo3-7b-think,instruct,base rate slope per 10 pts (mk),c,-1.841996235062071e-16,-2.302495293827589e-16,-9.209981175310355e-17,False,False,True
+journalism_seg,olmo3-7b-think,instruct,sentence p50-none (km),d,-0.015787366246841187,-0.3381535022005801,0.26433296755103664,False,True,True
+journalism_seg,olmo3-7b-think,instruct,sentence p50-none (km),c,-1.4550652245978073,-1.8595120308576747,-0.7882544669527646,True,True,True
+journalism_seg,olmo3-7b-think,instruct,base rate slope per 10 pts (km),d,0.03415858036912103,0.017220160179659636,0.050910534329406364,True,True,True
+journalism_seg,olmo3-7b-think,instruct,base rate slope per 10 pts (km),c,-0.06771509707081547,-0.10433196520666267,-1.3814971762965532e-16,False,True,True
+textbook,gemma3-4b,base,order km-mk,d,0.06584371398868234,-0.06475035119839194,0.2086974878043592,False,True,True
+textbook,gemma3-4b,base,order km-mk,c,0.30071157088768175,0.0,0.4757932285733446,False,True,True
+textbook,gemma3-4b,base,sentence p50-none (mk),d,0.02403275024757566,-0.08301625610274972,0.14609351553145655,False,True,True
+textbook,gemma3-4b,base,sentence p50-none (mk),c,0.0,0.0,0.0,False,False,True
+textbook,gemma3-4b,base,base rate slope per 10 pts (mk),d,0.014865637773409825,0.00020684136944488753,0.031173462585286704,True,True,True
+textbook,gemma3-4b,base,base rate slope per 10 pts (mk),c,-9.209981175310355e-17,-9.209981175310355e-17,-9.209981175310355e-17,False,False,True
+textbook,gemma3-4b,base,sentence p50-none (km),d,0.0769840572428403,-0.05709567354396353,0.20262418104984536,False,True,True
+textbook,gemma3-4b,base,sentence p50-none (km),c,0.6444487287135527,0.30071157088768175,1.0327813635674383,True,True,True
+textbook,gemma3-4b,base,base rate slope per 10 pts (km),d,0.0014627657445567058,-0.015528072255529527,0.019298086872821484,False,True,True
+textbook,gemma3-4b,base,base rate slope per 10 pts (km),c,-0.07814027702626536,-0.13364353829208142,-0.03956036876214454,True,True,True
+textbook,gemma3-4b,instruct,order km-mk,d,-0.09469820856705286,-0.2222575227952315,0.024184260872504394,False,True,False
+textbook,gemma3-4b,instruct,order km-mk,c,0.6707004219408323,0.5053058184690392,0.9002039034318684,True,True,False
+textbook,gemma3-4b,instruct,sentence p50-none (mk),d,0.1259438530692606,-0.05386095509053266,0.30707417156178196,False,True,True
+textbook,gemma3-4b,instruct,sentence p50-none (mk),c,0.0573118515645481,-0.20631686519490985,0.30508766959483125,False,True,True
+textbook,gemma3-4b,instruct,base rate slope per 10 pts (mk),d,0.0522344716821537,0.030287108557902415,0.0737340652875504,True,True,True
+textbook,gemma3-4b,instruct,base rate slope per 10 pts (mk),c,-0.5558006049968625,-0.5924774131874323,-0.5249853396268714,True,True,True
+textbook,gemma3-4b,instruct,sentence p50-none (km),d,0.08313964672659052,-0.09401548077638266,0.26375547872452054,False,True,True
+textbook,gemma3-4b,instruct,sentence p50-none (km),c,-0.23833143473078683,-0.42790326058506994,-0.07192851105328776,True,True,True
+textbook,gemma3-4b,instruct,base rate slope per 10 pts (km),d,0.04935302875477293,0.027809162475454504,0.0722184926830202,True,True,True
+textbook,gemma3-4b,instruct,base rate slope per 10 pts (km),c,-0.537458498404462,-0.5723115097183028,-0.5064297615780792,True,True,True
+textbook,gemma3-12b,base,order km-mk,d,-0.06063852359038524,-0.23894674224372775,0.11074405160099647,False,True,False
+textbook,gemma3-12b,base,order km-mk,c,1.3477138839422644,1.0684542627569062,1.5891042516118823,True,True,False
+textbook,gemma3-12b,base,sentence p50-none (mk),d,-0.21446757697213026,-0.3986445279970864,-0.05472857144749328,True,True,True
+textbook,gemma3-12b,base,sentence p50-none (mk),c,0.04616245162064492,-0.09731229621130076,0.20189068468819404,False,True,True
+textbook,gemma3-12b,base,base rate slope per 10 pts (mk),d,-0.012084921289310756,-0.03588195433572935,0.010391328478783038,False,True,True
+textbook,gemma3-12b,base,base rate slope per 10 pts (mk),c,-0.1961985983501186,-0.2603685061444809,-0.13938517692924537,True,True,True
+textbook,gemma3-12b,base,sentence p50-none (km),d,-0.3466358111223957,-0.5378297143152412,-0.15573013987748477,True,True,False
+textbook,gemma3-12b,base,sentence p50-none (km),c,0.2642030238508139,0.10300032144286883,0.4739530175127617,True,True,False
+textbook,gemma3-12b,base,base rate slope per 10 pts (km),d,0.016619263504140783,-0.000818558458524575,0.03425197305233095,False,True,False
+textbook,gemma3-12b,base,base rate slope per 10 pts (km),c,-0.31664218871289074,-0.3835854533222506,-0.27707146922142195,True,True,False
+textbook,gemma3-12b,instruct,order km-mk,d,-0.029321110195552502,-0.07587423877579008,0.01187712843914317,False,True,False
+textbook,gemma3-12b,instruct,order km-mk,c,0.6616782310925272,0.46588880780928227,0.9246427596877492,True,True,False
+textbook,gemma3-12b,instruct,sentence p50-none (mk),d,-0.2761950357369397,-0.4052315229891651,-0.15743220959108328,True,True,True
+textbook,gemma3-12b,instruct,sentence p50-none (mk),c,-1.2207888767457118,-1.4598776218075131,-0.864723646809374,True,True,True
+textbook,gemma3-12b,instruct,base rate slope per 10 pts (mk),d,-0.00394921008227338,-0.03095234733927824,0.023560338807983108,False,True,True
+textbook,gemma3-12b,instruct,base rate slope per 10 pts (mk),c,-0.3336279407919994,-0.36321248199613143,-0.30034206607401526,True,True,True
+textbook,gemma3-12b,instruct,sentence p50-none (km),d,-0.38846722653829263,-0.511312357790346,-0.2830289149362363,True,True,True
+textbook,gemma3-12b,instruct,sentence p50-none (km),c,0.19238773078305338,0.06826091220584543,0.34064631402413775,True,True,True
+textbook,gemma3-12b,instruct,base rate slope per 10 pts (km),d,0.01595114919308426,-0.01149232791983824,0.04317238955169897,False,True,True
+textbook,gemma3-12b,instruct,base rate slope per 10 pts (km),c,-0.677834706853363,-0.7352984833573545,-0.6394832866764565,True,True,True
+textbook,qwen3-8b,base,order km-mk,d,-0.11215303684296718,-0.2393015894144834,0.00935335403414112,False,True,True
+textbook,qwen3-8b,base,order km-mk,c,0.9670079447611535,0.5520683645621025,1.2063116899156987,True,True,True
+textbook,qwen3-8b,base,sentence p50-none (mk),d,-0.4253047984579129,-0.600922348221285,-0.25836857909916494,True,True,True
+textbook,qwen3-8b,base,sentence p50-none (mk),c,0.0,0.0,0.0,False,False,True
+textbook,qwen3-8b,base,base rate slope per 10 pts (mk),d,-0.009579514882558883,-0.03209641802911396,0.013332150381834712,False,True,True
+textbook,qwen3-8b,base,base rate slope per 10 pts (mk),c,-9.209981175310355e-17,-9.209981175310355e-17,-9.209981175310355e-17,False,False,True
+textbook,qwen3-8b,base,sentence p50-none (km),d,-0.24195367981838545,-0.4079073184989427,-0.07984833685248385,True,True,True
+textbook,qwen3-8b,base,sentence p50-none (km),c,-0.9670079447611535,-1.2063116899156987,-0.5520683645621025,True,True,True
+textbook,qwen3-8b,base,base rate slope per 10 pts (km),d,0.0033701281265625356,-0.014846811201651615,0.02211891453348562,False,True,True
+textbook,qwen3-8b,base,base rate slope per 10 pts (km),c,-0.2543587075137165,-0.2883343553943284,-0.20640660531893376,True,True,True
+textbook,qwen3-8b,instruct,order km-mk,d,0.16985195834408554,0.04988705677807172,0.2889780711554254,True,True,True
+textbook,qwen3-8b,instruct,order km-mk,c,0.0,0.0,0.0,False,False,True
+textbook,qwen3-8b,instruct,sentence p50-none (mk),d,-0.02512760761635495,-0.19393700915309817,0.1452152748751554,False,True,True
+textbook,qwen3-8b,instruct,sentence p50-none (mk),c,0.0,0.0,0.0,False,False,True
+textbook,qwen3-8b,instruct,base rate slope per 10 pts (mk),d,0.028401006205423858,0.001631111815322706,0.053967708988575364,True,True,True
+textbook,qwen3-8b,instruct,base rate slope per 10 pts (mk),c,-9.209981175310355e-17,-9.209981175310355e-17,-9.209981175310355e-17,False,False,True
+textbook,qwen3-8b,instruct,sentence p50-none (km),d,-0.19309361219974502,-0.3195336636914203,-0.07052119295810726,True,True,True
+textbook,qwen3-8b,instruct,sentence p50-none (km),c,0.0,0.0,0.0,False,False,True
+textbook,qwen3-8b,instruct,base rate slope per 10 pts (km),d,0.02831045342934138,0.006763188482564712,0.050584939283733144,True,True,True
+textbook,qwen3-8b,instruct,base rate slope per 10 pts (km),c,-9.209981175310355e-17,-9.209981175310355e-17,-9.209981175310355e-17,False,False,True
+textbook,olmo2-7b,base,order km-mk,d,-0.07962554982058428,-0.17713643306641622,0.014330838198234122,False,True,False
+textbook,olmo2-7b,base,order km-mk,c,2.5570395461013202,2.2920502666093747,2.951576812053034,True,True,False
+textbook,olmo2-7b,base,sentence p50-none (mk),d,-0.17142659790034256,-0.27015057658430985,-0.07642326240300276,True,True,False
+textbook,olmo2-7b,base,sentence p50-none (mk),c,0.5310571389416088,0.360687991931953,0.7663991866183915,True,True,False
+textbook,olmo2-7b,base,base rate slope per 10 pts (mk),d,0.016553436229382965,0.003848594899599572,0.029894617135412253,True,True,False
+textbook,olmo2-7b,base,base rate slope per 10 pts (mk),c,-0.24541743082212786,-0.3162830671190577,-0.19823389764914864,True,True,False
+textbook,olmo2-7b,base,sentence p50-none (km),d,-0.015370740276271555,-0.11570526425773843,0.08274021299571148,False,True,True
+textbook,olmo2-7b,base,sentence p50-none (km),c,1.583084371711503,1.332592747746943,1.7957955709046929,True,True,True
+textbook,olmo2-7b,base,base rate slope per 10 pts (km),d,0.00790698679654051,-0.004386364732217117,0.020534921162985522,False,True,True
+textbook,olmo2-7b,base,base rate slope per 10 pts (km),c,-0.1002371902958935,-0.14296548863078723,-0.03307121215598368,True,True,True
+textbook,olmo2-7b,instruct,order km-mk,d,-0.028779941937316034,-0.19478390798140788,0.14678022387707465,False,True,True
+textbook,olmo2-7b,instruct,order km-mk,c,0.0,0.0,0.0,False,False,True
+textbook,olmo2-7b,instruct,sentence p50-none (mk),d,-0.1950961789665372,-0.34193946532683783,-0.045500288236998566,True,True,True
+textbook,olmo2-7b,instruct,sentence p50-none (mk),c,0.0,0.0,0.0,False,False,True
+textbook,olmo2-7b,instruct,base rate slope per 10 pts (mk),d,-0.0034039318250230106,-0.02424802596908497,0.021335665864806248,False,True,True
+textbook,olmo2-7b,instruct,base rate slope per 10 pts (mk),c,-0.03307121215598368,-0.062089394900257104,9.209981175310355e-17,False,True,True
+textbook,olmo2-7b,instruct,sentence p50-none (km),d,-0.19327740041130792,-0.3601532711416729,-0.027771905896095076,True,True,True
+textbook,olmo2-7b,instruct,sentence p50-none (km),c,0.0,0.0,0.0,False,False,True
+textbook,olmo2-7b,instruct,base rate slope per 10 pts (km),d,0.01957919244852701,-0.0015558793484691802,0.040400267646338854,False,True,True
+textbook,olmo2-7b,instruct,base rate slope per 10 pts (km),c,9.209981175310355e-17,9.209981175310355e-17,9.209981175310355e-17,False,False,True
+textbook,apertus15-8b,base,order km-mk,d,-0.44557667095771736,-0.6141916185453354,-0.29263366848416555,True,True,True
+textbook,apertus15-8b,base,order km-mk,c,-0.6732479402892249,-0.9809648304544649,-0.198427272935902,True,True,True
+textbook,apertus15-8b,base,sentence p50-none (mk),d,-0.2874553793263418,-0.479097699359222,-0.09803617551733787,True,True,False
+textbook,apertus15-8b,base,sentence p50-none (mk),c,0.9147662424338294,0.6072675537524675,1.3973341404164064,True,True,False
+textbook,apertus15-8b,base,base rate slope per 10 pts (mk),d,0.0383949214887378,0.02004158563309705,0.05625793917066871,True,True,False
+textbook,apertus15-8b,base,base rate slope per 10 pts (mk),c,-0.14941957110725498,-0.20674888794906082,-0.1111186293115148,True,True,False
+textbook,apertus15-8b,base,sentence p50-none (km),d,-0.09447059012124609,-0.280448761123857,0.08020965800913023,False,True,True
+textbook,apertus15-8b,base,sentence p50-none (km),c,0.0,0.0,0.0,False,False,True
+textbook,apertus15-8b,base,base rate slope per 10 pts (km),d,0.05855752098112973,0.034191175166927025,0.0840858827524345,True,True,True
+textbook,apertus15-8b,base,base rate slope per 10 pts (km),c,-9.209981175310355e-17,-9.209981175310355e-17,-9.209981175310355e-17,False,False,True
+textbook,apertus15-8b,instruct,order km-mk,d,0.14993396717135307,0.03214136984537164,0.2855907077910057,True,True,True
+textbook,apertus15-8b,instruct,order km-mk,c,0.0,0.0,0.0,False,False,True
+textbook,apertus15-8b,instruct,sentence p50-none (mk),d,0.07230400193190469,-0.15002795848488829,0.30947341893132846,False,True,True
+textbook,apertus15-8b,instruct,sentence p50-none (mk),c,0.0,0.0,0.0,False,False,True
+textbook,apertus15-8b,instruct,base rate slope per 10 pts (mk),d,-0.015678576257636138,-0.05339131481131654,0.01937765085563209,False,True,True
+textbook,apertus15-8b,instruct,base rate slope per 10 pts (mk),c,-9.209981175310355e-17,-9.209981175310355e-17,-9.209981175310355e-17,False,False,True
+textbook,apertus15-8b,instruct,sentence p50-none (km),d,0.050583262223299806,-0.13489771678099613,0.2676716019792908,False,True,True
+textbook,apertus15-8b,instruct,sentence p50-none (km),c,0.0,0.0,0.0,False,False,True
+textbook,apertus15-8b,instruct,base rate slope per 10 pts (km),d,-0.02667933023007525,-0.055634751347960976,0.0013780369665035322,False,True,True
+textbook,apertus15-8b,instruct,base rate slope per 10 pts (km),c,-9.209981175310355e-17,-9.209981175310355e-17,-9.209981175310355e-17,False,False,True
+textbook,olmo3-7b-think,base,order km-mk,d,0.33425303987862565,0.14110853800207582,0.550856708200234,True,True,True
+textbook,olmo3-7b-think,base,order km-mk,c,1.2800754213866488,0.9906483268400137,1.4857772785154082,True,True,True
+textbook,olmo3-7b-think,base,sentence p50-none (mk),d,0.16827792776853415,0.02002130992937298,0.3312763530712467,True,True,True
+textbook,olmo3-7b-think,base,sentence p50-none (mk),c,0.0,0.0,0.0,False,False,True
+textbook,olmo3-7b-think,base,base rate slope per 10 pts (mk),d,-0.05830815497204283,-0.0854766010634623,-0.03387757218153638,True,True,True
+textbook,olmo3-7b-think,base,base rate slope per 10 pts (mk),c,-9.209981175310355e-17,-9.209981175310355e-17,-9.209981175310355e-17,False,False,True
+textbook,olmo3-7b-think,base,sentence p50-none (km),d,0.06788960228226545,-0.11660412904827408,0.24608754769427157,False,True,True
+textbook,olmo3-7b-think,base,sentence p50-none (km),c,0.15953940550811474,-0.11300432075442277,0.4507763688181011,False,True,True
+textbook,olmo3-7b-think,base,base rate slope per 10 pts (km),d,-0.056327236060695826,-0.08349620558812952,-0.030932761773324914,True,True,True
+textbook,olmo3-7b-think,base,base rate slope per 10 pts (km),c,-0.4137271132590218,-0.48986899841031034,-0.36563747387454076,True,True,True
+textbook,olmo3-7b-think,instruct,order km-mk,d,0.3012423171743117,0.11369851581120304,0.5013160468001151,True,True,True
+textbook,olmo3-7b-think,instruct,order km-mk,c,0.198427272935902,0.0,0.37253636940154333,False,True,True
+textbook,olmo3-7b-think,instruct,sentence p50-none (mk),d,0.02945304624746667,-0.09352244245414651,0.15066525011949025,False,True,True
+textbook,olmo3-7b-think,instruct,sentence p50-none (mk),c,0.0,0.0,0.0,False,False,True
+textbook,olmo3-7b-think,instruct,base rate slope per 10 pts (mk),d,0.004037318937049516,-0.010571451496131418,0.018244037699418826,False,True,True
+textbook,olmo3-7b-think,instruct,base rate slope per 10 pts (mk),c,-9.209981175310355e-17,-9.209981175310355e-17,-9.209981175310355e-17,False,False,True
+textbook,olmo3-7b-think,instruct,sentence p50-none (km),d,-0.080441026336527,-0.27004234253852,0.1002275804066083,False,True,True
+textbook,olmo3-7b-think,instruct,sentence p50-none (km),c,-0.198427272935902,-0.37253636940154333,0.0,False,True,True
+textbook,olmo3-7b-think,instruct,base rate slope per 10 pts (km),d,0.0009685515196636102,-0.01022176305590808,0.011919759072549625,False,True,True
+textbook,olmo3-7b-think,instruct,base rate slope per 10 pts (km),c,-0.03307121215598373,-0.06208939490025745,-9.209981175310355e-17,False,True,True

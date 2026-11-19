@@ -1,4 +1,9 @@
-# latent-detection
+# Represented but misread
+
+Code, derived results and manuscript sources for "Represented but misread: Post-training
+changes how language models read out what they represent"
+(https://github.com/xjlc/represented-but-misread). The working name of the project was
+`latent-detection`.
 
 **Do language models know more than they say?** This project separates sensitivity
 from response bias when language models judge whether a German text was written by
@@ -44,7 +49,8 @@ The stimulus texts are **not** part of this repository and never will be:
 The manuscript sources are in `paper/draft/` (build: `cd paper && bash build_draft.sh`).
 Every number in the manuscript is written by one of the scripts below into `outputs/`
 (not part of the repository, because the per-text files of the authorship corpora carry
-identifiers of unpublished texts). The public part, the negated statements, can be rerun
+identifiers of unpublished texts). The aggregate tables are copied to `results/` by
+`tools/export_results.py`. The public part, the negated statements, can be rerun
 with `reproduce/negation.sh`; see `reproduce/README.md`.
 
 | Step | Script | What it does | Manuscript |

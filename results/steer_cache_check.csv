@@ -1,0 +1,2 @@
+corpus,cell,layer,n_scores,n_items,n_settings,n_orders,r,max_abs_diff,mean_abs_diff,dv_sd,max_abs_diff_p_mass
+truth_neg_cities,olmo2-7b_base_raw_tf,21,102,3,17,2,0.9993663339546974,0.06052511930465698,0.016413279352527038,0.5776878258796689,0.0002571521345080541

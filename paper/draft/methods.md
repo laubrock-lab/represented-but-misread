@@ -360,7 +360,7 @@ All models were run in bfloat16 precision with the Hugging Face `transformers` l
 NVIDIA A100 GPUs (40 GB) of the university's high-performance computing cluster and on a
 local workstation. Gradients for the supplementary readout analysis were computed with
 gradient checkpointing, which leaves them unchanged. All analysis code is available in
-the project repository (TODO: URL).
+the project repository (https://github.com/xjlc/represented-but-misread).
 
 ## 2.11 Data and code availability
 
@@ -370,8 +370,10 @@ Therefore, these texts cannot be shared. The two further judgments (Section 2.8)
 publicly available data [@marks2024geometry; @ott2011finding; @ott2013negative], so that these
 analyses can be reproduced in full (see `reproduce/` in the repository); the same holds for the training data of the training
 study (Section 2.9), whose human texts are public [@block2019gnad] and whose AI texts we
-generated and will release. All code, the per-text model outputs without text
-content, and all derived results are available in the project repository (TODO: URL).
+generated and will release. All code and the tables of derived results from which the
+reported numbers are taken are available in the project repository; files cited here as
+`outputs/…` are found there under `results/`. The per-text model outputs for the authorship
+corpora are not included, because their identifiers refer to unpublished texts.
 
 ## 2.12 Use of AI tools
 
