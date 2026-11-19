@@ -50,6 +50,7 @@ with `reproduce/negation.sh`; see `reproduce/README.md`.
 | Step | Script | What it does | Manuscript |
 |---|---|---|---|
 | Answers | `judge_logits.py`, `config.py` | Prompts, log-odds of the two answer words (dv), activations at the last position and averaged over the text positions | 2.3 |
+| Pilot (Introduction) | `pilot_llm_judge_summary.py` | Commercial models as judges of the short chats: AUC of the confidence ratings per judge model and prompt version, from judgments collected in the lab course | 1 |
 | Signal detection | `sdt_summary.py`, `contrasts.py`, `meta_multilevel.R`, `meta_prompts.R`, `promptvar_summary.py` | d′ from the area under the ROC curve, criterion, grouped bootstrap, contrasts between checkpoints, family-level tests | 2.4, 3.1, 3.2 |
 | Base rate | `sdt_invariance.py`, `base_rate_shift.py`, `base_rate_scale.py` | Invariance of d′ and c under bias manipulations; shift of dv with the stated share of AI texts | 3.3, Appendix F |
 | Readout probes | `probe_layers.py` (`_make_probe`, `_fit_probe`, `cv_logits`) | The linear probe: standardization, principal component rotation, L2-regularized logistic regression with the penalty chosen by inner grouped cross-validation; out-of-fold scores with whole source groups held out; label-shuffle control | 2.5, 3.1 |
