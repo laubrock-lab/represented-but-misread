@@ -71,6 +71,9 @@ header-includes: |
   \\captionsetup[figure]{{labelformat=empty}}
   \\usepackage{{float}}
   \\usepackage{{newunicodechar}}
+  \\usepackage{{etoolbox}}
+  \\AtBeginEnvironment{{longtable}}{{\\footnotesize\\setlength{{\\tabcolsep}}{{4pt}}}}
+  \\emergencystretch=3em
   \\newunicodechar{{→}}{{\\ensuremath{{\\rightarrow}}}}
   \\newunicodechar{{←}}{{\\ensuremath{{\\leftarrow}}}}
   \\newunicodechar{{√}}{{\\ensuremath{{\\surd}}}}

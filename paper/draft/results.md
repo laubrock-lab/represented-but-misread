@@ -576,8 +576,8 @@ stitching result that the repair is not complete at this depth. Exchanging the s
 the instruction and question before the statement had no effect at either layer.
 
 Patching at two layers cannot show where the repair first appears. We therefore repeated
-the patching at 12 layers between 2 and 32, with 100 statement pairs (Figure 7C;
-outputs/patch_sweep/patch_sweep_summary.csv; on this subset, d′ = 0.34 for the OLMo 2 base
+the patching at 12 layers between 2 and 32, with 100 statement pairs (Figure 7C; the
+values are in the same summary file as for authorship; on this subset, d′ = 0.34 for the OLMo 2 base
 model and 3.09 for its SFT model, and −0.86 and 3.64, the maximum for 100 pairs, for
 Apertus). We express each effect as the share of the difference between the two
 checkpoints that the patch transferred. The two models differed. In OLMo 2, the repair
