@@ -59,7 +59,8 @@ main_text = place_figures("\n\n".join(section(f) for f in ("introduction.md", "m
 appendix = section("appendix.md")
 header = f"""---
 title: "{title}"
-author: "Jochen Laubrock"
+author: |
+  Jochen Laubrock`\\\\ {{\\normalsize University of Potsdam}}`{{=latex}}
 date: "{date.today():%d %B %Y}"
 abstract: |
 {chr(10).join('  ' + l for l in abstract.splitlines())}
