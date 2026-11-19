@@ -24,8 +24,8 @@ the two Gemma 3 models, and little in Apertus. In a training study, a small numb
 the readout in the direction their labels implied, and the item-level answers followed the
 class direction of the training texts. In short, post-training changed how a judgment is
 read out of information that the models represent, in a direction that depended on the
-judgment. That this change leaves the representation of the text untouched and resides in
-how the question reads it, as our title suggests, held for the probes at the text positions,
+judgment. The stronger statement, that this change leaves the representation of the text untouched
+and resides only in how the question reads it, held for the probes at the text positions,
 for authorship in OLMo 2, and for negation in Apertus. In the remaining cases, the
 representation of the text changed as well: in the lower layers of Apertus for authorship,
 and below mid-depth in OLMo 2 and the two Gemma 3 models for negation. What all cases share
@@ -177,9 +177,10 @@ these words. Within these limits, the comparison shows that post-training change
 which texts receive more evidence for "AI", but also how the models combine this evidence
 with what the prompt states about the situation, a second aspect of the readout.
 
-## The question reads the text
+## How the question reads the text
 
-What does it mean that post-training changes how the question reads the text? In a
+What does it mean that post-training changes how the question reads the text, where it
+does? In a
 language model, the answer is produced at the last position of the prompt, and
 information from the text reaches it only through the positions in between, i.e., the
 question. At each layer, these positions retrieve information from the text through

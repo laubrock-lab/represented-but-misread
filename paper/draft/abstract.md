@@ -2,18 +2,13 @@
 
 ## Title options
 
-1. Post-training changes how the question reads the text: Representation and readout
-   in language-model judgments
-2. Same knowledge, different reading: How post-training reshapes the readout of
-   judgments in language models
-3. Represented but misread: Authorship, truth, and deception judgments in language
-   models before and after post-training
+1. Represented but misread: Post-training changes how language models read out what
+   they represent
 
-(Option 1 keeps the earlier title's core and widens the scope; option 2 states the
-finding in plain words; option 3 names the three judgments. The previous,
-authorship-only title: "Post-training changes how the question reads the text:
-Authorship judgments as a test case for representation versus readout in language
-models".)
+(Chosen on 19 Nov 2026. Earlier title: "Post-training changes how the question reads the
+text: Representation and readout in language-model judgments"; it was dropped because the
+patching across layers showed that the representation of the text changed as well in
+several cases.)
 
 ## Abstract
 
