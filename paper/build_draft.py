@@ -30,11 +30,13 @@ for para in section("figures.md").split("\n\n"):
     if m:
         label, pre, stem, caption = m.groups()
         caption = " ".join(caption.split())
-        block = f"![**{label}.** {caption}](figures/{stem}.pdf){{width=100% height=68%}}"
+        # no label in the caption text: LaTeX numbers the figures (also in arXiv's HTML view)
+        block = f"![{caption}](figures/{stem}.pdf){{width=100% height=68%}}"
         if re.fullmatch(r"Figure \d+", label):
             figs[int(label.split()[1])] = block
         else:
             supp.append(block)
+            assert label == f"Figure S{len(supp)}", f"supplementary figures out of order: {label}"
 
 
 def place_figures(text: str) -> str:
@@ -52,11 +54,26 @@ def place_figures(text: str) -> str:
                 placed.add(n)
     missing = sorted(set(figs) - placed)
     assert not missing, f"figures never mentioned in the text: {missing}"
+    order = [n for b in out for n in figs if b is figs[n]]
+    assert order == sorted(figs), f"figures are not first mentioned in numerical order: {order}"
     return "\n\n".join(out)
 
 
-main_text = place_figures("\n\n".join(section(f) for f in ("introduction.md", "methods.md", "results.md", "discussion.md")))
-appendix = section("appendix.md")
+def unquote_tables(text: str) -> str:
+    """Tables are written as block quotes (caption, table, notes) in the parts. Remove the
+    quote marks, so that the LaTeX source contains plain tables and not tables inside quote
+    environments, which arXiv's HTML conversion renders poorly."""
+    out = []
+    for block in re.split(r"(\n\n+)", text):
+        lines = block.split("\n")
+        if lines[0].startswith("> **Table") and all(l.startswith(">") or not l for l in lines):
+            block = "\n".join(re.sub(r"^> ?", "", l) for l in lines)
+        out.append(block)
+    return "".join(out)
+
+
+main_text = unquote_tables(place_figures("\n\n".join(section(f) for f in ("introduction.md", "methods.md", "results.md", "discussion.md"))))
+appendix = unquote_tables(section("appendix.md"))
 header = f"""---
 title: "{title}"
 author: |
@@ -68,7 +85,7 @@ bibliography: references/references.bib
 csl: references/apa.csl
 header-includes: |
   \\usepackage{{caption}}
-  \\captionsetup[figure]{{labelformat=empty}}
+  \\captionsetup[figure]{{labelfont=bf,labelsep=period}}
   \\usepackage{{float}}
   \\usepackage{{newunicodechar}}
   \\usepackage{{etoolbox}}
@@ -86,7 +103,8 @@ link-citations: true
 
 """
 out = (header + main_text + "\n\n# References\n\n::: {{#refs}}\n:::\n\n" .replace("{{", "{").replace("}}", "}")
-       + appendix + "\n\n## Supplementary figures\n\n" + "\n\n".join(supp) + "\n")
+       + appendix + "\n\n## Supplementary figures\n\n"
+       + "`\\setcounter{figure}{0}\\renewcommand{\\thefigure}{S\\arabic{figure}}`{=latex}\n\n" + "\n\n".join(supp) + "\n")
 (P / "build").mkdir(exist_ok=True)
 (P / "build" / "draft.md").write_text(out, encoding="utf-8")
 print(f"title: {title}\nfigures: {len(figs)} in the text, {len(supp)} supplementary\n-> {P / 'build' / 'draft.md'}")
