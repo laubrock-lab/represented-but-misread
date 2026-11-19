@@ -1,9 +1,30 @@
 # Represented but misread
 
-Code, derived results and manuscript sources for "Represented but misread: Post-training
-changes how language models read out what they represent"
-(https://github.com/laubrock-lab/represented-but-misread). The working name of the project was
-`latent-detection`.
+## About this repository
+
+Code, derived results and manuscript sources for the paper *Represented but misread:
+Post-training changes how language models read out what they represent*
+(https://github.com/laubrock-lab/represented-but-misread). The working name of the project
+was `latent-detection`.
+
+**The three authorship corpora are not part of this repository and cannot be shared.**
+The newspaper texts are unpublished and confidential, the human chat messages were written
+by students who have not yet been asked for consent to publication, and the human textbook
+summaries are protected by copyright. `data/` and `outputs/` have never been part of any
+revision of this repository; `results/` holds the aggregate tables from which the numbers
+in the paper are taken.
+
+**What can be reproduced here.** The truth judgments use public data. `reproduce/README.md`
+describes the entry point: `reproduce/negation.sh` regenerates the analysis of the negated
+statements from the public statement sets and the open-weight checkpoints, and
+`reproduce/check_negation.py` compares the regenerated numbers with the values reported in
+the paper.
+
+The history of the public repository was filtered to remove unrelated internal work,
+internal planning documents and private paths; commit dates, order, authorship and
+messages are otherwise unchanged.
+
+## Project description (from the start of the project)
 
 **Do language models know more than they say?** This project separates sensitivity
 from response bias when language models judge whether a German text was written by
