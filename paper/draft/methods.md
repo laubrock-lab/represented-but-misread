@@ -207,9 +207,9 @@ the last label alternated between example sets.
 
 ## 2.7 Causal interventions
 
-We used three interventions, which are illustrated in Figure 2. All of them act on the internal states or the weights of
-an artificial neural network during a computation, which can be repeated at will with and
-without the intervention.
+We used three interventions, which are illustrated in Figure 2. All of them change internal states or weights of
+the model during a computation, which can be repeated at will with and without the
+intervention.
 
 *Steering.* As a check on how the answer depends on the represented information at the
 position where it is produced (Appendix D),
