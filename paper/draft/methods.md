@@ -72,8 +72,10 @@ judgments on public statement sets (Sections 2.8 and 3.6), which can be reproduc
 We studied six open-weight base models with 4 to 12 billion parameters from four
 developers (Table 1): Gemma 3 [@gemma2025gemma3], Qwen3 [@yang2025qwen3], OLMo 2
 [@olmo2024olmo2], OLMo 3 [@olmo2025olmo3], and Apertus [@apertus2025; @apertus2026v15]. For each base model, we compared the pretrained model with its final
-post-trained version. For three base models, the developers released checkpoints
-after each stage of post-training, which allowed us to follow the change step by step:
+post-trained version. We included the OLMo and Apertus models because they are open beyond their weights: Their
+training data are known, and for these three base models the developers released
+checkpoints after each stage of post-training, which allowed us to follow the change step
+by step:
 OLMo 2 7B (base, supervised fine-tuning [SFT], direct preference optimization [DPO],
 and a final reinforcement-learning stage with verifiable rewards), Apertus 1.5 8B
 (base, SFT, reinforcement learning, DPO, and a final alignment stage), and OLMo 3 7B,
@@ -116,7 +118,7 @@ judged with both orders of the answer options ("Mensch oder KI", "KI oder Mensch
 dv was averaged over the two orders. As a manipulation check, we recorded the answer
 probability, i.e., the summed probability of the two answers; conditions in which a
 model placed less than 30% of its probability on the two answers were excluded from
-inferential comparisons (reported with a 50% threshold as a sensitivity analysis).
+inferential comparisons.
 
 ## 2.4 Signal detection measures and statistics
 
