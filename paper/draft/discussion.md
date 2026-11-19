@@ -187,7 +187,7 @@ with what the prompt states about the situation, a second aspect of the readout.
 
 ## What reads the text
 
-Where the change resides in the positions after the text, what does this mean? In a
+What does it mean that the change resides at the positions after the text? In a
 language model, the answer is produced from the state at the last position of the prompt.
 Every position after the text, i.e., the question, the cue for the answer, and the last
 position itself, retrieves information from the text through attention at each layer and
