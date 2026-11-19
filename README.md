@@ -2,7 +2,7 @@
 
 Code, derived results and manuscript sources for "Represented but misread: Post-training
 changes how language models read out what they represent"
-(https://github.com/xjlc/represented-but-misread). The working name of the project was
+(https://github.com/laubrock-lab/represented-but-misread). The working name of the project was
 `latent-detection`.
 
 **Do language models know more than they say?** This project separates sensitivity

@@ -360,7 +360,7 @@ All models were run in bfloat16 precision with the Hugging Face `transformers` l
 NVIDIA A100 GPUs (40 GB) of the university's high-performance computing cluster and on a
 local workstation. Gradients for the supplementary readout analysis were computed with
 gradient checkpointing, which leaves them unchanged. All analysis code is available in
-the project repository (https://github.com/xjlc/represented-but-misread).
+the project repository (https://github.com/laubrock-lab/represented-but-misread).
 
 ## 2.11 Data and code availability
 
