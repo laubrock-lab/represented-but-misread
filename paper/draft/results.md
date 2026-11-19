@@ -619,8 +619,15 @@ isolated effect of the positions before the statement in Gemma 3 12B (layer 16: 
 did not occur at the neighboring layers. Across the four models, the states after the
 statement thus carried the repair from about the middle of the network onward, and in
 three of them (OLMo 2 and both Gemma 3 models) the representation of the statement
-contributed to it at about a third of the depth in at least one direction. TODO(sfirst):
-statement placed before the question.
+contributed to it at about a third of the depth in at least one direction.
+
+Because the question precedes the statement in this prompt, we also posed the judgment with
+the statement placed before the question. The pattern of the answers was the same, and
+more pronounced: The base models ordered the negated statements at or below chance (OLMo 2:
+d′ = −0.14 [−0.24, −0.05]; Apertus: −2.13 [−2.29, −1.99]), and the SFT models judged them
+nearly as with the default prompt (3.42 and 4.54; truth_variant_answers.py). The repair by
+supervised fine-tuning thus does not depend on the question being known when the statement
+is read. TODO(sfirst): patching across layers with this prompt.
 
 Steering at the answer position was consistent with a readout that uses the represented
 truth direction after SFT; as explained in Appendix D, this is a consistency check rather
