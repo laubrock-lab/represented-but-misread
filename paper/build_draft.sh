@@ -7,7 +7,7 @@ cd "$(dirname "$0")"
 python3 build_draft.py
 OPTS=(--filter pandoc-citeproc --resource-path=.
       -V mainfont="STIXTwoText" -V mainfontoptions="Extension=.otf, UprightFont=*-Regular, BoldFont=*-Bold, ItalicFont=*-Italic, BoldItalicFont=*-BoldItalic"
-      -V mathfont="STIX Two Math"
+      -V mathfont="STIXTwoMath-Regular.otf"
       -V geometry:margin=2.5cm -V fontsize=11pt -V linestretch=1.15
       -V colorlinks=true -V linkcolor=blue -V urlcolor=blue)
 pandoc build/draft.md -o build/draft.pdf --pdf-engine=xelatex "${OPTS[@]}"
