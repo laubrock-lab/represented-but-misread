@@ -113,8 +113,11 @@ donor's at one set of positions (the statement, the instruction before it, the q
 and answer cue after it, the final position only, or all positions); dotted lines show the
 unpatched recipients. Note that in the truth prompt the question precedes the statement,
 so that the positions after the statement contain only the answer instruction and cue. (C) The same
-exchange at 12 layers (100 statement pairs): share of the difference between the two
-checkpoints that the exchange transferred (values below 0 and above 1 are clipped).
+exchange at 12 layers (100 statement pairs), for base and SFT model of OLMo 2 and Apertus
+and for base and final post-trained model of Gemma 3 4B and 12B: share of the difference
+between the two checkpoints that the exchange transferred (values below 0 and above 1 are
+clipped). Upper row: the base model receives the states of the post-trained model; lower
+row: the post-trained model receives the states of the base model.
 
 **Figure S1 (`figS1_patching_layers`).** Activation patching at layers 8 and 16
 (textbook summaries). As Figure 5B, with layer 8 added. At layer 8 the picture is

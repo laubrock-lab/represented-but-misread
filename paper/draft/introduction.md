@@ -159,8 +159,9 @@ layers, and a sweep over layers showed that from mid-depth onward the states at 
 positions after the text, and not those of the text, transferred it between checkpoints;
 below mid-depth, the text states contributed in one of the two models. For negated statements, post-training acted in the opposite direction: It
 repaired answers that several base models gave poorly although the truth could be decoded
-at ceiling, through weights in the middle layers; the repair arose at the positions after
-the statement in one model and in the representation of the statement itself in the other.
+at ceiling, through weights in the middle layers; by mid-depth the repair resided at the
+positions after the statement, and below that the representation of the statement itself
+contributed in three of the four models in which we traced it.
 In the training study, a small number of labeled examples shifted the readout in the
 direction that their labels implied, with little change of the probes at the text
 positions. A further judgment, whether a hotel review is genuine, gave less conclusive

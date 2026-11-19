@@ -28,13 +28,12 @@ prompt wordings). It also changed the use of a stated base rate: Base models shi
 answers less than an ideal observer would, most post-trained models more. In two models with
 stage-wise checkpoints, the change occurred during supervised fine-tuning, model stitching
 implicated the early layers, and from mid-depth onward the internal states at the positions
-after the text, not those of the text, transferred the change between checkpoints (below
-it, the text states contributed in one model). Because our corpora cannot be
+after the text, not those of the text, transferred the change between checkpoints. Because our corpora cannot be
 shared, we add a case reproducible from public data, the truth of negated
 statements. Here, post-training acted in the opposite direction: Probes decoded truth
-perfectly in every model, the answers of several base models did not use it, and fine-tuning
-repaired them, at the positions after the statement in one model and in the representation
-of the statement in another. In a training study, adding 2,000 correctly labeled authorship
+perfectly in every model, the answers of several base models did not use it, and post-training
+repaired them; by mid-depth the repair resided at the positions after the statement, and
+below it the representation of the statement contributed in three of four models. In a training study, adding 2,000 correctly labeled authorship
 judgments to otherwise identical fine-tuning data improved the answers on two other corpora
 and inverted them on a third, where they followed a probe trained on news. Post-training
 thus changed how a judgment is read out of what a model represents, for better or worse,

@@ -17,18 +17,19 @@ transferred the change between checkpoints and the states of the text did not; i
 layers, the text states carried part of the change in Apertus and none of it in OLMo 2. A judgment on public data, the truth of negated statements,
 showed the complementary case: The truth could be decoded at ceiling in all six model
 families, the answers of several base models did not use it, and supervised fine-tuning
-repaired the answers while the probes stayed at ceiling. A sweep over layers located this
-repair at the positions after the statement in Apertus, but in the representation of the
-statement itself in OLMo 2. In a training study, a small number of labeled examples shifted
+repaired the answers while the probes stayed at ceiling. Sweeps over layers in four models located this
+repair at the positions after the statement from the middle of the network onward; below
+that, the representation of the statement itself contributed strongly in OLMo 2, partly in
+the two Gemma 3 models, and little in Apertus. In a training study, a small number of labeled examples shifted
 the readout in the direction their labels implied, and the item-level answers followed the
 class direction of the training texts. In short, post-training changed how a judgment is
 read out of information that the models represent, in a direction that depended on the
 judgment. That this change leaves the representation of the text untouched and resides in
 how the question reads it, as our title suggests, held for the probes at the text positions,
-for authorship in OLMo 2, and for negation in Apertus. In the two remaining cases, the
+for authorship in OLMo 2, and for negation in Apertus. In the remaining cases, the
 representation of the text changed as well: in the lower layers of Apertus for authorship,
-and at mid-depth in OLMo 2 for negation. What all four cases share is that, by the middle
-of the network, the change resided at the positions after the text. Note that the
+and below mid-depth in OLMo 2 and the two Gemma 3 models for negation. What all cases share
+is that, by the middle of the network, the change resided at the positions after the text. Note that the
 localization rests on two model families, and that for the deceptive reviews (Appendix C)
 it was inconclusive.
 
@@ -193,7 +194,7 @@ early, at the stage of selection, and not only at a late decision stage [@desimo
 weights in the early layers, where the question begins to select information from the
 text, and was fully located in the question positions by the middle of the network.
 
-The sweep over layers for the negated statements qualifies this picture. In Apertus, the
+The sweeps over layers qualify this picture. For the negated statements in Apertus, the
 repair arose at the positions after the statement (the answer instruction and cue), as the
 picture of a changed reader suggests. In OLMo 2, it arose in the states of the statement itself at layers 10 to 14, and
 the upper layers of the base model read these states correctly; here, supervised fine-tuning

@@ -51,16 +51,19 @@ fig <- pA / pB + plot_layout(heights = c(1, 1.25)); h <- 6.4
 sw <- "outputs/patch_sweep/patch_sweep_summary.csv"
 if (file.exists(sw)) {
   s <- read_csv(sw, show_col_types = FALSE) |>
-    filter(corpus == "truth_neg_cities", preset %in% names(fam), set %in% names(sets))
+    filter(corpus == "truth_neg_cities", set %in% names(sets))
+  fam4 <- c(fam, "gemma3-4b" = "Gemma 3 4B", "gemma3-12b" = "Gemma 3 12B")
   if ("variant" %in% names(s)) s <- filter(s, is.na(variant) | variant %in% c("", "default"))
-  s <- s |> mutate(family = fam[preset], set = factor(sets[set], levels = rev(sets)),
-                   rec = ifelse(recipient == "base", "base + SFT states", "SFT + base states"),
+  s <- s |> filter(preset %in% names(fam4)) |>
+            mutate(family = factor(fam4[preset], levels = fam4), set = factor(sets[set], levels = rev(sets)),
+                   rec = ifelse(recipient == "base", "recipient: base", "recipient: post-trained"),
                    share = pmin(pmax(transfer, 0), 1))
   pC <- ggplot(s, aes(factor(layer), set, fill = share)) + geom_tile(colour = "white", linewidth = 0.2) +
-    facet_grid(rec ~ family) +
+    facet_grid(rec ~ family, scales = "free_x") +
     scale_fill_gradient(low = "grey96", high = "#7A3E9D", limits = c(0, 1), name = "share of the\ncheckpoint\ndifference\ntransferred") +
     labs(title = "C  Layer-by-position patching (100 pairs)", x = "layer at which states are exchanged", y = NULL) +
-    th + theme(legend.position = "right", legend.key.height = unit(5, "mm"), panel.grid = element_blank())
+    th + theme(legend.position = "right", legend.key.height = unit(5, "mm"), panel.grid = element_blank(),
+               axis.text.x = element_text(size = 5.5))
   fig <- pA / pB / pC + plot_layout(heights = c(1, 1.25, 1.1)); h <- 9.4
 }
 f <- "paper/figures/fig_negation.pdf"

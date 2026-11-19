@@ -600,8 +600,27 @@ did not lower it at any layer; note that the Apertus SFT model was at the maximu
 that a small disruption would not be visible. Hence, the two models agree in that the
 repair has reached the positions after the statement by the middle of the network, but
 they differ in where it arises: at the statement positions in OLMo 2, and at the answer cue
-in Apertus. TODO(gemma, sfirst): sweeps for Gemma 3 and with the statement placed before
-the question.
+in Apertus.
+
+To see which of the two patterns is more typical, we ran the same sweep for the two Gemma 3
+models, comparing the base model with the final post-trained model at 12 layers each. Note
+that these base models placed only 19% and 26% of their probability on the two answer
+words, and that the post-trained Gemma 3 12B, like the Apertus SFT model, was at the maximum
+d′. In both models, the states after the statement carried the repair completely from about
+half of the depth onward (Gemma 3 4B, 34 layers: 75% at layer 17 and 97% at layer 20;
+Gemma 3 12B, 48 layers: 100% from layer 20). Below that depth, the statement states
+contributed in both models, but in different ways. In Gemma 3 4B, the post-trained model's
+statement states repaired the base model only slightly (at most 19%, at layer 11), whereas
+the base model's statement states abolished the repair in the post-trained model almost
+completely at layers 11 and 14 (d′ = 0.09 and 0.20, from 3.42). In Gemma 3 12B, the
+post-trained model's statement states transferred up to 45% of the repair (layer 12), and
+the base model's statement states did not lower the post-trained model at any layer. An
+isolated effect of the positions before the statement in Gemma 3 12B (layer 16: d′ = 3.47)
+did not occur at the neighboring layers. Across the four models, the states after the
+statement thus carried the repair from about the middle of the network onward, and in
+three of them (OLMo 2 and both Gemma 3 models) the representation of the statement
+contributed to it at about a third of the depth in at least one direction. TODO(sfirst):
+statement placed before the question.
 
 Steering at the answer position was consistent with a readout that uses the represented
 truth direction after SFT; as explained in Appendix D, this is a consistency check rather
@@ -619,13 +638,12 @@ the wrong sign, as its negative sensitivity would suggest, could not be establis
 In summary, the truth of negated statements could be decoded at ceiling from the last
 prompt position before and after post-training, the answers of several base models did not
 use this information, and supervised fine-tuning repaired the answers, through weights in
-the middle layers. Where the repair arose differed between the two models that we could
-localize: In Apertus, it arose at the positions after the statement, i.e., in how the
-answer cue takes up the statement; in OLMo 2, it arose in the representation of the
-statement itself at mid-depth. Note that the localization rests on the two
-models with stage-wise checkpoints whose base models misread negation; the Gemma 3 base
-models showed the same change of the answers, but with low answer probability, and two
-base models had nothing to repair.
+the middle layers. In all four models in which we could trace the repair, it resided at the positions after
+the statement from about the middle of the network onward. Where it arose differed: In
+Apertus, at these positions, i.e., in how the answer cue takes up the statement; in OLMo 2,
+in the representation of the statement itself; in the two Gemma 3 models, the
+representation of the statement contributed as well. Note that the Gemma 3 base models
+answered with low answer probability, and that two base models had nothing to repair.
 
 What do the training data teach? The direction of the change differed between the
 judgments: Post-training impaired the readout of authorship, repaired that of negated
