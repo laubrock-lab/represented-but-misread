@@ -14,13 +14,13 @@ observable cues of the text, some of which are valid and some of which are not (
 In the first lens (encoding), the model integrates these cues into its internal
 representation; whether the ground truth can be decoded from this representation is
 measured with linear probes, and whether two checkpoints represent it in the same way
-with probe transfer. In the second lens (readout), the question reads the representation
-out into an answer by weighting internal features. Only one of these features was
+with probe transfer. In the second lens (readout), the representation is read
+out into an answer to the question by weighting internal features. Only one of these features was
 measured directly: the class direction, i.e., the direction that separates the two
 classes in the representation; its relation to the answer was examined with
 steering at the answer position (Appendix D). The other features are schematic. Achievement, i.e., the agreement of the
-answer with the state of the world, requires both lenses. Post-training changes the
-second lens (orange); model stitching and activation patching locate the change in depth
+answer with the state of the world, requires both lenses. Post-training changes mainly the
+second lens (orange), and in several cases also the first (Sections 3.4 and 3.6); model stitching and activation patching locate the change in depth
 and in the prompt. Splitting the judge side of the lens model has precedents in
 personality judgment [detection vs. utilization of cues; @funder1995accuracy] and in
 neuroscience [information encoded in a neural population vs. read out for behavior;
@@ -33,8 +33,10 @@ In panels A, C, and D, the horizontal axis shows the positions of the prompt in 
 order (the instruction, the text to be judged, the question, and the position at which
 the answer is produced), and the vertical axis shows the layers of the network. (A) Information
 flow: through attention, later positions read information from earlier ones. The answer
-is produced at the last position, so information from the text can reach it only via
-the positions in between, i.e., the question (dark tiles). (B) Steering, sketched in a two-dimensional
+is produced at the last position. Information from the text reaches it through the
+positions after the text: the question (dark tiles) and the last position itself, which
+also reads the text directly at every layer (the schematic shows only the route via the
+question). (B) Steering, sketched in a two-dimensional
 version of the high-dimensional representation space: human texts (open circles) and AI
 texts (triangles) differ along an AI–human direction (arrow between the class means).
 Steering moves the state of one text along this direction (diamonds) and measures how
@@ -96,11 +98,13 @@ contribute somewhat) is shown in Supplementary Figure S1.
 **Figure 6 (`fig_authorship_sweep`).** Authorship: activation patching across layers
 (textbook summaries, 238 texts; error bars: 95% grouped-bootstrap confidence intervals).
 Sensitivity (d′) of the recipient checkpoint after its residual stream was replaced by the
-donor's at one set of positions and one layer: the tokens of the text, the question and
-answer cue after the text, the final position only, or all positions. Horizontal lines show
+donor's at one set of positions and one layer: the instruction before the text, the tokens
+of the text, the question and answer cue after the text, the final position only, or all
+positions. Note that the two rows have different scales. Horizontal lines show
 the unpatched recipient (dotted) and the donor (dashed). In OLMo 2, the text states had no
 effect at any layer; in Apertus, they carried part of the difference between the
-checkpoints up to layer 12. From layer 14 onward, the states after the text carried it in
+checkpoints up to layer 12. The instruction positions carried part of it in the lower layers
+of both models. From layer 14 onward, the states after the text carried it in
 both models. Hybrids can lie outside the range of the two checkpoints.
 
 **Figure 7 (`fig_negation`).** Negated statements: where supervised fine-tuning repairs the
@@ -116,8 +120,8 @@ so that the positions after the statement contain only the answer instruction an
 exchange at 12 layers (100 statement pairs), for base and SFT model of OLMo 2 and Apertus
 and for base and final post-trained model of Gemma 3 4B and 12B: share of the difference
 between the two checkpoints that the exchange transferred (values below 0 and above 1 are
-clipped). Upper row: the base model receives the states of the post-trained model; lower
-row: the post-trained model receives the states of the base model.
+clipped). Upper row: the base model receives the states of the post-trained model ("into base");
+lower row: the post-trained model receives the states of the base model.
 
 **Figure S1 (`figS1_patching_layers`).** Activation patching at layers 8 and 16
 (textbook summaries). As Figure 5B, with layer 8 added. At layer 8 the picture is
@@ -137,8 +141,8 @@ the classes in both checkpoints. Dark lines: OLMo 2 7B (solid) and Apertus 1.5 8
 (dashed), the two models included in all six sets; thin grey lines: the other
 models (OLMo 3 Think and Instruct, which share a base model, counted separately); thick
 light line: mean over all models at the text positions (authorship
-corpora only). At the text positions, probes transferred without loss at every depth,
-also where they were well below ceiling (chats, d′ ≈ 2). At the last prompt position, at
+corpora only). At the text positions, probes transferred with little loss at every depth
+(largest deficit 0.54; on the chats, where they were well below ceiling, 0.16). At the last prompt position, at
 which the answer is produced, the deficit grew with depth in all models and tasks,
 although probes trained on each checkpoint itself still decoded the information. For the
 negated statements, the deficit drops to zero at mid-depth because both checkpoints are

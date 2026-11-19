@@ -29,7 +29,7 @@ PATTERNS = [
     "stitch/stitch_summary.csv", "stitch/stitch_neg_cities.csv", "stitch/*/perplexity.csv",
     "patch/patch_summary.csv", "patch/sweep_check.csv", "patch_sweep/patch_sweep_summary.csv",
     "training_study/answers_summary.csv", "training_study/contrasts_ts.csv", "training_study/heldout_breakdown.csv",
-    "training_study/formality_*.csv", "training_study/transfer_ts.csv", "training_study/prediction_test.csv",
+    "training_study/formality_*.csv", "training_study/transfer_ts.csv", "training_study/prediction_test.csv", "training_study/prediction_ngram_control.csv",
     "truth_*/stages.csv", "truth_neg_cities/sfirst_answers_summary.csv", "sft_check/*_counts.csv", "figdata/*.csv",
 ]
 ITEM_COLS = {"text_id", "source_id", "item_id", "pair_id", "text", "segment", "user", "assistant"}

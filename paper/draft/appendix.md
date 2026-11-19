@@ -371,8 +371,12 @@ were significant only without correction or under false-discovery-rate control: 
 on the short chats (+0.35 [0.06, 0.63]) and OLMo 3 Think on the textbook summaries, the
 latter in a condition with low answer probability. Note that we defined the family of
 tests post hoc as the comparisons that address our hypothesis; Holm correction across
-all 111 contrasts we computed, including comparisons between adjacent post-training
-stages and across prompt formats, left five of the six decreases significant. Hence,
+all 75 contrasts that we tested (of 129 computed), including comparisons between adjacent
+post-training stages and across prompt formats, left five of the six decreases significant.
+Note also that three of the six decreases did not hold with another wording of the prompt:
+For OLMo 2 on the textbook summaries, the change was +0.18 with the paraphrased prompt, and
+for Qwen3 it was +0.10 on the textbook summaries and +0.04 on the newspaper segments with
+the question placed before the text (Section 3.2). Hence,
 post-training lowered the sensitivity of the answers on average, but neither uniformly
 nor in a single direction across models and text types.
 

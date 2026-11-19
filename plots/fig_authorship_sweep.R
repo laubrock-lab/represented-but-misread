@@ -8,7 +8,7 @@
 suppressPackageStartupMessages({ library(ggplot2); library(dplyr); library(readr) })
 BLUE <- "#3B6FB6"; ORANGE <- "#E08A2B"; GREY <- "grey45"
 fam <- c("olmo2-7b" = "OLMo 2 7B", "apertus15-8b" = "Apertus 1.5 8B")
-sets <- c(text = "text", post = "after the text", last = "final position", all = "all positions")
+sets <- c(pre = "before the text", text = "text", post = "after the text", last = "final position", all = "all positions")
 s <- read_csv("outputs/patch_sweep/patch_sweep_summary.csv", show_col_types = FALSE) |>
   filter(corpus == "textbook", preset %in% names(fam), set %in% names(sets),
          is.na(variant) | variant %in% c("", "default")) |>
@@ -24,7 +24,7 @@ p <- ggplot(s, aes(layer, d, colour = set)) +
   geom_line(linewidth = 0.5, position = position_dodge(width = 1.2)) +
   geom_point(size = 1.1, position = position_dodge(width = 1.2)) +
   facet_grid(family ~ rec, scales = "free_y") +
-  scale_colour_manual(values = c("text" = "#7A3E9D", "after the text" = ORANGE, "final position" = "#2A9D8F", "all positions" = "grey25"),
+  scale_colour_manual(values = c("before the text" = BLUE, "text" = "#7A3E9D", "after the text" = ORANGE, "final position" = "#2A9D8F", "all positions" = "grey25"),
                       name = "states exchanged at") +
   scale_linetype_manual(values = c("unpatched recipient" = "dotted", "donor" = "dashed"), name = NULL) +
   scale_x_continuous(breaks = c(2, 6, 10, 14, 20, 24, 28, 32)) +

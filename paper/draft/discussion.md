@@ -9,29 +9,33 @@ it, and often ordered the texts inversely. Post-training lowered the sensitivity
 answers on average (Δd′ = −0.34 across families; −0.29 across three prompt wordings), with
 considerable variation between models, text types, and prompts, and in the two models with
 stage-wise checkpoints the change occurred during supervised fine-tuning. Post-training
-also changed how strongly a stated base rate moved the answers, from less than an ideal
-observer would to more. Model stitching implicated the weights of the early layers, with the
+also changed how strongly a stated base rate moved the log-odds of the answers, from less
+than the change in prior odds to more in most models, although relative to the larger
+spread of their log-odds this held less generally. Model stitching implicated the weights of the early layers, with the
 caveat that stitched hybrids produce effects of their own, and activation patching across layers showed
 that, from the middle of the network onward, the states at the positions after the text
 transferred the change between checkpoints and the states of the text did not; in the lower
-layers, the text states carried part of the change in Apertus and none of it in OLMo 2. A judgment on public data, the truth of negated statements,
-showed the complementary case: The truth could be decoded at ceiling in all six model
-families, the answers of several base models did not use it, and supervised fine-tuning
-repaired the answers while the probes stayed at ceiling. Sweeps over layers in four models located this
+layers, the text states carried part of the change in Apertus and none of it in OLMo 2, and
+the positions of the instruction before the text carried part of it in both. A judgment on public data, the truth of negated statements,
+showed the complementary case: The truth could be decoded at or near ceiling in all six model
+families, the answers of several base models did not use it, and post-training
+repaired the answers while the probes stayed at or near ceiling. Sweeps over layers in four models located this
 repair at the positions after the statement from the middle of the network onward; below
-that, the representation of the statement itself contributed strongly in OLMo 2, partly in
-the two Gemma 3 models, and little in Apertus. In a training study, a small number of labeled examples shifted
-the readout in the direction their labels implied, and the item-level answers followed the
-class direction of the training texts. In short, post-training changed how a judgment is
+that, the representation of the statement itself contributed in all four, strongly in
+OLMo 2 (up to 82% of the repair) and to a smaller extent in the others (19–45%). In a training study, a small number of labeled examples shifted
+the readout in the direction their labels implied, and the item-level answers on another genre followed a probe for the
+authorship of the training texts that was fitted in the base model, more closely than they
+followed surface classifiers of the same texts. In short, post-training changed how a judgment is
 read out of information that the models represent, in a direction that depended on the
 judgment. The stronger statement, that this change leaves the representation of the text untouched
-and resides only in how the question reads it, held for the probes at the text positions,
-for authorship in OLMo 2, and for negation in Apertus. In the remaining cases, the
+and resides only in the positions that follow the text, held for the probes at the text
+positions and, in the patching, for authorship in OLMo 2. In the other cases, the
 representation of the text changed as well: in the lower layers of Apertus for authorship,
-and below mid-depth in OLMo 2 and the two Gemma 3 models for negation. What all cases share
-is that, by the middle of the network, the change resided at the positions after the text. Note that the
-localization rests on two model families, and that for the deceptive reviews (Appendix C)
-it was inconclusive.
+and below mid-depth for negation, strongly in OLMo 2 and to a smaller extent in Apertus and
+the two Gemma 3 models. What all cases share is that, by the middle of the network, the
+change resided at the positions after the text. Note that the localization rests on two
+models for authorship and on four models from three families for negation, and that for the
+deceptive reviews (Appendix C) it was inconclusive.
 
 ## Relation to previous work
 
@@ -62,10 +66,12 @@ evidence [@lin2023urial] and by comparisons of representations between base and
 post-trained models [@kissane2024saetransfer; @lee2024dpo; @prakash2024finetuning; @waldis2026instructions], and it has been qualified by the observation that post-training
 gains continue to grow with the amount of fine-tuning data [@raghavendra2024revisiting; see also @vergarabrowne2026sah]. To our knowledge, it has not yet been tested with
 causal interventions across checkpoints. Our
-patching results provide causal evidence for it in one respect: The representation of
-the text was interchangeable between base and post-trained checkpoints as far as the
-judgment is concerned, and probes transferred between them at the text positions
-wherever this test was not limited by ceiling effects. Note, however, that the
+results provide partial support for it: Probes transferred between base and post-trained
+checkpoints at the text positions wherever this test was not limited by ceiling effects,
+and from the middle of the network onward the states of the text could be exchanged between
+checkpoints without changing the judgment. Below mid-depth, however, exchanging the text
+states did change the judgment in several cases (Sections 3.4 and 3.6), so that the
+representation of the text was not left intact throughout. Note, however, that the
 information available at the answer position declined after post-training in some
 models (Gemma 3, OLMo 3 Think), so that the hypothesis holds for the representation of
 the text rather than for the model as a whole. In another respect, our results qualify
@@ -77,8 +83,8 @@ that a property tracked across the stages of post-training is shaped mainly duri
 supervised fine-tuning [@heidari2026evalawareness].
 
 Our localization agrees with previous comparisons of base and post-trained models in
-one respect and departs from them in another. That the effect of post-training resided
-in the positions of the question rather than in those of the text agrees with model
+one respect and departs from them in another. That, from mid-depth onward, the effect of post-training resided
+in the positions after the text rather than in those of the text agrees with model
 diffing and cache patching, in which much of what fine-tuning adds was concentrated at
 chat-template and system-prompt tokens [@leong2025template; @loos2026kvpatching; @minder2025crosscoders]. Because our prompts used no chat template, our results suggest that the
 relevant positions are those at which the task is posed, whether in template tokens or
@@ -138,8 +144,10 @@ correctly labeled authorship judgments to otherwise identical fine-tuning data i
 readout of texts whose cues resembled those of the training texts and impaired it where
 they did not, and the probes at the text positions changed little. On the chats, the
 item-level answers followed a probe for the authorship of news that was fitted in the base
-model, which turns the post-hoc explanation of the inversion into a tested prediction:
-Fine-tuning installed a readout along the class direction of the training texts. The
+model, which turns the post-hoc explanation of the inversion into a tested prediction; they
+followed it more closely than they followed surface n-gram classifiers of the same news,
+which suggests that fine-tuning made the answer read features that the base model already
+represents. The
 training signal can thus set the direction of the readout, as the account assumes. The
 training study does not show, however, that the decline after the official fine-tuning of
 OLMo 2 has the same origin: Our background condition, with a small part of the original
@@ -177,27 +185,31 @@ these words. Within these limits, the comparison shows that post-training change
 which texts receive more evidence for "AI", but also how the models combine this evidence
 with what the prompt states about the situation, a second aspect of the readout.
 
-## How the question reads the text
+## What reads the text
 
-What does it mean that post-training changes how the question reads the text, where it
-does? In a
-language model, the answer is produced at the last position of the prompt, and
-information from the text reaches it only through the positions in between, i.e., the
-question. At each layer, these positions retrieve information from the text through
-attention and transform it through the feed-forward blocks. Post-training could
-intervene at either step, by changing what is retrieved or by changing what is made of
-it, and the stitching results suggest that both are involved. Speculatively, a
-psychological description of such a change is a different construal of the question. A model after
-post-training may understand "written by a human" differently than its base model did,
-much as a task set determines which features of a stimulus an observer selects and how
-they are mapped onto a response. In accounts of biased competition, a task set acts
-early, at the stage of selection, and not only at a late decision stage [@desimone1995biased]. It is instructive to see that the effect of post-training, too, involved
-weights in the early layers, where the question begins to select information from the
-text, and was fully located in the question positions by the middle of the network.
+Where the change resides in the positions after the text, what does this mean? In a
+language model, the answer is produced from the state at the last position of the prompt.
+Every position after the text, i.e., the question, the cue for the answer, and the last
+position itself, retrieves information from the text through attention at each layer and
+transforms it through the feed-forward blocks. Post-training could intervene at either
+step, by changing what is retrieved or by changing what is made of it, and the stitching
+results suggest that both are involved. Speculatively, a psychological description of such a
+change is a different construal of the task. A model after post-training may understand
+"written by a human" differently than its base model did, much as a task set determines
+which features of a stimulus an observer selects and how they are mapped onto a response. In
+accounts of biased competition, a task set acts early, at the stage of selection, and not
+only at a late decision stage [@desimone1995biased]. It is instructive to see that the
+effect of post-training on the authorship judgments, too, involved weights in the early
+layers, and positions as early as the instruction that precedes the text. Note that our
+data do not single out the question as the place of the change: Where we could separate
+the tokens of the question from the cue for the answer and the last position, the latter
+carried most of the difference (Sections 3.4 and 3.6).
 
-The sweeps over layers qualify this picture. For the negated statements in Apertus, the
-repair arose at the positions after the statement (the answer instruction and cue), as the
-picture of a changed reader suggests. In OLMo 2, it arose in the states of the statement itself at layers 10 to 14, and
+The sweeps over layers show that the positions after the text are not the whole story. For
+the negated statements in Apertus, most of the repair appeared at the positions after the
+statement (the answer instruction and cue), as the picture of a changed reader suggests,
+although the statement states carried a reliable part of it (up to 23%). In OLMo 2, most of
+it appeared in the states of the statement itself at layers 10 to 14, and
 the upper layers of the base model read these states correctly; here, supervised fine-tuning
 changed what is read, and the reader of the base model was adequate. The same held when
 the statement was placed before the question, so that it was processed without the task
@@ -287,9 +299,11 @@ the evidence on which the answer is based rather than the binary decisions thems
 The
 information that the models failed to use was largely lexical and stylistic, as shown by
 simple n-gram classifiers, so our results concern the readout of ordinary cues rather
-than of any deep representation of authorship. The stitching and patching analyses were
-restricted to two models per judgment, because stage-wise checkpoints with a clear change
-were available for these two only, to two corpora for authorship, and to the plain
+than of any deep representation of authorship. The stitching analyses and the patching for authorship were
+restricted to two models, because stage-wise checkpoints with a clear change
+were available for these two only (for the negated statements, the patching across layers
+included the two Gemma 3 models, whose base models answer with low probability), to two
+corpora for authorship, and to the plain
 prompt format, because base models cannot be queried with a chat template; the patching
 across layers was run for one authorship corpus and with 100 statement pairs, which was what
 the available computing time allowed. The two
@@ -309,9 +323,10 @@ the analyses were added step by step and not all could be repeated for every com
 only Apertus on the textbook summaries was examined with steering, stitching, and patching
 alike. The newspaper
 segments stem from only 14 articles, so that bootstrap intervals that resample articles
-are likely too narrow for this corpus. All judgments used German prompts; a paraphrased
+are likely too narrow for this corpus. The authorship judgments used German prompts (the truth and review judgments used English
+ones); a paraphrased
 prompt reproduced the decline, a prompt with the question before the text reproduced it on
-average but not in every family, and we did not test English prompts. Models
+average but not in every family, and we did not test English prompts for authorship. Models
 from different developers also differ in their post-training recipes, including distillation from larger
 models, the emphasis on reasoning, and the share of human preference data, and our
 design cannot separate these factors; they are a plausible source of the heterogeneity

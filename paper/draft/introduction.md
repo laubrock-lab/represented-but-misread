@@ -65,8 +65,8 @@ judges, the utilization of cues can only be inferred from their judgments. For l
 models, it can be examined directly, because their internal representations are
 accessible. The judgment of a language model can then be described by two lenses in
 series (Figure 1): In a first lens, the cues of the text are encoded in the model's
-internal representation; in a second lens, the question reads this representation out
-into an answer. Splitting the judge side of the lens model in this way has precedents in
+internal representation; in a second lens, this representation is read out into an
+answer to the question. Splitting the judge side of the lens model in this way has precedents in
 research on personality judgment, which distinguishes the detection of cues from their
 utilization [@funder1995accuracy], and in neuroscience, which distinguishes the information that
 a neural population encodes from the information that is read out for behavior (Panzeri
@@ -161,7 +161,7 @@ below mid-depth, the text states contributed in one of the two models. For negat
 repaired answers that several base models gave poorly although the truth could be decoded
 at ceiling, through weights in the middle layers; by mid-depth the repair resided at the
 positions after the statement, and below that the representation of the statement itself
-contributed in three of the four models in which we traced it.
+contributed in the four models in which we traced it, strongly in one of them.
 In the training study, a small number of labeled examples shifted the readout in the
 direction that their labels implied, with little change of the probes at the text
 positions. A further judgment, whether a hotel review is genuine, gave less conclusive

@@ -121,7 +121,11 @@ inferential comparisons (reported with a 50% threshold as a sensitivity analysis
 ## 2.4 Signal detection measures and statistics
 
 Treating AI texts as signal, we computed sensitivity as d′ = √2 · z(AUC), where AUC is
-the area under the ROC curve of dv. This measure does not depend on where the model sets
+the area under the ROC curve of dv. For this transformation, the AUC is limited to the
+interval [1/(2m), 1 − 1/(2m)], where m is the size of the smaller class, so that d′ has a
+maximum that depends on the number of texts (e.g., 3.64 for 100 statement pairs and 4.54
+for 748); values at this maximum mean that all pairs were ordered correctly, and differences
+near it are compressed. This measure does not depend on where the model sets
 its decision threshold, and negative values indicate that the model judges AI texts as
 less AI-like than human texts. As a measure of response bias, we computed the criterion
 c at the model's natural threshold (dv = 0), with a log-linear correction of hit and
@@ -156,9 +160,12 @@ compared each post-trained checkpoint with its base model on the identical raw p
 ("clean" contrasts), computing the difference in d′ on the same texts with a paired
 grouped bootstrap. Comparisons across formats (base raw versus post-trained chat) are
 reported but marked as confounded. p-values were obtained from a z-test with the
-bootstrap standard error and corrected for multiple comparisons across all tested
-contrasts, with the Holm procedure as the primary and the Benjamini–Hochberg procedure
-as a secondary correction.
+bootstrap standard error and corrected for multiple comparisons with the Holm procedure
+within the family of the 18 comparisons between final and base model on the identical
+prompt, which address our hypothesis; as a stricter check, we report the Holm correction
+across all tested contrasts, and the Benjamini–Hochberg procedure as a secondary
+correction (Appendix G). The summary inference rests on the model family as the unit
+(Section 3.2).
 
 ## 2.5 Probes and baselines
 
@@ -251,18 +258,35 @@ feed-forward blocks (each with its normalization) of the first ℓ layers.
 *Activation patching.* Activation patching replaces internal states of a model with
 those obtained under different conditions [@vig2020causal; @meng2022rome; @heimersheim2024patching]; here, the states came from a different checkpoint [cf. @prakash2024finetuning]. Stitching without an adapter at layer ℓ is the special case in
 which the full residual stream is exchanged at all positions. To separate the
-representation of the text from the processing of the question, we ran the donor checkpoint over every prompt, stored its residual stream
-after layer k at all prompt positions, and then ran the recipient checkpoint with its
-residual stream replaced by the donor's at a selected set of positions: the tokens of the
-text, the instruction before the text, the question and answer cue after the text, the
-final position only, or all positions. For the negated statements, we additionally repeated
-the exchange at 12 layers (2 to 16 in steps of 2, then 20, 24, 28, and 32) with the first 100
-statement pairs, and expressed each effect as the share of the difference in d′ between the
-two unpatched checkpoints that the exchange transferred. These runs for OLMo 2 used NVIDIA
-V100 GPUs; in half precision, their scores differed slightly from those obtained on A100
-GPUs (unpatched condition: largest difference 0.10 nats per item, r > .998;
-outputs/patch/sweep_check.csv), so that the sweep is compared only with its own unpatched
-conditions.
+representation of the text from the processing at the positions that follow it, we ran the
+donor checkpoint over every prompt, stored its residual stream after decoder layer k (i.e.,
+the output of layer k, counted from 1) at all prompt positions, and then ran the recipient
+checkpoint with its residual stream after layer k replaced by the donor's at a selected set
+of positions: the tokens of the text (or statement), the positions before the text (the
+instruction), the positions after the text (question, instruction to answer with one word,
+and answer cue), the tokens of the question line only, the final position only, or all
+positions. The effect of an exchange is reported as the d′ of the patched recipient or as
+the share of the difference in d′ between the two unpatched checkpoints that the exchange
+transferred. A share above 100% or below 0% means that the hybrid lies outside the range of
+the two checkpoints; where a checkpoint is at the maximum d′, shares are compressed and a
+small disruption cannot be seen.
+
+We first ran the exchange at layers 8 and 16 (textbook summaries, short chats, and the
+negated statements with 300 pairs), and for the textbook summaries with a prompt that placed
+the question before the text. We then repeated it across layers: for authorship on the
+textbook summaries (all 238 texts; OLMo 2 and Apertus, base vs. SFT) and for the negated
+statements (first 100 pairs; OLMo 2 and Apertus, base vs. SFT; Gemma 3 4B and 12B, base vs.
+final model), at 12 layers each (2 to 16 in steps of 2, then 20, 24, 28, and 32 for the
+models with 32 layers; 12 layers between 3 and 34 for Gemma 3 4B and between 4 and 48 for
+Gemma 3 12B). For the negated statements, the default prompt poses the question before the
+statement ("Is the following statement true or false? Statement: … Answer with one word
+(True or False). Answer:"); for OLMo 2 and Apertus we therefore also ran the answers and
+the patching across layers with the statement placed first ("Statement: … Is this
+statement true or false? Answer with one word (True or False). Answer:"). The runs across
+layers for OLMo 2 used NVIDIA V100 GPUs; in half precision, their scores differed slightly
+from those obtained on A100 GPUs (unpatched condition: largest difference 0.10 nats per
+item, r > .998; outputs/patch/sweep_check.csv), so that each run across layers is compared
+only with its own unpatched conditions.
 
 ## 2.8 Two further judgments
 
@@ -305,7 +329,9 @@ substantially with post-training and whose base models placed at least 30% of th
 probability on the two answer words, the criterion used for authorship (Table 2). For the
 negated statements, these were OLMo 2 and Apertus (base vs. SFT, 300 pairs); the Gemma 3
 base models fell below this criterion (18% and 25%), and the base models of Qwen3 and OLMo 3 already
-judged the negated statements perfectly. For the reviews, these were Gemma 3 4B, which
+judged the negated statements perfectly. Because the two models differed in where the repair
+appeared (Section 3.6), we later added the patching across layers for the two Gemma 3 models
+as an exception to this criterion; their results are reported with this caveat. For the reviews, these were Gemma 3 4B, which
 lost sensitivity, and Qwen3 8B, which gained (base vs. final model; 800 pairs for
 stitching, 400 for patching); OLMo 2, Apertus and OLMo 3 changed little, and Gemma
 3 12B, added later for consistency, was not localized. For the
@@ -334,8 +360,8 @@ judgment tasks.
 ## 2.9 Training study
 
 To test causally whether the training signal sets the direction of the readout, we
-fine-tuned the OLMo 2 7B base model under four conditions that differed only in a small
-set of authorship judgments. Every run contained the same 20,000 conversations, sampled
+fine-tuned the OLMo 2 7B base model under five conditions that differed only in a small
+set of added judgments. Every run contained the same 20,000 conversations, sampled
 proportionally from all parts of the model's original supervised fine-tuning mixture
 [Tülu 3; @lambert2024tulu3]. The conditions added 1,994 authorship judgments in the
 format of our experiments (plain prompt, random answer order) with correct labels (C1),
@@ -359,6 +385,22 @@ evaluated the final adapters on our three authorship corpora and on 400 held-out
 items (plain prompt, both answer orders), and we analyzed their representations with
 probes and probe transfer as in Section 2.8. The official SFT checkpoint of OLMo 2 served
 as a reference.
+
+To test whether the answers after training with valid news labels follow what
+distinguishes AI from human news, we fitted a probe on the held-out news in the base model
+(text positions, layers 20 and 24), applied it unchanged to the short chats, and computed
+for every fine-tuned model the Spearman correlation across the 300 chats between the probe
+score and the answer score dv (pooled and within each class; means over the three seeds;
+grouped bootstrap over source groups; differences between conditions on the same
+resamples). The prediction was a positive correlation for C1 that exceeds those of C0, C3,
+and C4. As a control that uses no activations, we repeated the test with logistic
+regressions on word n-grams (1–2) and character n-grams (2–4) of the same held-out news,
+and computed partial rank correlations of each predictor with dv controlling for the
+other. We also computed the cosine between the direction that separates AI from human news
+at the last prompt position of a fine-tuned model (difference of class means, or weight
+vector of a probe) and the direction along which its answers to the chats vary (difference
+between chats above and below the median dv, or ridge regression of dv on the
+activations), with 1,000 random directions as a reference; all variants are reported.
 
 ## 2.10 Implementation
 

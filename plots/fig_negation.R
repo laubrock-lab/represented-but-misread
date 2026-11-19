@@ -52,11 +52,11 @@ sw <- "outputs/patch_sweep/patch_sweep_summary.csv"
 if (file.exists(sw)) {
   s <- read_csv(sw, show_col_types = FALSE) |>
     filter(corpus == "truth_neg_cities", set %in% names(sets))
-  fam4 <- c(fam, "gemma3-4b" = "Gemma 3 4B", "gemma3-12b" = "Gemma 3 12B")
+  fam4 <- c("apertus15-8b" = "Apertus 1.5 8B", "olmo2-7b" = "OLMo 2 7B", "gemma3-4b" = "Gemma 3 4B", "gemma3-12b" = "Gemma 3 12B")
   if ("variant" %in% names(s)) s <- filter(s, is.na(variant) | variant %in% c("", "default"))
   s <- s |> filter(preset %in% names(fam4)) |>
             mutate(family = factor(fam4[preset], levels = fam4), set = factor(sets[set], levels = rev(sets)),
-                   rec = ifelse(recipient == "base", "recipient: base", "recipient: post-trained"),
+                   rec = ifelse(recipient == "base", "into base", "into post-trained"),
                    share = pmin(pmax(transfer, 0), 1))
   pC <- ggplot(s, aes(factor(layer), set, fill = share)) + geom_tile(colour = "white", linewidth = 0.2) +
     facet_grid(rec ~ family, scales = "free_x") +
