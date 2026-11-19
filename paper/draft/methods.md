@@ -169,7 +169,10 @@ Each probe consisted of standardization, a principal component rotation, and an
 L2-regularized logistic regression whose regularization strength was selected by an
 inner grouped cross-validation (standardization and rotation were fitted on the whole
 training fold, so that the inner validation folds entered these unsupervised steps; the
-held-out fold of the outer cross-validation entered none). Performance was estimated out of fold with a 10-fold
+held-out fold of the outer cross-validation entered none; a strictly nested version, in
+which all steps were refitted within each inner split, changed the probe d′ for the short
+chats by −0.03 on average, with a range from −0.20 to +0.12 across the base and final
+checkpoints of the six families; probe_inner_cv_check.py). Performance was estimated out of fold with a 10-fold
 cross-validation that held out whole source groups, and expressed as d′ (AUC). As a
 check, the same procedure was repeated with labels shuffled within source groups. For
 comparisons across models, we report the probe at a fixed relative depth of two thirds

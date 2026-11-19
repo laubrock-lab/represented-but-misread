@@ -23,7 +23,7 @@ PATTERNS = [
     "meta_multilevel.csv", "meta_prompts*.csv", "meta_contrasts.csv", "contrasts*.csv", "promptvar_summary.csv",
     "sdt_invariance_*.csv", "sdt_invariance_table.md", "base_rate_shift*.csv", "base_rate_shift_table.md",
     "base_rate_scale*.csv", "baselines*.csv", "cka_textbook.csv", "checkpoint_transfer_*.csv",
-    "steer_nulls_summary.csv", "steer_cosines.csv", "steer_cache_check.csv", "review_polarity.csv",
+    "probe_inner_cv_check.csv", "steer_nulls_summary.csv", "steer_cosines.csv", "steer_cache_check.csv", "review_polarity.csv",
     "review_convergence.csv", "truth_stages_contrasts.csv", "stages_summary.csv", "lens_opspam*.csv",
     "fewshot/fewshot_summary.csv", "fewshot/fewshot_interaction.csv",
     "stitch/stitch_summary.csv", "stitch/stitch_neg_cities.csv", "stitch/*/perplexity.csv",
