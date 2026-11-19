@@ -56,7 +56,7 @@ with `reproduce/negation.sh`; see `reproduce/README.md`.
 | Probe transfer | `probe_transfer.py` (between corpora), `checkpoint_transfer.py` (between base and post-trained model), `checkpoint_transfer_last_summary.py` | A probe fitted on one corpus or checkpoint and tested on another | 3.1, 3.5 |
 | Baselines | `baselines.py`, `editlens_score.py` | n-gram and surface classifiers, input-embedding probe, external detector | 2.5, 3.1 |
 | Few-shot | `fewshot_summary.py` | Labeled examples in the prompt | 2.6, 3.2 |
-| Lens model | `lens_model.py`, `cue_lens_chats.py`, `segment_features.py`, `lens_opspam.py` | Lens model equation on interpretable text properties | Appendix B |
+| Lens model | `lens_model.py`, `cue_lens_chats.py`, `segment_features.py`, `lens_opspam.py` | Lens model equation on interpretable text properties. For the authorship corpora, `segment_features.py` and `human_cues.py` import a feature extractor from the lab course repository, which is not public; `lens_opspam.py` (public reviews) computes its cues itself | Appendix B |
 | Stitching | `stitch.py`, `stitch_summary.py` | Lower layers of one checkpoint under the upper layers of another | 2.7, 3.4 |
 | Patching | `patch_positions.py`, `localization_summary.py`, `patch_sweep_summary.py` | Exchange of internal states between checkpoints at sets of prompt positions, at one layer or across layers | 2.7, 3.4, 3.6 |
 | Steering | `steer_logits.py`, `steer_nulls_analysis.py`, `steer_cache_check.py` | Shift of the state at the last position along the class direction, with control directions | Appendix D |

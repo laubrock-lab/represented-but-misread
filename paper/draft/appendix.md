@@ -80,7 +80,8 @@ r~a~ = G R~e~ R~s~ + C √(1 − R_e²) √(1 − R_s²). Because the regression
 sample, we also report cross-validated R~e~, R~s~ and G (10-fold, grouped by source). For
 the short chats, the cues were 34 text properties (word and sentence length, lexical
 diversity, part-of-speech shares, readability, punctuation, and properties that the
-students had named as typical of AI text); for the reviews, 15 cues motivated by @ott2011finding, such as the rates of first-person pronouns, of references to family and to the
+students had named as typical of AI text), computed with a feature extractor written for the
+lab course (based on spaCy, textstat, and wordfreq); for the reviews, 15 cues motivated by @ott2011finding, such as the rates of first-person pronouns, of references to family and to the
 hotel or city, of spatial details and of emotion words, and the length of the review and
 of its words and sentences, all centered within the positive and the negative reviews.
 
