@@ -46,12 +46,13 @@ by a human or by an AI are weak and biased judges: Their errors lean in one dire
 and the direction differs between models and model generations [@bhattacharjee2024fighting; @yuan2026crossgen]. When GPT-3.5 and GPT-4 judged transcripts of Turing-test
 conversations, their accuracy was even below chance [@rathi2024gpt4]. In pilot work
 with the German chat messages used here, four commercial models judged each message with
-five prompt versions and rated their confidence (pilot_llm_judge_summary.py). A small model
-(GPT-5.4-mini) likewise ordered the messages below chance with each prompt version
-(AUC = .20–.34), whereas the larger model of the same family did not (GPT-5.4: .53–.73), and
-two models of another provider ordered them above chance (Claude Sonnet 4.6: .63–.76; Claude
-Opus 4.6: .69–.90). All four models answered "human" for nearly all messages (at most 13%
-"AI" answers), so that these values rest on the confidence ratings. Why would a model that writes like an AI fail to recognize
+five prompt versions and rated their confidence (pilot_llm_judge_summary.py). Two of them,
+GPT-5.4 and Claude Opus 4.6, had written the AI messages themselves. None of the four
+models recognized these messages: With any prompt version, each model called at most 16%
+of them AI, and the two generators called at most 7% and 14% of their own messages AI.
+The confidence ratings ordered the messages below chance in the smallest model
+(GPT-5.4-mini: AUC = .20–.34) and at or above chance in the larger ones (GPT-5.4: .53–.73;
+Claude Sonnet 4.6: .63–.76; Claude Opus 4.6: .69–.90). Why would a model that writes like an AI fail to recognize
 AI-written text, and why would the training that makes it a helpful assistant make it
 worse at this?
 

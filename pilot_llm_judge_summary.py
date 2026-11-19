@@ -12,10 +12,11 @@ This script condenses the per-message file into one row per judge model and prom
 AUC of the signed confidence (confidence for "KI", minus confidence for "Mensch") with a
 bootstrap CI that resamples source messages (a human message and the AI messages derived from
 it), the AUC of the binary choice, and the share of "KI" answers overall, for AI messages
-(hits), and for human messages (false alarms).
+(hits), and for human messages (false alarms). A second table gives the hit rate separately
+for the AI messages written by each of the two generator models, which are also among the judges.
 
 Usage:  python pilot_llm_judge_summary.py [--input llm_judgments.csv] [--n-boot 2000]
-        -> outputs/pilot_llm_judge.csv
+        -> outputs/pilot_llm_judge.csv, outputs/pilot_llm_judge_by_generator.csv
 """
 from __future__ import annotations
 
@@ -57,6 +58,16 @@ def main() -> None:
     r = pd.DataFrame(rows)
     out = config.OUTPUT_DIR / "pilot_llm_judge.csv"
     r.to_csv(out, index=False)
+    # share of "KI" answers to the AI messages, by the model that wrote them (two of the judges
+    # are also the generators of the AI messages)
+    ai = d[d.is_ai == 1]
+    cell = ai.groupby(["judge_model", "model_name", "prompt_version"]).ai.mean().reset_index()
+    g = cell.groupby(["judge_model", "model_name"]).ai.agg(hit_rate_mean="mean", hit_rate_min="min", hit_rate_max="max")
+    g["n_messages"] = ai.groupby(["judge_model", "model_name"]).source_id.size() // cell.prompt_version.nunique()
+    g = g.reset_index().rename(columns={"model_name": "generator_model"})
+    g["own_text"] = g.judge_model == g.generator_model
+    g.to_csv(config.OUTPUT_DIR / "pilot_llm_judge_by_generator.csv", index=False)
+    print(g.round(3).to_string(index=False))
     with pd.option_context("display.width", 220, "display.float_format", "{:.3f}".format):
         print(r.to_string(index=False))
         print(r.groupby("judge_model").agg(auc_min=("auc", "min"), auc_max=("auc", "max"), lo_min=("lo", "min"),
