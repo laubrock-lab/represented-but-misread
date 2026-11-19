@@ -1,4 +1,4 @@
-"""SDT invariance test (17 Nov 2026): do bias manipulations move the criterion c but leave the
+"""SDT invariance test: do bias manipulations move the criterion c but leave the
 sensitivity d′ unchanged, as signal detection theory assumes?
 
 Bias manipulations (plain prompt):

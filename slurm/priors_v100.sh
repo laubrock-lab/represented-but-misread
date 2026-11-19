@@ -7,7 +7,7 @@
 #SBATCH --time=08:00:00
 #SBATCH -o slurm/prior_%j.out
 #SBATCH -e slurm/prior_%j.err
-# Bias manipulation for the SDT invariance test (17 Nov 2026): stated AI base rate of 20, 50,
+# Bias manipulation for the SDT invariance test: stated AI base rate of 20, 50,
 # or 80% in the raw prompt (one wording of the base-rate sentence), both answer orders, base
 # and final model; answers only. Existing conditions are skipped.
 # Usage: sbatch slurm/priors_v100.sh <preset> <corpus> [prior_order]

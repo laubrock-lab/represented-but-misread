@@ -7,7 +7,7 @@
 #SBATCH --time=12:00:00
 #SBATCH -o slurm/psweep_%j.out
 #SBATCH -e slurm/psweep_%j.err
-# Layer sweep of position-specific patching on a V100 (18 Nov 2026): one donor pass caches the
+# Layer sweep of position-specific patching on a V100: one donor pass caches the
 # residual stream for all requested layers, the recipient is loaded once and looped over layers
 # x position sets; one CSV per layer, written as soon as the layer is done.
 # Usage: sbatch slurm/patch_sweep_v100.sh <corpus> <preset> <recipient> <donor> "<layers>" [extra args]

@@ -1,6 +1,6 @@
 #!/bin/bash
 # Rerun of the base-rate conditions with the other mention order of the base-rate sentence
-# (human share named first, --prior-orders hu); 18 Nov 2026.
+# (human share named first, --prior-orders hu).
 # One dependency chain per preset (3 corpora in sequence), so at most three V100 jobs of
 # this batch run at the same time and other users' jobs still fit under the per-user cap.
 # ssh <cluster-login-host> 'bash -c "cd /work/<user>/latent-detection && bash slurm/priors_hu_submit.sh"'

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Authorship patching across layers on a local Apple-silicon machine (18 Nov 2026), because the
+# Authorship patching across layers on a local Apple-silicon machine, because the
 # cluster GPUs were not available: textbook summaries (all 238 texts), OLMo 2 7B base vs. SFT,
 # both directions, position sets none / text / post, float16 (about a third faster than bfloat16
 # on MPS; the run is compared only with its own unpatched conditions).

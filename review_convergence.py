@@ -6,7 +6,7 @@ after centering dv within review polarity (positive / negative reviews), because
 polarity shifts the judgments of all models alike. Mean and range over the model
 pairs, separately for the five conversation-oriented models and for OLMo 3 Think.
 
-Second output (reproducibility, 17 Nov 2026): the polarity heuristic itself, per model
+Second output: the polarity heuristic itself, per model
 and checkpoint (outputs/review_polarity.csv):
     r2_polarity    share of the variance of the order-averaged dv explained by review
                    polarity (positive / negative), i.e. eta^2 = between-group sum of

@@ -25,7 +25,7 @@ _nulls). One row per cell (model x corpus x layer):
                 cosine, which is the quantity steer_logits.py prints to its log
                 ("mean cosine with class direction"); cos_class_decision_scored is the
                 same mean over the subset of texts that were actually steered (identical
-                except in the --limit smoke runs). Added 17 Nov 2026: Results 3.3 and
+                except in the --limit smoke runs). Results 3.3 and
                 3.6 quote these cosines, which previously existed only in the logs.
   clear diff    Two explicit versions of "cells in which this difference was clearly
                 different from zero" (Results 3.3), applied to the observed AI-human

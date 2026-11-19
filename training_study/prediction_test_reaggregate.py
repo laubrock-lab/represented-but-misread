@@ -1,8 +1,7 @@
 """Recompute the seed-mean rows of test P2 in outputs/training_study/prediction_test.csv from
-its per-seed rows (19 Nov 2026). The first version of prediction_test.py pooled the values of
-both fixed layers and all seeds for the layer-mean row, so that its min/max was a range across
-seeds and layers; the range across seeds is the min/max of the per-seed means over the two
-layers (as prediction_test.py computes it now). Estimates are unchanged.
+its per-seed rows: for the mean over the two fixed layers, the range across seeds is the
+minimum and maximum of the per-seed means over the layers (as prediction_test.py computes
+it). Estimates are unchanged, which the script asserts.
 Usage: python training_study/prediction_test_reaggregate.py
 """
 from pathlib import Path

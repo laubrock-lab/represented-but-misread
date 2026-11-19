@@ -1,4 +1,4 @@
-"""Base-rate shift of the judgment logit (18 Nov 2026).
+"""Base-rate shift of the judgment logit.
 
 judge_logits.py --priors states the share of AI texts in the study (20/50/80 %),
 with the AI share or the human share named first (--prior-orders ai|hu).  If the

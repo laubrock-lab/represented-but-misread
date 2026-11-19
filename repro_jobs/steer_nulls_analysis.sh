@@ -7,7 +7,7 @@
 #SBATCH --time=01:00:00
 #SBATCH -o repro_jobs/steerNA2_%j.out
 #SBATCH -e repro_jobs/steerNA2_%j.err
-# Reproducibility run (17 Nov 2026): steer_nulls_analysis.py with the new columns
+# Reproducibility run: steer_nulls_analysis.py with the new columns
 # cos_class_decision (Results 3.3 / 3.6) and dv_diff_lo/hi + dv_diff_clear +
 # sign_agree (the explicit criterion behind "all 20 cells in which this difference
 # was clearly different from zero"). Needs the *_acts.npz of all 25 cells.

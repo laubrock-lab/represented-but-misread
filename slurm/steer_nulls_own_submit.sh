@@ -1,5 +1,5 @@
 #!/bin/bash
-# Scale-matched null (16 Nov 2026): the 100 fixed control directions per cell again, each
+# Scale-matched null: the 100 fixed control directions per cell again, each
 # stepped by +-2 within-class SD along its OWN direction (--control-unit own), so that the
 # controls stay within the natural range of the texts as much as the class direction does.
 # Output suffix _ownsd. Run on the login node from a clean shell:

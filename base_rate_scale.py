@@ -1,4 +1,4 @@
-"""Scale-free companion to base_rate_shift.py (17 Nov 2026).
+"""Scale-free companion to base_rate_shift.py.
 
 The benchmark ln 16 applies to dv only if dv is a calibrated posterior log-odds. A model whose
 dv is over- or under-dispersed (e.g., a post-trained model with more extreme logits) would shift

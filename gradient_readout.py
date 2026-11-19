@@ -9,7 +9,7 @@ pass per answer token sequence; the per-sequence gradients are combined with the
 log-sum-exp weights, which gives the exact gradient of dv. No parameter gradients.
 
 Answer order "Mensch oder KI" (mk) only, matching the activations saved by
-judge_logits.py. See paper/notes_readout_decomposition.md for the analysis.
+judge_logits.py. 
 Texts are read locally / on the university cluster and never printed.
 
 Usage

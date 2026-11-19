@@ -8,7 +8,7 @@ a control task on which the parents judge alike (counterfact statements) measure
 artifacts that are unrelated to post-training; compare with the authorship corpora.
 Grouped-bootstrap 95% CI for each hybrid's d′ and for its distance from the nearer parent.
 
-Two parent references (the second added 17 Nov 2026 for reproducibility):
+Two parent references :
     *_split   the degenerate hybrids of the stitching runs themselves (k = 0 and k = L,
               i.e. all layers from one checkpoint) -- the default columns d_base, d_post,
               overshoot, out_lo, out_hi. They pass through the same stitching code, so

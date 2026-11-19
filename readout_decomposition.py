@@ -1,4 +1,4 @@
-"""Gain x angle decomposition of the readout (see paper/notes_readout_decomposition.md).
+"""Gain x angle decomposition of the readout.
 
 Inputs per condition (outputs/<corpus>/): grad_<stem>.npz from gradient_readout.py
 (d dv / d h_l at the last prompt token) and <stem>_acts.npz from judge_logits.py
