@@ -30,8 +30,8 @@ chosen that the models are unlikely to have seen, or cannot have seen, during tr
 which rules out memorization. Humans make the same judgment, which connects the question
 to a long tradition of research on human judgment. The judgment is also of practical
 relevance, because AI-generated text has become hard to tell
-apart from human writing in education, journalism, and science, and human readers
-perform close to chance [@clark2021human; @kobis2021angelou; @jakesch2023human; @porter2024poetry; @jones2025turing]. Human judgments rely on plausible
+apart from human writing in education, journalism, and science, human readers
+perform close to chance [@clark2021human; @kobis2021angelou; @jakesch2023human; @porter2024poetry; @jones2025turing], and detectors trained specifically for this purpose are in wide use [@thai2026editlens]. Human judgments rely on plausible
 but invalid heuristics, such as taking references to personal experience or first-person
 pronouns as signs of human authorship [@jakesch2023human], and only readers who
 frequently use language models for their own writing appear to detect AI-generated text
