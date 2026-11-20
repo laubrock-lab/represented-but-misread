@@ -4,7 +4,7 @@
 
 Code, derived results and manuscript sources for the paper *Represented but misread:
 Post-training changes how language models read out what they represent*
-(https://github.com/laubrock-lab/represented-but-misread).
+(arXiv:2611.26584, https://arxiv.org/abs/2611.26584).
 
 **The three authorship corpora are not part of this repository and cannot be shared.**
 The newspaper texts are unpublished and confidential, the human chat messages were written
